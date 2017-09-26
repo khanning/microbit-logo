@@ -1,0 +1,42 @@
+global [tiltstate tiltticks inhibit]
+constants [[stable 0][checking 1][tilted 2][shake 3]]
+
+to go
+resett
+startticker 1
+settiltstate 0
+setinhibit 0
+shape 103
+end
+
+to xontick
+prf "|%d | timer
+print tilt
+end
+
+to ontick
+let [t tilt]
+if inhibit > 0 [setinhibit inhibit - 1 stop]
+if (:t < 10) and (tiltstate != stable) [stabilize stop] 
+if (:t > 40) and (tiltstate = stable) [settiltstate checking settiltticks 0 stop] 
+if tiltstate != checking [stop]
+if :t > 100 [settiltstate shake prs "shake setinhibit 60 stop]
+settiltticks tiltticks + 1
+if tiltticks > 30 [settiltstate tilted prs "tilt] 
+end
+
+
+to stabilize
+if tiltstate = tilted [prs "untilt]
+settiltstate stable
+setinhibit 60
+end
+
+to onbuttona
+go
+end
+
+to onbuttonb
+clear
+stopticker
+end
