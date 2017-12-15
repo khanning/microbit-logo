@@ -9,65 +9,45 @@ MicroBitStorage storage;
 MicroBitFlash flash;
 MicroBitMessageBus messageBus;
 MicroBitBLEManager bleManager(storage);
-BLEDevice ble;
-MicroBitUARTService *uart;
 
 #define TICK_VECTOR 0
 #define BUTTONA_VECTOR 4
 #define BUTTONB_VECTOR 8
-#define TILT_VECTOR 12
-#define UNTILT_VECTOR 16
+#define RADIO_VECTOR 12
 
 void lib_init(void);
 void evt_poll(void);
 void dev_poll(void);
 void direct_setshape(UBYTE a, UBYTE b, UBYTE c,  UBYTE d,  UBYTE e);
-void mwait(SLONG);
 
 UBYTE ugetc(){return pc.read(SYNC_SPINWAIT);}
 int ugetcAsync(){return pc.read(ASYNC);}
 void uputc(UBYTE c){pc.sendChar(c, SYNC_SPINWAIT);}
-UBYTE BLEgetcAsync(){return uart->getc(ASYNC);}
-void BLEputc(UBYTE c){uart->putc(c);}
 
-UBYTE BLEgetc(){
-    while(1){
-        int c = uart->getc(ASYNC);
-        if (c!=MICROBIT_NO_DATA) return(c);
-    }
-}
-
-
-UBYTE (*xgetc)(void);
-void (*xputc)(UBYTE);
 
 void vm_run_cc(void);
 void vm_run_vector(int32_t);
-extern int tick_evt, btna_evt, btnb_evt, tilt_evt, untilt_evt;
+extern int tick_evt, btna_evt, btnb_evt, radio_evt;
 extern volatile uint32_t ticks;
 
 void init(){
     pc.baud(19200);  
     scheduler_init(messageBus);
     microbit_create_heap(MICROBIT_SD_GATT_TABLE_START + MICROBIT_SD_GATT_TABLE_SIZE, MICROBIT_SD_LIMIT);
-    ManagedString BLEName("microbit 1");
-    ManagedString BLESerial("00003");
-    bleManager.init(BLEName, BLESerial, messageBus, false);
-    uart = new MicroBitUARTService(ble, 32, 32);
     pc.printf("starting...\n");
 }
 
 ULONG read16(){
-    UBYTE c1 = xgetc();
-    UBYTE c2 = xgetc();
+    UBYTE c1 = ugetc();
+    UBYTE c2 = ugetc();
     return (c2<<8)+c1;
 }
 
 ULONG read32(){
-    UBYTE c1 = xgetc();
-    UBYTE c2 = xgetc();
-    UBYTE c3 = xgetc();
-    UBYTE c4 = xgetc();
+    UBYTE c1 = ugetc();
+    UBYTE c2 = ugetc();
+    UBYTE c3 = ugetc();
+    UBYTE c4 = ugetc();
     return (c4<<24)+(c3<<16)+(c2<<8)+c1;
 }
 
@@ -75,7 +55,7 @@ void readmemory(){
     ULONG addr = read32();
     ULONG count = read16();
     ULONG i;
-    for(i=0;i<count;i++) xputc(*((UBYTE*) addr++));
+    for(i=0;i<count;i++) uputc(*((UBYTE*) addr++));
 }
 
 void writememory(){
@@ -83,15 +63,15 @@ void writememory(){
     ULONG count = read16();
     ULONG i;
     for(i=0;i<count;i++){
-        UBYTE c = xgetc();
+        UBYTE c = ugetc();
         *((UBYTE*) addr++)=c;
-        if(xputc==uputc) xputc(c);
+        uputc(c);
     }
 }
 
 void run(){
     vm_run_cc();
-    xputc(0xcf);
+    uputc(0xcf);
 }
 
 
@@ -100,45 +80,33 @@ void writeflash(){
     ULONG dst = read32();
     ULONG count = read16();
     flash.flash_write((std::uint32_t*)dst, (std::uint32_t*)src, (int)count);
-    xputc(0xbf);
+    uputc(0xbf);
 }
 
 void eraseflash(){
     ULONG addr = read32();
     flash.erase_page((std::uint32_t*)addr);
-    xputc(0xaf);
+    uputc(0xaf);
 }
 
 void setshapecmd(){
-    direct_setshape(xgetc(), xgetc(), xgetc(), xgetc(), xgetc());
+    direct_setshape(ugetc(), ugetc(), ugetc(), ugetc(), ugetc());
 }
 
 void dispatch(UBYTE c){
-    if(c==0xff) xputc(23);
+    if(c==0xff) uputc(23);
     else if(c==0xfe) readmemory();
     else if(c==0xfd) writememory();
     else if(c==0xfc) run();
     else if(c==0xfb) writeflash();
     else if(c==0xfa) eraseflash();
     else if(c==0xf9) setshapecmd();
-    else xputc(c);
+    else uputc(c);
 }
 
-void uDispatch(UBYTE c){
-    xgetc = ugetc;
-    xputc = uputc;
-    dispatch(c);
-}
 
-void bleDispatch(UBYTE c){
-    xgetc = BLEgetc;
-    xputc = BLEputc;
-    dispatch(c);
-}
-
-int bleAvail(){
-    int c = uart->getc(ASYNC);
-    return c!=MICROBIT_NO_DATA;
+int serialAvail(){
+    return pc.isReadable();
 }
 
 int main() {
@@ -148,14 +116,11 @@ int main() {
     while(1){
         if(ticks!=lastticks){evt_poll(); dev_poll(); lastticks = ticks;} 
         int c = ugetcAsync();
-        if (c!=MICROBIT_NO_DATA) uDispatch((UBYTE)c);
-        c = uart->getc(ASYNC);
-        if (c!=MICROBIT_NO_DATA) bleDispatch(c);
+        if (c!=MICROBIT_NO_DATA) dispatch((UBYTE)c);
         if(tick_evt){tick_evt=0; vm_run_vector(TICK_VECTOR);}
         if(btna_evt){btna_evt=0; vm_run_vector(BUTTONA_VECTOR);}
         if(btnb_evt){btnb_evt=0; vm_run_vector(BUTTONB_VECTOR);}
-        if(tilt_evt){tilt_evt=0; vm_run_vector(TILT_VECTOR);}
-        if(untilt_evt){untilt_evt=0; vm_run_vector(UNTILT_VECTOR);}
+        if(radio_evt){radio_evt=0; vm_run_vector(RADIO_VECTOR);}
     }
 }
 

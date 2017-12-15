@@ -23,41 +23,42 @@ MicroBitRadio radio;
 
 extern MicroBitStorage flash;
 extern MicroBitSerial pc;
-extern BLEDevice ble;
 
 void mwait(SLONG);
 void dshape(char);
 void clear(void);
+int radiorecv(void);
+int serialAvail(void);
+
+void prs(UBYTE*);
 
 SLONG buf_ave(SSHORT*);
 
 extern volatile uint32_t ticks;
 uint32_t tick_period;
 ULONG t0;
-int tick_evt;
+int tick_evt, radio_evt;
 int btna_evt, last_btna;
 int btnb_evt, last_btnb;
-int tilted;
-int tilt_evt;
-int untilt_evt;
 
 char thisshape = 0;
+int recvchar=-1;
 
 SSHORT xbuf[32];
 SSHORT ybuf[32];
 SSHORT zbuf[32];
 SLONG last_ave[3];
-ULONG tilt;
 
 void lib_init(){
-    display.setDisplayMode(DISPLAY_MODE_GREYSCALE);
-    display.setBrightness(100);
-    dshape(101); mwait(50);
-    dshape(102); mwait(50);
-    dshape(103); mwait(50);
-    dshape(102); mwait(50);
-    dshape(101); mwait(50);
-    clear();
+  radio.enable();
+  display.setDisplayMode(DISPLAY_MODE_GREYSCALE);
+  display.setBrightness(100);
+  dshape(101); mwait(50);
+  dshape(102); mwait(50);
+  dshape(103); mwait(50);
+  dshape(102); mwait(50);
+  dshape(101); mwait(50);
+  clear();
 }
 
 void evt_poll(){
@@ -68,21 +69,14 @@ void evt_poll(){
   int this_btnb = buttonb.isPressed();
   if(this_btnb&!last_btnb) btnb_evt=1;
   last_btnb = this_btnb;
+  int c = radiorecv();
+  if(c!=-1) {recvchar = c; radio_evt=1;}
 }
 
 void dev_poll(){
   xbuf[ticks&0x1f] = acc.getX();
   ybuf[ticks&0x1f] = acc.getY();
   zbuf[ticks&0x1f] = acc.getZ();
-  SLONG ax = buf_ave(xbuf);
-  SLONG ay = buf_ave(ybuf);
-  SLONG az = buf_ave(zbuf);
-  tilt = abs(ax-last_ave[0])+abs(ay-last_ave[1])+abs(az-last_ave[2]);
-  last_ave[0] = ax;
-  last_ave[1] = ay;
-  last_ave[2] = az;
-  if((tilt>50)&&!tilted){tilt_evt=1; tilted=1;} 
-  if((tilt<10)&&tilted){untilt_evt=1; tilted=0;} 
 }
 
 void direct_setshape(UBYTE a, UBYTE b, UBYTE c,  UBYTE d,  UBYTE e){
@@ -122,7 +116,10 @@ void prf(char *s, int32_t n) {
 }
 
 
-void scroll(char* s){display.scroll(s);}
+void ddots(UBYTE* s){
+  direct_setshape(s[0],s[1],s[2],s[3],s[4]);
+}
+
 void dprint(char* s, ULONG d){display.print(s, d);}
 void dchar(char c){MicroBitFont::setSystemFont(charfont); display.printChar(c);}
 void clear(){display.clear(); thisshape = 0;}
@@ -160,7 +157,9 @@ void nextshape(){
 void mwait(SLONG d){
     if(d<0) return;
     uint64_t end = system_timer_current_time()+d;
-    while(system_timer_current_time()<end){};
+    while(system_timer_current_time()<end){
+      if (serialAvail()) return;
+    };
 }
  
 ULONG get_buttona(){return buttona.isPressed();}
@@ -175,15 +174,12 @@ SLONG buf_ave(SSHORT *buf){
 SLONG getx(){return buf_ave(xbuf);}
 SLONG gety(){return buf_ave(ybuf);}
 SLONG getz(){return buf_ave(zbuf);}
-ULONG get_tilt(){return tilt;}
 
-int blerunning(){return ble_running();}
-void switchradio(){ble.shutdown(); radio.enable();}
 void rsend(uint8_t c){radio.datagram.send(&c, 1);}
+int rrecc(){int c=recvchar; recvchar=-1; return c;}
 
-int rrecc(){
+int radiorecv(){
   uint8_t c;
-  radio.idleTick();
   int len = radio.datagram.recv(&c, 1);
   if(len==MICROBIT_INVALID_PARAMETER) return -1;
   else return c;
@@ -197,7 +193,7 @@ void *fcns[] = {
     (void*) 1, (void*) prhh,  
     (void*) 1, (void*) prs,  
     (void*) 2, (void*) prf,  
-    (void*) 1, (void*) scroll,  
+    (void*) 1, (void*) ddots,  
     (void*) 2, (void*) dprint,  
     (void*) 1, (void*) dchar,  
     (void*) 1, (void*) dshape,  
@@ -216,10 +212,7 @@ void *fcns[] = {
     (void*) 0, (void*) getz,  
     (void*) 1, (void*) startticker,
     (void*) 0, (void*) stopticker,
-    (void*) 0, (void*) blerunning,
-    (void*) 0, (void*) switchradio,
     (void*) 1, (void*) rsend,
     (void*) 0, (void*) rrecc,
     (void*) 0, (void*) nextshape,
-    (void*) 0, (void*) get_tilt,
 };

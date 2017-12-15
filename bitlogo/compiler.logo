@@ -20,8 +20,7 @@ wfl :proc-addr + :proc-start :procs
 setup-vector "ontick 0
 setup-vector "onbuttona 4
 setup-vector "onbuttonb 8
-setup-vector "ontilt 12
-setup-vector "onuntilt 16
+setup-vector "onrecv 12
 flash-write :command-center :proc-addr 20
 setstatus "downloaded.
 end
@@ -725,15 +724,15 @@ setup-prims [
 setup-externals [
   print c 1  prh c 1  prhb c 1  prhh c 1  
   prs c 1  prf c 2
-  scroll c 1  dprint c 2  
+  dots c 1  dprint c 2  
   char c 1  shape c 1  clear c 0  setbrightness c 1
   flashwrite c 2  flasherase c 1
   resett c 0  timer r 0  ticks r 0  mwait c 1
   buttona r 0  buttonb r 0
   accx r 0  accy r 0  accz r 0
   startticker c 1  stopticker c 0
-  blerunning r 0  switchradio c 0  rsend c 1  rrecv r 0
-  nextshape c 0  tilt r 0]
+  send c 1  recv r 0
+  nextshape c 0]
 setup-specials [( ) waituntil make let]
 put "|(| "outputs? true put "|)| "outputs? false
 put "make "outputs? false put "let "outputs? false

@@ -13,7 +13,7 @@ extern void *fcns[];
 
 extern void(*prims[])();
 
-int bleAvail(void);
+int serialAvail(void);
 void dev_poll(void);
 
 void run_vm(uint8_t*);
@@ -48,7 +48,7 @@ void run_vm(uint8_t *startip){
     uint32_t lastticks = ticks; 
     while(1){
         if(ticks!=lastticks){
-            if(bleAvail()) break;
+            if(serialAvail()) break;
             dev_poll();
             lastticks = ticks;
         } 
