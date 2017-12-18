@@ -1,0 +1,77 @@
+html {
+ width: 700px;
+ height: 500px;
+}
+
+body {
+ background: lightgray;
+ margin: 10px;
+ font-family: courier;
+ font-size: 20px;
+}
+
+div.frame {
+ position: absolute;
+ margin: 0px;
+ width: 1200px;
+ height: 900px;
+}
+
+
+textarea.cc {
+ position: absolute;
+ background: white;
+ font-family: courier;
+ font-size: 20px;
+ resize: none;
+ padding: 4px;
+ top: 0px;
+ left: 5px;
+ width: 440px;
+ height: 590px;
+ outline: none;
+}
+
+textarea.procs {
+ position: absolute;
+ background: white;
+ font-family: courier;
+ font-size: 20px;
+ resize: none;
+ padding: 4px;
+ top: 0px;
+ left: 465px;
+ width: 590px;
+ height: 550px;
+ outline: none;
+}
+
+div.buttons {
+ position: absolute;
+ background: rgba(0, 0, 0, 0.0);
+ margin: 0px;
+ top: 565px;
+ left: 465px;
+ width: 598px;
+ height: 30px;
+}
+
+button.floatright {
+ float: right;
+ font-family: courier;
+ font-size: 20px;
+ margin: 5px;
+}
+
+button.floatleft {
+ float: left;
+ font-family: courier;
+ font-size: 20px;
+ margin: 5px;
+}
+
+:focus {
+    outline: 0px;
+}
+
+
