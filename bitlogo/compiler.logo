@@ -732,7 +732,7 @@ setup-externals [
   accx r 0  accy r 0  accz r 0
   startticker c 1  stopticker c 0
   send c 1  recv r 0
-  nextshape c 0]
+  nextshape c 0  doton c 2  dotoff c 2]
 setup-specials [( ) waituntil make let]
 put "|(| "outputs? true put "|)| "outputs? false
 put "make "outputs? false put "let "outputs? false

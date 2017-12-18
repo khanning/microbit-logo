@@ -5,7 +5,7 @@
 
 
 #define flashshapes 0x31000
-#define ramshapes 0x31000
+
 extern char shapes[];
 unsigned char directshape[5];
 
@@ -15,8 +15,6 @@ MicroBitButton buttonb(MICROBIT_PIN_BUTTON_B, MICROBIT_ID_BUTTON_B);
 MicroBitI2C i2c = MicroBitI2C(I2C_SDA0, I2C_SCL0); 
 MicroBitAccelerometer acc = MicroBitAccelerometer(i2c); 
 MicroBitFont charfont;
-MicroBitFont romshapefont((const unsigned char*)shapes, 32+8);
-MicroBitFont flashshapefont((const unsigned char*)flashshapes, 32+20);
 MicroBitFont ramshapefont((const unsigned char*)directshape, 32+2);
 MicroBitTicker ticker;
 MicroBitRadio radio;
@@ -41,7 +39,7 @@ int tick_evt, radio_evt;
 int btna_evt, last_btna;
 int btnb_evt, last_btnb;
 
-char thisshape = 0;
+int thisshape = 0;
 int recvchar=-1;
 
 SSHORT xbuf[32];
@@ -53,6 +51,7 @@ void lib_init(){
   radio.enable();
   display.setDisplayMode(DISPLAY_MODE_GREYSCALE);
   display.setBrightness(100);
+  MicroBitFont::setSystemFont(ramshapefont); 
   dshape(101); mwait(50);
   dshape(102); mwait(50);
   dshape(103); mwait(50);
@@ -79,20 +78,6 @@ void dev_poll(){
   zbuf[ticks&0x1f] = acc.getZ();
 }
 
-void direct_setshape(UBYTE a, UBYTE b, UBYTE c,  UBYTE d,  UBYTE e){
-  directshape[0] = a;
-  directshape[1] = b;
-  directshape[2] = c;
-  directshape[3] = d;
-  directshape[4] = e;
-  MicroBitFont::setSystemFont(ramshapefont); 
-  display.printChar(32);
-}
-
-
-void startticker(uint32_t n){tick_period = n;}
-void stopticker(){tick_period = 0;}
-
 void print(SLONG c){pc.printf("%d\n", c);}
 void prh(SLONG c){pc.printf("%08X\n", c);}
 void prhb(SLONG c){pc.printf("%02X\n", c&0xff);}
@@ -116,32 +101,27 @@ void prf(char *s, int32_t n) {
 }
 
 
+void direct_setshape(UBYTE a, UBYTE b, UBYTE c,  UBYTE d,  UBYTE e){
+  directshape[0] = a;
+  directshape[1] = b;
+  directshape[2] = c;
+  directshape[3] = d;
+  directshape[4] = e;
+  display.printChar(32);
+}
+
 void ddots(UBYTE* s){
   direct_setshape(s[0],s[1],s[2],s[3],s[4]);
 }
 
-void dprint(char* s, ULONG d){display.print(s, d);}
-void dchar(char c){MicroBitFont::setSystemFont(charfont); display.printChar(c);}
-void clear(){display.clear(); thisshape = 0;}
-void setbrightness(int b){display.setBrightness(b);}
-
-void flashwrite(uint32_t* addr, ULONG data){flash.flashWordWrite(addr, data);}
-void flasherase(uint32_t* addr){flash.flashPageErase(addr);}
-
-void resett(){t0 = (ULONG)system_timer_current_time();}
-ULONG timer(){return ((ULONG)system_timer_current_time()) - t0;}
-ULONG get_ticks(){return ticks;}
-
 void dshape(char s){
   thisshape = s;
   if(s<100){
-    MicroBitFont::setSystemFont(flashshapefont); 
-    display.printChar(s+32);
+    ddots((UBYTE*)&((unsigned char*)flashshapes)[5*s]);
     thisshape = s;
   }
   else {
-    MicroBitFont::setSystemFont(romshapefont); 
-    display.printChar(s-100+32);
+    ddots((UBYTE*)&shapes[5*(s-100)]);
     thisshape = 0;
   }
 }
@@ -150,9 +130,45 @@ void nextshape(){
   unsigned char *font = (unsigned char*)flashshapes;
   thisshape++;
   if(font[5*thisshape]==0xff) thisshape = 0;
-  MicroBitFont::setSystemFont(flashshapefont); 
-  display.printChar(thisshape+32);
+  ddots(&font[5*thisshape]);
 }
+
+void doton(UBYTE a, UBYTE b){
+  directshape[4-b] |= 1<<(4-a);
+  display.printChar(32);
+}
+
+void dotoff(UBYTE a, UBYTE b){
+  directshape[4-b] &= (0x3f^(1<<(4-a)));
+  display.printChar(32);
+}
+
+void dchar(char c){
+  const unsigned char* chars = charfont.characters;
+  ddots((UBYTE*)&chars[5*(c-32)]);
+}
+
+
+void clear(){
+  direct_setshape(0,0,0,0,0);
+  thisshape = 0;
+}
+
+void dprint(char* s, ULONG d){display.print(s, d);}
+void setbrightness(int b){display.setBrightness(b);}
+
+
+
+void startticker(uint32_t n){tick_period = n;}
+void stopticker(){tick_period = 0;}
+
+
+void flashwrite(uint32_t* addr, ULONG data){flash.flashWordWrite(addr, data);}
+void flasherase(uint32_t* addr){flash.flashPageErase(addr);}
+
+void resett(){t0 = (ULONG)system_timer_current_time();}
+ULONG timer(){return ((ULONG)system_timer_current_time()) - t0;}
+ULONG get_ticks(){return ticks;}
 
 void mwait(SLONG d){
     if(d<0) return;
@@ -215,4 +231,6 @@ void *fcns[] = {
     (void*) 1, (void*) rsend,
     (void*) 0, (void*) rrecc,
     (void*) 0, (void*) nextshape,
+    (void*) 2, (void*) doton,
+    (void*) 2, (void*) dotoff,
 };

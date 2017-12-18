@@ -20,7 +20,7 @@ var extlist =
   'accx','r',0,   'accy','r',0,   'accz','r',0, 
   'startticker','c',1,   'stopticker','c',0, 
   'send','c',1,   'recv','r',0, 
-  'nextshape','c',0];
+  'nextshape','c',0,  'doton','c',2,  'dotoff','c',2];
 
 
 class Compiler {
@@ -82,10 +82,10 @@ compileProcs(str){
 			var proc = {};
 			parseTitleLine();
 			proc.type = 'ufun';
-			proc.outputs = false;
 			proc.len = 3;
 			proc.nargs = parsed.length-2;
 			proc.body = gatherBody();
+			proc.outputs = proc.body.match(/(^|\s)output\s/);
 			t.oblist[name] = proc;
 			t.procnames.push(name);
 
