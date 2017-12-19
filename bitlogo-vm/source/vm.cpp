@@ -34,7 +34,7 @@ void vm_init(){
 }
 
 void vm_run_vector(int32_t v){
-    if(*(code+v)!=8)    return;     // check for a valid vector
+    if(*(code+v)!=9)    return;     // check for a valid vector
     run_vm(code+v);
 }
 
@@ -106,6 +106,10 @@ void eval_lthing(){
 
 void eval_lmake(){
     *get_local_address() = *--sp;
+}
+
+void eval_lchange(){
+    *get_local_address() += *--sp;
 }
 
 void eval_ufun(){
@@ -250,11 +254,8 @@ void eolr_waituntil(){
 }
 
 void prim_gwrite(){int32_t t0 = *--sp; globals[*--sp] = t0;}
-
-void prim_gread(){
-    int32_t t0 = globals[*--sp];
-    *sp++ = t0;
-}
+void prim_gread(){int32_t t0 = globals[*--sp]; *sp++ = t0;}
+void prim_gchange(){int32_t t0 = *--sp; globals[*--sp] += t0;}
 
 void prim_sum(){int32_t t0 = *--sp; int32_t t1 = *--sp; *sp++ = t1+t0;}
 void prim_difference(){int32_t t0 = *--sp; int32_t t1 = *--sp; *sp++ = t1-t0;}
@@ -307,13 +308,12 @@ void(*prims[])() = {
     eval_done,
     eval_byte, eval_num,
     eval_list, eval_eol, eval_eolr,
-    eval_lthing, eval_lmake,
-    eval_ufun, eval_done,
-    eval_libfcn, eval_libfcnr,
+    eval_lthing, eval_lmake,  eval_lchange,
+    eval_ufun, eval_libfcn, eval_libfcnr,
     prim_stop, prim_output, prim_call,
     prim_run, prim_runmacro, prim_repeat, prim_loop,
     prim_if, prim_ifelse, prim_waituntil,
-    prim_gwrite, prim_gread,
+    prim_gwrite, prim_gread, prim_gchange,
     prim_sum, prim_difference, prim_product, prim_quotient, prim_mod,
     prim_random, prim_extend, prim_extendb,
     prim_equal, prim_ne, prim_greater, prim_less,

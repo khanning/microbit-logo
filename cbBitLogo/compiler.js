@@ -1,7 +1,7 @@
 var primlist = 
  ['stop','c',0,   'output','c',1,   'call','c',1,   'run','c',1,   'runmacro','c',1, 
   'repeat','c',2,   'loop','c',1,   'if','c',2,   'ifelse','c',3,   'waituntil','c',1, 
-  'gwrite','c',2,   'gread','r',1, 
+  'gwrite','c',2,   'gread','r',1,  'gchange','r',1, 
   '+','r',-1,  '-','r',-1,   '*','r',-1,   '/','r',-1,   '%','r',-1,   'random','r',1, 
   'extend','r',1,   'extendb','r',1, 
   '=','r',-1,   '!=','r',-1,   '>','r',-1,   '<','r',-1, 
@@ -101,6 +101,7 @@ compileProcs(str){
 					if(arg[0]!=':') throw '"'+arg+'" needs a ":" to be an input';
 					t.oblist[arg] = {type: 'getlocal', outputs: true};
 					t.oblist['set'+arg] = {type: 'setlocal', outputs: false};
+					t.oblist['change'+arg] = {type: 'changelocal', outputs: false};
 					proc.args.push(arg); 
 				}
 			}
@@ -168,7 +169,7 @@ vectors(){
 		var proc = t.oblist[name];
 		if(proc==undefined) return;
 		var addr = proc.addr;
-		res[offset] = 8
+		res[offset] = 9
 		res[offset+1] = addr&0xff;
 		res[offset+2] = (addr>>8)&0xff;
 	}
@@ -193,6 +194,7 @@ compileCommands(list){
 		else if(item.substring(0,1)=="'") compileString(item);
 		else if(item.substring(0,1)==':') compileLocalGet(item);
 		else if(item.substring(0,4)=='set:') compileLocalSet(item);
+		else if(item.substring(0,7)=='change:') compileLocalChange(item);
 		else if(item=='let') compileLet();
 		else compileSymbol(item);
 		var command = (t.oblist[item])&&!t.oblist[item].outputs;
@@ -236,11 +238,20 @@ compileCommands(list){
 		addAndCount(['localset',index],2);
 	}
 
+	function compileLocalChange(cname){
+		var name = cname.substring(6);
+		var index = localIndex(name);
+		if(index==undefined) throw name+' has no value'+thisProc();
+		argloop(1, cname);
+		addAndCount(['localchange',index],2);
+	}
+
 	function compileSymbol(name){
 		var sym = t.oblist[name];
 		if(sym==undefined) throw 'I don\'t know how to '+name+thisProc();
 		else if(sym.type=='global') compileGlobalGet(sym.index);
 		else if(sym.type=='setglobal') compileGlobalSet(sym.index);
+		else if(sym.type=='changeglobal') compileGlobalChange(sym.index);
 		else compileCallSym();
 
 		function compileCallSym(){
@@ -258,6 +269,12 @@ compileCommands(list){
 			addAndCount(['byte',index],2);
 			argloop(1, name);
 			addAndCount(['prim','gwrite'],1);
+		}
+
+		function compileGlobalChange(index){
+			addAndCount(['byte',index],2);
+			argloop(1, name);
+			addAndCount(['prim','gchange'],1);
 		}
 
 	}
@@ -311,6 +328,7 @@ compileCommands(list){
 			var local = ':'+list.shift();
 			t.oblist[local] = {type: 'getlocal', outputs: true};
 			t.oblist['set'+local] = {type: 'setlocal', outputs: false};
+			t.oblist['change'+local] = {type: 'changelocal', outputs: false};
 			t.oblist[t.thisproc].locals.push(local); 
 			compileLocalSet('set'+local);
 		}
@@ -385,11 +403,15 @@ encodeItem(i, res, lists){
 		res.push(7);
 		res.push(val);
 		break;
+	case 'localchange':
+		res.push(8);
+		res.push(val);
+		break;
 	case 'prim':
 		res.push(this.oblist[val].code);
 		break;
 	case 'ufun':
-		res.push(8);
+		res.push(9);
 		res.push(this.oblist[val].addr&0xff);
 		res.push((this.oblist[val].addr>>8)&0xff);
 		break;
@@ -421,6 +443,7 @@ encodeItem(i, res, lists){
 setupGlobal(name){
 	this.oblist[name] = {type: 'global', index: this.nextglobal, outputs: true};
 	this.oblist['set'+name] = {type: 'setglobal', index: this.nextglobal, outputs: false};;
+	this.oblist['change'+name] = {type: 'changeglobal', index: this.nextglobal, outputs: false};;
 	this.nextglobal++;
 }
 

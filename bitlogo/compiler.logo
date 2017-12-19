@@ -17,10 +17,10 @@ setstatus se count :procs "bytes
 if not check [print "|Device not found.| stop]
 erp :proc-addr
 wfl :proc-addr + :proc-start :procs
-setup-vector "ontick 0
-setup-vector "onbuttona 4
-setup-vector "onbuttonb 8
-setup-vector "onrecv 12
+setup-vector "on-tick 0
+setup-vector "on-buttona 4
+setup-vector "on-buttonb 8
+setup-vector "on-recv 12
 flash-write :command-center :proc-addr 20
 setstatus "downloaded.
 end
@@ -115,9 +115,7 @@ dolist [i :list]
   add-name :i add-name .word "storein :i
   put :i "macro (se "|(| "gread :next-global "|)| )
   put .word "set :i "macro se "gwrite :next-global
-  put .word "storein :i "macro se "gwrite :next-global
-  put .word :i "++ "macro se "ginc :next-global
-  put .word "-- :i "macro se "gdec :next-global
+  put .word "change :i "macro se "gchange :next-global
   make "next-global :next-global + 1]
 end
 
@@ -200,6 +198,8 @@ end
 
 to pass2-symbol :item
 if (first :item) = "# [pass2-number from-binary bf :item stop]
+if startswith? "set: :item [pass2-setdsym :item stop]
+if startswith? "change: :item [pass2-changedsym :item stop]
 let [nargs getp :item "args]
 if empty? :nargs [try-macro :item stop]
 if  :nargs < 0 [error se [not enough inputs to] :item]
@@ -244,6 +244,20 @@ to break-into-bytes :list
 let [res []]
 dolist [i :list][make "res (se :res byte0 :i byte1 :i)]
 output :res
+end
+
+to pass2-changedsym :changer
+if not :command? [error se :changer [doesn't output]]
+let [var bf bf bf bf bf bf bf :changer
+     offset dsym-offset :var]
+if empty? :offset [error se :var [isn't a local]]
+let [nargs 1] pass2-argloop
+add-and-count se "lchange :offset 2
+end
+
+to pass2-setdsym :setter
+if not :command? [error se :setter [doesn't output]]
+handle-make bf bf bf bf :setter
 end
 
 to pass2-dsym :item
@@ -314,12 +328,11 @@ if not list? :body [error [let needs a list as input]]
 loop [if empty? :body [stop]
          make "locals se :locals first :body
          put :name "locals 1 + getp :name "locals
-         handle-make]
+         handle-make pop "body]
 end
 
-to handle-make
-let [var sym pop "body
-       offset dsym-offset :var]
+to handle-make :var
+let [offset dsym-offset :var]
 if empty? :offset [error se :var [isn't a local]]
 let [nargs 1] pass2-argloop
 add-and-count se "lmake :offset 2
@@ -362,12 +375,10 @@ selectq item 2 :item
       |-]-r|      [add-eol 5]
       lthing      [add 6 add :x]
       lmake       [add 7 add :x]
-      ufun        [add 8
+      lchange     [add 8 add :x]
+      ufun        [add 9
                    add byte0 (getp :x "addr)
                    add byte1 (getp :x "addr)]
-;       ufun-tail [add 9 
-;                  add byte0 (getp :x "addr)
-;                  add byte1 (getp :x "addr)]
       external    [ifelse get :x "outputs? [add 11 add ext# :x][add 10 add ext# :x]]
       prim        [add prim# :x]]
 end
@@ -684,6 +695,15 @@ let [end timer + :n]
 loop [if timer > :end [stop]]
 end
 
+to startswith? :start :str
+loop
+ [if empty? :start [output true]
+  if empty? :str [output false]
+  if not (first :str) = (first :start) [output false]
+  make "str bf :str
+  make "start bf :start]
+end
+
 define byte0 [n][output logand :n $ff]
 define byte1 [n][output logand lsh :n -8 $ff]
 define byte2 [n][output logand $ff lsh :n -16]
@@ -704,7 +724,7 @@ end
 
 to setup
 if name? "prims [dolist [i :prims][erplist :i]]
-if name? "globals [dolist [i :globals][erplist :i erplist .word "set :i]]
+if name? "globals [dolist [i :globals][erplist :i erplist .word "set :i erplist .word "change :i]]
 make "plist-names []
 make "prims [] make "globals [] make "infixes [] make "externals []
 make "next-global 0
@@ -714,7 +734,7 @@ make "command-center $20003000
 setup-prims [
   stop c 0  output c 1  call c 1  run c 1  runmacro c 1
   repeat c 2  loop c 1  if c 2  ifelse c 3  waituntil c 1
-  gwrite c 2  gread r 1
+  gwrite c 2  gread r 1  gchange c 2
   + r -1  - r -1  * r -1  / r -1  % r -1  random r 1
   extend r 1 extendb r 1
   = r -1  != r -1  > r -1  < r -1
@@ -733,8 +753,8 @@ setup-externals [
   startticker c 1  stopticker c 0
   send c 1  recv r 0
   nextshape c 0  doton c 2  dotoff c 2]
-setup-specials [( ) waituntil make let]
+setup-specials [( ) waituntil let]
 put "|(| "outputs? true put "|)| "outputs? false
-put "make "outputs? false put "let "outputs? false
+put "let "outputs? false
 setup-globals [n m]
 end
