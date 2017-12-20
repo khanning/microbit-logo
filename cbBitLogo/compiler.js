@@ -1,6 +1,6 @@
 var primlist = 
  ['stop','c',0,   'output','c',1,   'call','c',1,   'run','c',1,   'runmacro','c',1, 
-  'repeat','c',2,   'loop','c',1,   'if','c',2,   'ifelse','c',3,   'waituntil','c',1, 
+  'repeat','c',2,   'loop','c',1,   'if','c',2,   'ifelse','c',3,   'waituntil','c',0, 
   'gwrite','c',2,   'gread','r',1,  'gchange','r',1, 
   '+','r',-1,  '-','r',-1,   '*','r',-1,   '/','r',-1,   '%','r',-1,   'random','r',1, 
   'extend','r',1,   'extendb','r',1, 
@@ -65,7 +65,6 @@ compileProcs(str){
 	var t = this;
 	var tk = new Tokenizer(str);
 	while(!tk.eof()) onePass1Command();
-	console.log(t);
 	for(var i in t.procnames) compileProcBody(t.procnames[i]);
 	return [].concat(t.vectors(), t.encodeProcs());
 
@@ -252,6 +251,7 @@ compileCommands(list){
 		else if(sym.type=='global') compileGlobalGet(sym.index);
 		else if(sym.type=='setglobal') compileGlobalSet(sym.index);
 		else if(sym.type=='changeglobal') compileGlobalChange(sym.index);
+		else if(sym.type=='waituntil') compileWaituntil();
 		else compileCallSym();
 
 		function compileCallSym(){
@@ -276,6 +276,16 @@ compileCommands(list){
 			argloop(1, name);
 			addAndCount(['prim','gchange'],1);
 		}
+
+		function compileWaituntil(){
+			addAndCount(['list',0],3)
+			var oldlist = list; list = list.shift();
+			argloop(1, 'waituntil');
+			list = oldlist;
+			addAndCount(['eolr',0],1)
+			addAndCount(['prim','waituntil'],1);
+		}
+
 
 	}
 
@@ -395,6 +405,9 @@ encodeItem(i, res, lists){
 	case 'eol':
 		addEOL(4);
 		break;
+	case 'eolr':
+		addEOL(5);
+		break;
 	case 'localget':
 		res.push(6);
 		res.push(val);
@@ -458,6 +471,7 @@ setup(){
 	setupBuiltIns('prim', primlist, 12, 1);
 	setupBuiltIns('ext', extlist, 0, 2);
 	this.oblist['let'] = {type: 'let', outputs: false};
+	this.oblist['waituntil'].type = 'waituntil';
 	this.setupGlobal('box1');
 	this.setupGlobal('box2');
 
