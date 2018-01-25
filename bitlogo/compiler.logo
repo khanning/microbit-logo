@@ -730,7 +730,7 @@ make "prims [] make "globals [] make "infixes [] make "externals []
 make "next-global 0
 make "proc-start 32
 make "proc-addr $30000
-make "command-center $20003000
+make "command-center $20001000
 setup-prims [
   stop c 0  output c 1  call c 1  run c 1  runmacro c 1
   repeat c 2  loop c 1  if c 2  ifelse c 3  waituntil c 1

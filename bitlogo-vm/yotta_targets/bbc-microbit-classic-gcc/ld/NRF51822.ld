@@ -3,7 +3,7 @@
 MEMORY
 {
   FLASH (rx) : ORIGIN = 0x00018000, LENGTH = 0x28000
-  RAM (rwx) :  ORIGIN = 0x20002000, LENGTH = 0x2000
+  RAM (rwx) :  ORIGIN = 0x20000100, LENGTH = 0x3f00
 }
 
 OUTPUT_FORMAT ("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")

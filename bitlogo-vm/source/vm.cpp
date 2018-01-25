@@ -1,6 +1,6 @@
 #include <stdint.h>
 
-#define g 0x20003000
+#define g 0x20001000
 #define procs 0x30000
 
 extern void *fcns[];

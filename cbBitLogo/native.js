@@ -1,7 +1,7 @@
 class Comms{
 
 constructor(){
-	this.CC = 0x20003000;
+	this.CC = 0x20001000;
 	this.FONT = 0x31000;
 	this.PROCS = 0x30000;
 
@@ -110,7 +110,7 @@ openSerialPort(){
 	function gotDevices(devices){
 		for(var i in devices){
 			var d = devices[i];
-			console.log(d, validDevice(d));
+//			console.log(d, validDevice(d));
 			if(!validDevice(d)) continue;
 			chrome.serial.connect(d.path, {bitrate: 19200}, connected);
 			return;
@@ -126,7 +126,7 @@ openSerialPort(){
 
 
 	function connected(r){
-		console.log(r);
+//		console.log(r);
 		chrome.serial.onReceive.addListener(onrecc);
 		t.serialID = r. connectionId;
 		println('connected');
