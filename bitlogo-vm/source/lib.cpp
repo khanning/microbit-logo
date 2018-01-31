@@ -27,6 +27,7 @@ void dshape(char);
 void clear(void);
 int radiorecv(void);
 int serialAvail(void);
+SLONG accmag(void);
 
 void prs(UBYTE*);
 
@@ -45,7 +46,7 @@ int recvchar=-1;
 SSHORT xbuf[32];
 SSHORT ybuf[32];
 SSHORT zbuf[32];
-SLONG last_ave[3];
+SLONG mag,lastmag;
 
 void lib_init(){
   radio.enable();
@@ -76,6 +77,9 @@ void dev_poll(){
   xbuf[ticks&0x1f] = acc.getX();
   ybuf[ticks&0x1f] = acc.getY();
   zbuf[ticks&0x1f] = acc.getZ();
+  SLONG thismag = accmag();
+  mag = abs(thismag-lastmag);
+  lastmag = thismag;
 }
 
 void print(SLONG c){pc.printf("%d\n", c);}
@@ -193,6 +197,16 @@ SLONG getx(){return buf_ave(xbuf);}
 SLONG gety(){return buf_ave(ybuf);}
 SLONG getz(){return buf_ave(zbuf);}
 
+SLONG accmag(){
+  SLONG x = getx();
+  SLONG y = gety();
+  SLONG z = getz();
+  float acc = sqrt((float)(x*x+y*y+z*z));
+  return (SLONG)(acc);
+}
+
+SLONG getacc(){return mag;}
+
 void rsend(uint8_t c){radio.datagram.send(&c, 1);}
 int rrecc(){int c=recvchar; recvchar=-1; return c;}
 
@@ -235,4 +249,6 @@ void *fcns[] = {
     (void*) 0, (void*) nextshape,
     (void*) 2, (void*) doton,
     (void*) 2, (void*) dotoff,
+    (void*) 0, (void*) accmag,  
+    (void*) 0, (void*) getacc,  
 };

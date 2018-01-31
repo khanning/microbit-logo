@@ -26,7 +26,7 @@ function handleCCKeyDown(e) {
 		if(e.shiftKey) insertcr(e);
 		else handlecr(e);
 	}
-//	else if(k==220) {e.preventDefault(); openSerialPort();}		// backslash
+	else if(k==220) {e.preventDefault(); comms.openSerialPort();}		// backslash
 }
 
 function handlecr(e){

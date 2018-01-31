@@ -20,7 +20,8 @@ var extlist =
   'accx','r',0,   'accy','r',0,   'accz','r',0, 
   'startticker','c',1,   'stopticker','c',0, 
   'send','c',1,   'recv','r',0, 
-  'nextshape','c',0,  'doton','c',2,  'dotoff','c',2];
+  'nextshape','c',0,  'doton','c',2,  'dotoff','c',2,
+  'acc','r','0',  'delta','r','0'];
 
 
 class Compiler {

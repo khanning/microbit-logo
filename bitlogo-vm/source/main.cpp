@@ -33,8 +33,7 @@ extern volatile uint32_t ticks;
 void init(){
     pc.baud(19200);  
     scheduler_init(messageBus);
-    microbit_create_heap(MICROBIT_SD_GATT_TABLE_START + MICROBIT_SD_GATT_TABLE_SIZE, MICROBIT_SD_LIMIT);
-    pc.printf("starting...\n");
+//    microbit_create_heap(MICROBIT_SD_GATT_TABLE_START + MICROBIT_SD_GATT_TABLE_SIZE, MICROBIT_SD_LIMIT);
 }
 
 ULONG read16(){
@@ -112,6 +111,7 @@ int serialAvail(){
 int main() {
     init();
     lib_init();
+    pc.printf("starting...\n");
     uint32_t lastticks = ticks; 
     while(1){
         if(ticks!=lastticks){evt_poll(); dev_poll(); lastticks = ticks;} 
