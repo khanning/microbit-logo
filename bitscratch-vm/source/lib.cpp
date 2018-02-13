@@ -24,12 +24,15 @@ void mwait(int32_t);
 void setshape(char);
 void clear(void);
 void direct_setshape(uint8_t,uint8_t,uint8_t,uint8_t,uint8_t);
+int radiorecv(void);
+void print(int32_t);
 
 extern volatile uint32_t ticks;
 uint32_t tick_period;
 uint32_t t0;
 int btna_evt, last_btna;
 int btnb_evt, last_btnb;
+int radio_evt;
 
 int32_t pollphase;
 int16_t xbuf[32];
@@ -38,17 +41,19 @@ int16_t zbuf[32];
 int16_t accbuf[32];
 
 int thisshape = 0;
+int recvchar=-1;
 
 void lib_init(){
-    microbit_seed_random();
-    display.setDisplayMode(DISPLAY_MODE_GREYSCALE);
-    display.setBrightness(100);
-    direct_setshape(0x00,0x00,0x04,0x00,0x00); mwait(50);
-    direct_setshape(0x00,0x0e,0x04,0x0e,0x00); mwait(50);
-    direct_setshape(0x1f,0x11,0x11,0x11,0x1f); mwait(50);
-    direct_setshape(0x00,0x0e,0x04,0x0e,0x00); mwait(50);
-    direct_setshape(0x00,0x00,0x04,0x00,0x00); mwait(50);
-    clear();
+  microbit_seed_random();
+  radio.enable();
+  display.setDisplayMode(DISPLAY_MODE_GREYSCALE);
+  display.setBrightness(100);
+  direct_setshape(0x00,0x00,0x04,0x00,0x00); mwait(50);
+  direct_setshape(0x00,0x0e,0x04,0x0e,0x00); mwait(50);
+  direct_setshape(0x1f,0x11,0x11,0x11,0x1f); mwait(50);
+  direct_setshape(0x00,0x0e,0x00,0x0e,0x00); mwait(50);
+  direct_setshape(0x00,0x00,0x04,0x00,0x00); mwait(50);
+  clear();
 }
 
 void evt_poll(){
@@ -58,6 +63,8 @@ void evt_poll(){
   int this_btnb = buttonb.isPressed();
   if(this_btnb&!last_btnb) btnb_evt=1;
   last_btnb = this_btnb;
+  int c = radiorecv();
+  if(c!=-1) {recvchar = c; radio_evt=1;}
 }
 
 void dev_poll(){
@@ -171,8 +178,9 @@ int32_t accz(){return buf_ave(zbuf);}
 int32_t accmag(){return buf_ave(accbuf);}
 
 void rsend(uint8_t c){radio.datagram.send(&c, 1);}
+int rrecc(){int c=recvchar; recvchar=-1; return c;}
 
-int rrecc(){
+int radiorecv(){
   uint8_t c;
   radio.idleTick();
   int len = radio.datagram.recv(&c, 1);

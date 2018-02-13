@@ -1,4 +1,4 @@
-to on-buttona1
+to on-buttona
 print 1
 shape 0
 waituntil [not buttona]
@@ -10,6 +10,10 @@ print 2
 shape 1
 waituntil [not buttonb]
 ifelse buttona [shape 0][clear]
+end
+
+to on-recv
+print recv
 end
 
 shapes [

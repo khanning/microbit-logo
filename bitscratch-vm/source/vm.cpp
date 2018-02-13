@@ -40,6 +40,8 @@ int32_t accz(void);
 int32_t accmag(void);
 int32_t get_buttona(void);
 int32_t get_buttonb(void);
+void rsend(uint8_t c);
+int32_t rrecc(void);
 
 int32_t *stack;
 int32_t *sp;
@@ -371,6 +373,8 @@ void prim_accz(){*sp++=accz();}
 void prim_acc(){*sp++=accmag();}
 void prim_buttona(){*sp++=get_buttona();}
 void prim_buttonb(){*sp++=get_buttonb();}
+void prim_rsend(){rsend((uint8_t)*--sp);}
+void prim_rrecc(){*sp++=rrecc();}
 
 void(*prims[])() = {
     eval_done,
@@ -391,5 +395,6 @@ void(*prims[])() = {
     prim_shape, prim_clear, prim_nextshape,
     prim_doton, prim_dotoff,
     prim_accx, prim_accy, prim_accz, prim_acc,
-    prim_buttona, prim_buttonb
+    prim_buttona, prim_buttonb,
+    prim_rsend, prim_rrecc
 };

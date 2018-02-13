@@ -11,7 +11,8 @@ var primlist =
   'shape','c',1,   'clear','c',0, 'nextshape','c',0,  
   'doton','c',2,  'dotoff','c',2,
   'accx','r',0,   'accy','r',0,   'accz','r',0, 'acc','r','0',
-  'buttona','r','0',  'buttonb','r','0'
+  'buttona','r','0',  'buttonb','r','0',
+  'send','c','1',  'recv','r','0'
   ];
 
 class Compiler {
@@ -154,6 +155,7 @@ vectors(){
 	setupVectors('on-start',8);
 	setupVectors('on-buttona',0x80);
 	setupVectors('on-buttonb',0x81);
+	setupVectors('on-recv',0x82);
 	return res;
 
 	function setupVectors(type,op){

@@ -29,7 +29,7 @@ dotimes[i count :vectors][setnth :i :vectors 0]
 setup-vectors "on-start 8
 setup-vectors "on-buttona $80
 setup-vectors "on-buttonb $81
-;setup-vectors "on-dark $82
+setup-vectors "on-recv $82
 ;setup-vectors "on-light $83
 output se :vectors :bytes
 end
@@ -49,7 +49,8 @@ output pass3 :*result*
 end
 
 to setup-vectors :type :op
-dotimes [i 8][setup-vector .word :type :i :op]
+setup-vector :type :op
+dotimes [i 7][setup-vector .word :type :i + 1 :op]
 end
 
 to setup-vector :name :op 
@@ -342,7 +343,8 @@ setup-prims
   shape c 1  clear c 0  nextshape c 0
   doton c 2  dotoff c 2
   accx r 0  accy r 0  accz r 0  acc r 0
-  buttona r 0  buttonb r 0]
+  buttona r 0  buttonb r 0
+  send c 1  recv r 0]
 end
 
 to compiler-startup
