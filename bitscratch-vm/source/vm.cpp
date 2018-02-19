@@ -131,7 +131,7 @@ void vm(){
 void eval_done(){}
 
 void eval_byte(){
-    *sp++ = *ip++;
+    *sp++ = (*ip++)*100;
 }
 
 void eval_num(){
@@ -219,14 +219,14 @@ void prim_repeat(){
 }
 
 void eol_repeat(){
-    if(*(sp-4)==0) {
+    if(*(sp-4)<=50) {
         eoltype = *--sp;
         ip = (uint8_t*)(*--sp); 
         sp-=2;
         yield((int32_t)vm);
     }
     else {
-        (*(sp-4))--; 
+        (*(sp-4))-=100; 
         ip=(uint8_t*)(*(sp-3));
         yield((int32_t)vm);
     }
@@ -286,25 +286,26 @@ void eol_list(){
 
 void prim_add(){int32_t t0 = *--sp; int32_t t1 = *--sp; *sp++ = t1+t0;}
 void prim_subtract(){int32_t t0 = *--sp; int32_t t1 = *--sp; *sp++ = t1-t0;}
-void prim_multiply(){int32_t t0 = *--sp; int32_t t1 = *--sp; *sp++ = t1*t0;}
-void prim_divide(){int32_t t0 = *--sp; int32_t t1 = *--sp; *sp++ = t1/t0;}
+void prim_multiply(){int32_t t0 = *--sp; int32_t t1 = *--sp; *sp++ = (int32_t)(((double)t1)*((double)t0)/100);}
+void prim_divide(){int32_t t0 = *--sp; int32_t t1 = *--sp; *sp++ = (int32_t)(((double)t1)/((double)t0)*100);}
 
 void prim_mod(){
-    int32_t t0 = *--sp;
-    int32_t res = *--sp%t0;
+    int32_t t0 = (int32_t)(((float)*--sp)/100);
+    int32_t t1 = (int32_t)(((float)*--sp)/100);
+    int32_t res = t1%t0;
     if(res<0) res+= t0;
-    *sp++=res;
+    *sp++=res*100;
 }
 
-void prim_equal(){int32_t t0 = *--sp; int32_t t1 = *--sp; *sp++ = t1==t0;}
-void prim_ne(){int32_t t0 = *--sp; int32_t t1 = *--sp; *sp++ = t1!=t0;}
-void prim_greater(){int32_t t0 = *--sp; int32_t t1 = *--sp; *sp++ = t1>t0;}
-void prim_less(){int32_t t0 = *--sp; int32_t t1 = *--sp; *sp++ = t1<t0;}
+void prim_equal(){int32_t t0 = *--sp; int32_t t1 = *--sp; *sp++ = (t1==t0)*100;}
+void prim_ne(){int32_t t0 = *--sp; int32_t t1 = *--sp; *sp++ = (t1!=t0)*100;}
+void prim_greater(){int32_t t0 = *--sp; int32_t t1 = *--sp; *sp++ = (t1>t0)*100;}
+void prim_less(){int32_t t0 = *--sp; int32_t t1 = *--sp; *sp++ = (t1<t0)*100;}
 
 void prim_and(){int32_t t0 = *--sp; int32_t t1 = *--sp; *sp++ = t1&t0;}
 void prim_or(){int32_t t0 = *--sp; int32_t t1 = *--sp; *sp++ = t1|t0;}
 void prim_xor(){int32_t t0 = *--sp; int32_t t1 = *--sp; *sp++ = t1^t0;}
-void prim_not(){if(*--sp) *sp++=0; else *sp++=1;}
+void prim_not(){if(*--sp) *sp++=0; else *sp++=100;}
 
 void prim_setbox(){
     int32_t t0 = *--sp;
@@ -324,6 +325,7 @@ void prim_changebox(){
 }
 
 void prim_wait(){
+    (*(sp-1)) *= 10;
     (*(sp-1)) += now();
     yield((int32_t)wait_again);
 }
@@ -334,10 +336,10 @@ void wait_again(){
 }
 
 void prim_random(){
-    int32_t max = *--sp;
-    int32_t min = *--sp;
-    if(max>min) *sp++ = lib_random(min,max);
-    else *sp++ = lib_random(max,min);
+    int32_t max = (int32_t)(((float)*--sp)/100);
+    int32_t min = (int32_t)(((float)*--sp)/100);
+    if(max>min) *sp++ = lib_random(min,max)*100;
+    else *sp++ = lib_random(max,min)*100;
 }
 
 void prim_print(){print(*--sp);}
@@ -348,33 +350,33 @@ void prim_prf(){
     prf(format,val);
 }
 
-void prim_shape(){setshape((char)*--sp);}
+void prim_shape(){setshape((char)(((float)*--sp)/100));}
 void prim_clear(){clear();}
 void prim_nextshape(){nextshape();}
 void prim_resett(){resett();}
-void prim_timer(){*sp++=timer();}
-void prim_ticks(){*sp++=get_ticks();}
+void prim_timer(){*sp++=timer()/10;}
+void prim_ticks(){*sp++=get_ticks()*100;}
 
 void prim_doton(){
-    uint8_t y = (uint8_t)*--sp;
-    uint8_t x = (uint8_t)*--sp;
+    uint8_t y = (uint8_t)(((float)*--sp)/100);
+    uint8_t x = (uint8_t)(((float)*--sp)/100);
     doton(x,y);
 }
 
 void prim_dotoff(){
-    uint8_t y = (uint8_t)*--sp;
-    uint8_t x = (uint8_t)*--sp;
+    uint8_t y = (uint8_t)(((float)*--sp)/100);
+    uint8_t x = (uint8_t)(((float)*--sp)/100);
     dotoff(x,y);
 }
 
-void prim_accx(){*sp++=accx();}
-void prim_accy(){*sp++=accy();}
-void prim_accz(){*sp++=accz();}
-void prim_acc(){*sp++=accmag();}
-void prim_buttona(){*sp++=get_buttona();}
-void prim_buttonb(){*sp++=get_buttonb();}
-void prim_rsend(){rsend((uint8_t)*--sp);}
-void prim_rrecc(){*sp++=rrecc();}
+void prim_accx(){*sp++=accx()*100;}
+void prim_accy(){*sp++=accy()*100;}
+void prim_accz(){*sp++=accz()*100;}
+void prim_acc(){*sp++=accmag()*100;}
+void prim_buttona(){*sp++=get_buttona()*100;}
+void prim_buttonb(){*sp++=get_buttonb()*100;}
+void prim_rsend(){rsend((uint8_t)(((float)*--sp)/100));}
+void prim_rrecc(){*sp++=rrecc()*100;}
 
 void(*prims[])() = {
     eval_done,
@@ -386,6 +388,7 @@ void(*prims[])() = {
     prim_repeat, prim_forever, prim_if, prim_ifelse,
     prim_waituntil,
     prim_add, prim_subtract, prim_multiply, prim_divide,
+    prim_mod,
     prim_equal, prim_ne, prim_greater, prim_less,
     prim_and, prim_or, prim_xor,
     prim_not, 

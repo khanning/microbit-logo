@@ -162,9 +162,9 @@ pass2-symbol :item
 end
 
 to pass2-number :n
-ifelse and :n < 256 :n > -1 
+ifelse (and :n < 256 :n > -1 :n = round :n)
    [add-and-count se "byte :n 2]
-   [add-and-count se "number :n 5]
+   [add-and-count se "number round :n * 100 5]
 end
 
 to pass2-symbol :item
@@ -335,6 +335,7 @@ setup-prims
   repeat c 2  forever c 1  if c 2  ifelse c 3
   waituntil c 1
   add r 2  subtract r 2  multiply r 2  divide r 2
+  mod r 2
   eq r 2  ne r 2  gt r 2  lt r 2
   and r 2  or r 2  xor r 2  not r 1
   setbox c 2  box r 1  changebox c 2

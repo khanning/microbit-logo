@@ -67,7 +67,7 @@ ccrun(l,fcn){
 
 vmstopThenRun(fcn){
 	var t = this;
-	t.sendl([0]);		//stop the vm if runninf
+	t.sendl([0xf8]);		//stop the vm if runninf
 	setTimeout(next1, 300);
 
 	function next1(){chrome.serial.flush(t.serialID, fcn);}

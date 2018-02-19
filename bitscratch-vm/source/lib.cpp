@@ -133,8 +133,18 @@ int32_t lib_random(int32_t min, int32_t max){
   return min+microbit_random(max-min+1);
 }
 
+void printnum(int32_t n){
+  if(n<0) {pc.printf("-"); n=-n;}
+  int32_t k = (int32_t)(n/100);
+  int32_t d1 = (int32_t)((n/10)%10);
+  int32_t d2 = (int32_t)(n%10);
+  pc.printf("%d", k);
+  if(d1||d2) pc.printf(".");
+  if(d1||d2) pc.printf("%d",d1);
+  if(d2) pc.printf("%d",d2);
+}
 
-void print(int32_t c){pc.printf("%d\n", c);}
+void print(int32_t c){printnum(c); pc.printf("\n");}
 
 void prf(uint8_t *s, int32_t n) {
   for (; *s; s++) {
@@ -144,7 +154,7 @@ void prf(uint8_t *s, int32_t n) {
           case 'b': pc.printf("%02x", n); break;
           case 'h': pc.printf("%04x", n); break;
           case 'w': pc.printf("%08x", n); break;
-          case 'd': pc.printf("%d", n); break;
+          case 'd': printnum(n); break;
           case 0: return;
           default: pc.sendChar(*s,SYNC_SPINWAIT); break;
       }

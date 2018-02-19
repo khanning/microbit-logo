@@ -2,7 +2,7 @@ var primlist =
  ['stop','c',0,   'output','c',1,   'stopall','c',0, 
   'repeat','c',2,   'forever','c',1,   'if','c',2,   'ifelse','c',3,   
   'waituntil','c',0, 
-  '+','r',-1,  '-','r',-1,   '*','r',-1,   '/','r',-1,
+  '+','r',-1,  '-','r',-1,   '*','r',-1,   '/','r',-1,  '%','r',-1,
   '=','r',-1,   '!=','r',-1,   '>','r',-1,   '<','r',-1, 
   'and','r',-1,   'or','r',-1,   'xor','r',-1,  'not','r',1,  
   '%gwrite','c',2,   '%gread','r',1,  '%gchange','r',1, 
@@ -202,8 +202,8 @@ compileCommands(list){
 	}
 
 	function compileNumber(n){
-		if((n<256)&&(n>=0)) addAndCount(['byte',n],2);
-		else addAndCount(['number',n],5)
+		if((n<256)&&(n>=0)&&(n==Math.round(n))) addAndCount(['byte',n],2);
+		else addAndCount(['number',n*100],5)
 	}
 
 	function compileList(l){
