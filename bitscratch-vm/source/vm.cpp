@@ -30,7 +30,7 @@ void resett(void);
 int32_t timer(void);
 int32_t get_ticks(void);
 void clear();
-void setshape(char);
+void setshape(int32_t);
 void nextshape(void);
 void doton(uint8_t, uint8_t);
 void dotoff(uint8_t, uint8_t);
@@ -350,7 +350,7 @@ void prim_prf(){
     prf(format,val);
 }
 
-void prim_shape(){setshape((char)(((float)*--sp)/100));}
+void prim_shape(){setshape((int32_t)(((float)*--sp)/100));}
 void prim_clear(){clear();}
 void prim_nextshape(){nextshape();}
 void prim_resett(){resett();}

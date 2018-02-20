@@ -28,7 +28,7 @@ runCommandLine(str){
 	try {
 		this.thisproc = undefined;
 		var compiledtokens = this.compileCommands(parse(str));
-		console.log(compiledtokens);
+//		console.log(compiledtokens);
 		var code = this.encodeItems(compiledtokens);
 		code.push(0);
 		console.log(code);

@@ -105,20 +105,20 @@ fourbytes(n){return [n&0xff, (n>>8)&0xff, (n>>16)&0xff, (n>>24)&0xff];}
 	
 sendReceive(l, n, fcn){
 	var rec = {response: [], rlen: 0, fcn: fcn, t: this};
-	this.packetcallback = (l)=>{srrecc(l,rec);}
+	this.packetcallback = (c)=>{srrecc(c,rec);}
+//	console.log('sending: ',l);
 	this.sendl(l);
 
-	function srrecc(l,rec){
-		rec.response = rec.response.concat(l);
+	function srrecc(c,rec){
+		rec.response.push(c);
+//		console.log('received:',l,rec.response.length,n,);
 		if(rec.response.length!=n) return;
-//		console.log('received:',response);
 		rec.t.packetcallback=null; 
 		if(rec.fcn) rec.fcn(rec.response);
 	}
 }
 
 sendl(l){
-//	console.log('sending: ',l);
 	chrome.serial.send(this.serialID, new Uint8Array(l), ()=>{});
 }
 
@@ -154,8 +154,10 @@ openSerialPort(){
 
 		function onrecc(r){
 			var l = Array.from(new Uint8Array(r.data));
-			if (t.packetcallback!=null) t.packetcallback(l);
-			else for(var i in l) gotChar(l[i]);
+			for(var i in l) {
+				if (t.packetcallback!=null) t.packetcallback(l[i]);
+				else gotChar(l[i]);
+			}
 
 			function gotChar(c){
 				if(c==10){println(t.monstr); t.monstr='';}

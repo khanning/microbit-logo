@@ -21,7 +21,7 @@ extern MicroBitStorage flash;
 extern MicroBitSerial pc;
 
 void mwait(int32_t);
-void setshape(char);
+void setshape(int32_t);
 void clear(void);
 void direct_setshape(uint8_t,uint8_t,uint8_t,uint8_t,uint8_t);
 int radiorecv(void);
@@ -94,16 +94,19 @@ void ddots(uint8_t* s){
   direct_setshape(s[0],s[1],s[2],s[3],s[4]);
 }
 
-void setshape(char s){
-  ddots((uint8_t*)&((unsigned char*)flashshapes)[5*s]);
-  thisshape = s;
+void setshape(int32_t s){
+  if(s<=0) clear();
+  else {
+    ddots((uint8_t*)&((unsigned char*)flashshapes)[5*(s-1)]);
+    thisshape = s;
+  }
 }
 
 void nextshape(){
   unsigned char *font = (unsigned char*)flashshapes;
   thisshape++;
-  if(font[5*thisshape]==0xff) thisshape = 0;
-  ddots(&font[5*thisshape]);
+  if(font[5*(thisshape-1)]==0xff) thisshape = 1;
+  ddots(&font[5*(thisshape-1)]);
 }
 
 void doton(uint8_t a, uint8_t b){
@@ -120,7 +123,7 @@ void dotoff(uint8_t a, uint8_t b){
 
 void clear(){
   direct_setshape(0,0,0,0,0);
-  thisshape = -1;
+  thisshape = 0;
 }
 
 void mwait(int32_t d){
