@@ -20,6 +20,7 @@ void vm(void);
 
 int32_t now(void);
 void evt_poll(void);
+void dev_poll(void);
 void print(int32_t);
 int rpeek(void);
 void send_io_state(void);
@@ -120,6 +121,7 @@ int main() {
         while(now()<end){
             int c = ugetcAsync();
             if (c!=MICROBIT_NO_DATA) dispatch((uint8_t)c);
+            dev_poll();
         }
         evt_poll();
         if(btna_evt){btna_evt=0; vm_start(OP_ONBUTTONA);}

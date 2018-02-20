@@ -11,9 +11,6 @@ int32_t stacks[NSTACKS*STACKLEN];
 
 extern void(*prims[])();
 
-
-int bleAvail(void);
-
 void vm(void);
 void resume(int32_t*);
 void eol_repeat(void);
@@ -25,6 +22,7 @@ void wait_again(void);
 void eval_ufun(void);
 void setup_stack(int32_t*,uint32_t,uint8_t);
 
+void dev_poll(void);
 int32_t now(void);
 int32_t lib_random(int32_t,int32_t);
 void print(int32_t);
@@ -37,6 +35,7 @@ void setshape(int32_t);
 void nextshape(void);
 void doton(uint8_t, uint8_t);
 void dotoff(uint8_t, uint8_t);
+void setbrightness(int32_t);
 int32_t accx(void);
 int32_t accy(void);
 int32_t accz(void);
@@ -117,6 +116,7 @@ void yield(int32_t continuation){
 
 void vm(){
     while(1){
+        dev_poll();
         uint8_t token = *ip++;
         if((token==0)||(token==0xff)){
             *stack=0; 
@@ -394,6 +394,13 @@ void prim_resett(){resett();}
 void prim_timer(){*sp++=timer()/10;}
 void prim_ticks(){*sp++=get_ticks()*100;}
 
+void prim_brightness(){
+    int32_t n = (int32_t)(((float)*--sp)/100);
+    if(n<1) n=1;
+    if(n>100) n=100;
+    setbrightness(n*255/100);
+}
+
 void prim_doton(){
     uint8_t y = (uint8_t)(((float)*--sp)/100);
     uint8_t x = (uint8_t)(((float)*--sp)/100);
@@ -434,7 +441,7 @@ void(*prims[])() = {
     prim_random, prim_print, prim_prf, prim_wait,
     prim_resett, prim_timer, prim_ticks,
     prim_shape, prim_clear, prim_nextshape,
-    prim_doton, prim_dotoff,
+    prim_doton, prim_dotoff, prim_brightness,
     prim_accx, prim_accy, prim_accz, prim_acc,
     prim_buttona, prim_buttonb,
     prim_rsend, prim_rrecc

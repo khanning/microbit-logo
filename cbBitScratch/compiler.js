@@ -10,7 +10,7 @@ var primlist =
   'random','r',2, 'print','c',1,   'prf','c',2,  'wait','c',1, 
   'resett','c',0,   'timer','r',0,   'ticks','r',0, 
   'shape','c',1,   'clear','c',0, 'nextshape','c',0,  
-  'doton','c',2,  'dotoff','c',2,
+  'doton','c',2,  'dotoff','c',2,  'brightness','c',1,
   'accx','r',0,   'accy','r',0,   'accz','r',0, 'acc','r',0,
   'buttona','r',0,  'buttonb','r',0,
   'send','c',1,  'recv','r','0'

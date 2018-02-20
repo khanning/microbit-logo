@@ -30,7 +30,7 @@ int radiorecv(void);
 void print(int32_t);
 
 extern volatile uint32_t ticks;
-uint32_t tick_period;
+uint32_t lastticks;
 uint32_t t0;
 int btna_evt, last_btna;
 int btnb_evt, last_btnb;
@@ -72,6 +72,8 @@ void evt_poll(){
 }
 
 void dev_poll(){
+  if(ticks==lastticks) return;
+  lastticks = ticks;
   int16_t x = acc.getX();
   int16_t y = acc.getY();
   int16_t z = acc.getZ();
@@ -169,7 +171,7 @@ void prf(uint8_t *s, int32_t n) {
   }
 }
 
-void setbrightness(int b){display.setBrightness(b);}
+void setbrightness(int32_t b){display.setBrightness(b);}
 
 void flashwrite(uint32_t* addr, uint32_t data){flash.flashWordWrite(addr, data);}
 void flasherase(uint32_t* addr){flash.flashPageErase(addr);}
