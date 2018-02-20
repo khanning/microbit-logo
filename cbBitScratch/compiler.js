@@ -1,18 +1,19 @@
 var primlist = 
  ['stop','c',0,   'output','c',1,   'stopall','c',0, 
   'repeat','c',2,   'forever','c',1,   'if','c',2,   'ifelse','c',3,   
-  'waituntil','c',0, 
+  'waituntil','c',0,  'repeatuntil','c',0,
   '+','r',-1,  '-','r',-1,   '*','r',-1,   '/','r',-1,  '%','r',-1,
   '=','r',-1,   '!=','r',-1,   '>','r',-1,   '<','r',-1, 
   'and','r',-1,   'or','r',-1,   'xor','r',-1,  'not','r',1,  
   '%gwrite','c',2,   '%gread','r',1,  '%gchange','r',1, 
+  'broadcast','c',1,
   'random','r',2, 'print','c',1,   'prf','c',2,  'wait','c',1, 
   'resett','c',0,   'timer','r',0,   'ticks','r',0, 
   'shape','c',1,   'clear','c',0, 'nextshape','c',0,  
   'doton','c',2,  'dotoff','c',2,
-  'accx','r',0,   'accy','r',0,   'accz','r',0, 'acc','r','0',
-  'buttona','r','0',  'buttonb','r','0',
-  'send','c','1',  'recv','r','0'
+  'accx','r',0,   'accy','r',0,   'accz','r',0, 'acc','r',0,
+  'buttona','r',0,  'buttonb','r',0,
+  'send','c',1,  'recv','r','0'
   ];
 
 class Compiler {
@@ -155,7 +156,8 @@ vectors(){
 	setupVectors('on-start',8);
 	setupVectors('on-buttona',0x80);
 	setupVectors('on-buttonb',0x81);
-	setupVectors('on-recv',0x82);
+	setupVectors('on-receive-all',0x82);
+	for(var i=0;i<8;i++) setupVectors('on-receive-'+i,0xf0+i);
 	return res;
 
 	function setupVectors(type,op){
@@ -252,6 +254,7 @@ compileCommands(list){
 		else if(sym.type=='setglobal') compileGlobalSet(sym.index);
 		else if(sym.type=='changeglobal') compileGlobalChange(sym.index);
 		else if(sym.type=='waituntil') compileWaituntil();
+		else if(sym.type=='repeatuntil') compileRepeatuntil();
 		else compileCallSym();
 
 		function compileCallSym(){
@@ -286,6 +289,15 @@ compileCommands(list){
 			addAndCount(['prim','waituntil'],1);
 		}
 
+		function compileRepeatuntil(){
+			addAndCount(['list',0],3)
+			var oldlist = list; list = list.shift();
+			argloop(1, 'repeatuntil');
+			list = oldlist;
+			addAndCount(['eol',0],1)
+			argloop(1, 'repeatuntil');
+			addAndCount(['prim','repeatuntil'],1);
+		}
 
 	}
 
@@ -481,6 +493,7 @@ setup(){
 	setupBuiltIns('prim', primlist, 9, 1);
 	this.oblist['let'] = {type: 'let', outputs: false};
 	this.oblist['waituntil'].type = 'waituntil';
+	this.oblist['repeatuntil'].type = 'repeatuntil';
 	this.setupGlobal('box1');
 	this.setupGlobal('box2');
 

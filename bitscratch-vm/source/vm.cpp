@@ -7,6 +7,7 @@
 int32_t stacks[NSTACKS*STACKLEN];
 
 #define OP_ONSTART 5
+#define FIRST_FLAG 0xf0
 
 extern void(*prims[])();
 
@@ -18,6 +19,8 @@ void resume(int32_t*);
 void eol_repeat(void);
 void eol_list(void);
 void eol_waituntil(void);
+void eol_repeatuntil_cond(void);
+void eol_repeatuntil_action(void);
 void wait_again(void);
 void eval_ufun(void);
 void setup_stack(int32_t*,uint32_t,uint8_t);
@@ -232,6 +235,33 @@ void eol_repeat(){
     }
 }
 
+void prim_repeatuntil(){
+    *sp++ = (int32_t) ip;
+    *sp++ = eoltype;
+    eoltype = (int32_t)eol_repeatuntil_cond;
+    ip=(uint8_t*)(*(sp-4));
+}
+
+void eol_repeatuntil_cond(){
+    int32_t res = *--sp;
+    if(!res){
+        eoltype = (int32_t)eol_repeatuntil_action;
+        ip=(uint8_t*)(*(sp-3));
+        yield((int32_t)vm);
+    } else {
+        eoltype = *--sp;
+        ip = (uint8_t*)(*--sp);
+        sp-=2;
+        yield((int32_t)vm);
+    }
+}
+
+void eol_repeatuntil_action(){
+    eoltype = (int32_t)eol_repeatuntil_cond;
+    ip=(uint8_t*)(*(sp-4));
+    yield((int32_t)vm);
+}
+
 void prim_waituntil(){
     *sp++ = (int32_t) ip;
     *sp++ = eoltype;
@@ -342,6 +372,13 @@ void prim_random(){
     else *sp++ = lib_random(max,min)*100;
 }
 
+void prim_broadcast(){
+    int32_t n = (int32_t)(((float)*--sp)/100);
+    vm_start(FIRST_FLAG+n);
+    rsend(n);
+}
+
+
 void prim_print(){print(*--sp);}
 
 void prim_prf(){
@@ -386,13 +423,14 @@ void(*prims[])() = {
     eval_ufun, 
     prim_stop, prim_output, prim_stopall, 
     prim_repeat, prim_forever, prim_if, prim_ifelse,
-    prim_waituntil,
+    prim_waituntil, prim_repeatuntil,
     prim_add, prim_subtract, prim_multiply, prim_divide,
     prim_mod,
     prim_equal, prim_ne, prim_greater, prim_less,
     prim_and, prim_or, prim_xor,
     prim_not, 
     prim_setbox, prim_box, prim_changebox,
+    prim_broadcast,
     prim_random, prim_print, prim_prf, prim_wait,
     prim_resett, prim_timer, prim_ticks,
     prim_shape, prim_clear, prim_nextshape,

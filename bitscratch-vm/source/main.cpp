@@ -21,6 +21,8 @@ void vm(void);
 int32_t now(void);
 void evt_poll(void);
 void print(int32_t);
+int rpeek(void);
+void send_io_state(void);
 extern int btna_evt, btnb_evt, radio_evt;
 extern volatile int32_t ticks;
 extern int32_t stacks[];
@@ -28,7 +30,8 @@ extern int32_t stacks[];
 #define OP_ONSTART 5
 #define OP_ONBUTTONA 0x80
 #define OP_ONBUTTONB 0x81
-#define OP_ONRECV 0x82
+#define OP_ONRECEIVE 0x82
+#define OP_ONFLAG 0xF0
 
 void init(){
     pc.baud(19200);  
@@ -103,6 +106,7 @@ void dispatch(uint8_t c){
     else if(c==0xf9) setshapecmd();
     else if(c==0xf8) vm_stop();
     else if(c==0xf7) getaddrs();
+    else if(c==0xf6) send_io_state();
     else uputc(c);
 }
 
@@ -120,7 +124,11 @@ int main() {
         evt_poll();
         if(btna_evt){btna_evt=0; vm_start(OP_ONBUTTONA);}
         if(btnb_evt){btnb_evt=0; vm_start(OP_ONBUTTONB);}
-        if(radio_evt){radio_evt=0; vm_start(OP_ONRECV);}
+        if(radio_evt){
+            radio_evt=0; 
+            vm_start(OP_ONRECEIVE);
+            if(rpeek()<8) vm_start(OP_ONFLAG+rpeek());
+        }
         vm_run();
         end += 25;
     }

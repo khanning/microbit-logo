@@ -29,7 +29,8 @@ dotimes[i count :vectors][setnth :i :vectors 0]
 setup-vectors "on-start 8
 setup-vectors "on-buttona $80
 setup-vectors "on-buttonb $81
-setup-vectors "on-recv $82
+setup-vectors "on-receive-any $82
+setup-receive-vectors
 ;setup-vectors "on-light $83
 output se :vectors :bytes
 end
@@ -46,6 +47,10 @@ let [*result* [] arglist []
       *pc* 0]
 pass2-body :code
 output pass3 :*result*
+end
+
+to setup-receive-vectors
+dotimes [i 8][setup-vectors .word "on-receive- :i $f0 + :i]
 end
 
 to setup-vectors :type :op
@@ -333,12 +338,13 @@ make "prims []
 setup-prims 
  [stop c 0  output c 1  stopall c 0  
   repeat c 2  forever c 1  if c 2  ifelse c 3
-  waituntil c 1
+  waituntil c 1  repeatuntil c 2
   add r 2  subtract r 2  multiply r 2  divide r 2
   mod r 2
   eq r 2  ne r 2  gt r 2  lt r 2
   and r 2  or r 2  xor r 2  not r 1
   setbox c 2  box r 1  changebox c 2
+  broadcast c 1
   random r 2  print c 1  prf c 2  wait c 1  
   resett c 0  timer r 0  ticks c 0
   shape c 1  clear c 0  nextshape c 0

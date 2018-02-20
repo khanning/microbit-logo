@@ -116,6 +116,12 @@ to stopvm
 send $f8
 end
 
+to io-state
+clearcom
+send $f6
+output (se recc recc recc recc16 recc16 recc16 recc16)
+end
+
 to first32 :l
 if (count :l) < 32 [output :l]
 let [res []]
@@ -136,6 +142,12 @@ loop
  [if empty? :l [output :res]
   make "res se :res (nth 0 :l) + 256 * nth 1 :l
   make "l bf bf :l]
+end
+
+to recc16
+let [n recc + 256 * recc]
+if :n < 32768 [output :n]
+output :n - 65536
 end
 
 define recc32[][output recc + (lsh recc 8) + (lsh recc 16) + (lsh recc 24)]

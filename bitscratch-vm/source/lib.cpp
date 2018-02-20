@@ -20,6 +20,8 @@ MicroBitRadio radio;
 extern MicroBitStorage flash;
 extern MicroBitSerial pc;
 
+void uputc(uint8_t);
+
 void mwait(int32_t);
 void setshape(int32_t);
 void clear(void);
@@ -42,6 +44,8 @@ int16_t accbuf[32];
 
 int thisshape = 0;
 int recvchar=-1;
+int pollrecv=-1;
+
 
 void lib_init(){
   microbit_seed_random();
@@ -64,7 +68,7 @@ void evt_poll(){
   if(this_btnb&!last_btnb) btnb_evt=1;
   last_btnb = this_btnb;
   int c = radiorecv();
-  if(c!=-1) {recvchar = c; radio_evt=1;}
+  if(c!=-1) {recvchar = c; pollrecv=c; radio_evt=1;}
 }
 
 void dev_poll(){
@@ -192,6 +196,7 @@ int32_t accmag(){return buf_ave(accbuf);}
 
 void rsend(uint8_t c){radio.datagram.send(&c, 1);}
 int rrecc(){int c=recvchar; recvchar=-1; return c;}
+int rpeek(){return recvchar;}
 
 int radiorecv(){
   uint8_t c;
@@ -199,5 +204,20 @@ int radiorecv(){
   int len = radio.datagram.recv(&c, 1);
   if(len==MICROBIT_INVALID_PARAMETER) return -1;
   else return c;
+}
+
+void uputc16(int32_t n){
+  uputc(n&0xff);
+  uputc((n>>8)&0xff);
+}
+
+void send_io_state(){
+  uputc(buttona.isPressed());
+  uputc(buttonb.isPressed());
+  uputc(pollrecv); pollrecv=-1;
+  uputc16(accx());
+  uputc16(accy());
+  uputc16(accz());
+  uputc16(accmag());
 }
 

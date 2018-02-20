@@ -1,19 +1,21 @@
 to on-buttona
-print 1
-shape 0
-waituntil [not buttona]
-ifelse buttonb [shape 1][clear]
+broadcast 1
 end
 
-to on-buttonb1
-print 2
-shape 1
-waituntil [not buttonb]
-ifelse buttona [shape 0][clear]
+to on-buttonb
+broadcast 3
 end
 
-to on-recv
+to on-receive-any
 print recv
+end
+
+to on-receive-1
+shape 2 wait .5 clear
+end
+
+to on-receive-3
+shape 1 wait .5 clear
 end
 
 shapes [
