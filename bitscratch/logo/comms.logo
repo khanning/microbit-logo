@@ -60,16 +60,6 @@ sendl (se $fd
 repeat count :l [ignore recc]
 end
 
-to wfl :addr :l
-loop
- [if empty? :l [stop]
-  repeat 32 - count :l [make "l se :l $ff]
-  wl :command-center first32 :l
-  flash-write :command-center :addr 32
-  make "l bf32 :l
-  make "addr :addr + 32]
-end
-
 to flash-write :src :dst :count
 clearcom
 sendl (se $fb

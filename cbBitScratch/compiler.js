@@ -42,7 +42,7 @@ downloadProcs(str){
 	try {
 		this.setup();
 		var bytes = this.compileProcs(str);
-		console.log(bytes);
+		compiler.dump(bytes);
 		if(comms.serialID) comms.download(bytes, compiler.shapes, ()=>{println('downloaded.')});
  	} catch (e) {println(e);}
 }
@@ -99,7 +99,7 @@ compileProcs(str){
 			}
 
 			function gatherBody(){
-				var res = [];
+				var res = '';
 				while(true){
 					if(tk.eof()) return res;
 					var line = tk.nextLine();
