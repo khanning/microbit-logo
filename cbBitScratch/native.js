@@ -53,7 +53,7 @@ ccrun(l,fcn){
 	function next1(){t.getaddrs(next2);}
 
 	function next2(a){
-		stack = a[0]+7*512;
+		stack = a[0]+15*512;
 		vm = a[1];
 		t.ramwrite(stack+0x1c0,l,next3);
 	}

@@ -2,7 +2,7 @@
 
 #define procs 0x30000
 #define code ((uint8_t*)procs)
-#define NSTACKS 8
+#define NSTACKS 16
 #define STACKLEN 128
 int32_t stacks[NSTACKS*STACKLEN];
 
@@ -26,6 +26,7 @@ void dev_poll(void);
 int32_t now(void);
 int32_t lib_random(int32_t,int32_t);
 void print(int32_t);
+void prs(uint8_t*);
 void prf(uint8_t*,int32_t);
 void resett(void);
 int32_t timer(void);
@@ -35,6 +36,8 @@ void setshape(int32_t);
 void nextshape(void);
 void doton(uint8_t, uint8_t);
 void dotoff(uint8_t, uint8_t);
+void shiftl(void);
+void shiftr(void);
 void setbrightness(int32_t);
 int32_t accx(void);
 int32_t accy(void);
@@ -380,6 +383,7 @@ void prim_broadcast(){
 
 
 void prim_print(){print(*--sp);}
+void prim_prs(){prs((uint8_t*)*--sp);}
 
 void prim_prf(){
     int32_t val = *--sp;
@@ -413,6 +417,9 @@ void prim_dotoff(){
     dotoff(x,y);
 }
 
+void prim_shiftl(){shiftl();}
+void prim_shiftr(){shiftr();}
+
 void prim_accx(){*sp++=accx()*100;}
 void prim_accy(){*sp++=accy()*100;}
 void prim_accz(){*sp++=accz()*100;}
@@ -438,11 +445,12 @@ void(*prims[])() = {
     prim_not, 
     prim_setbox, prim_box, prim_changebox,
     prim_broadcast,
-    prim_random, prim_print, prim_prf, prim_wait,
-    prim_resett, prim_timer, prim_ticks,
+    prim_random, prim_print, prim_prs, prim_prf, 
+    prim_wait, prim_resett, prim_timer, prim_ticks,
     prim_shape, prim_clear, prim_nextshape,
     prim_doton, prim_dotoff, prim_brightness,
     prim_accx, prim_accy, prim_accz, prim_acc,
     prim_buttona, prim_buttonb,
-    prim_rsend, prim_rrecc
+    prim_rsend, prim_rrecc,
+    prim_shiftl, prim_shiftr,
 };

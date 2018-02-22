@@ -7,13 +7,14 @@ var primlist =
   'and','r',-1,   'or','r',-1,   'xor','r',-1,  'not','r',1,  
   '%gwrite','c',2,   '%gread','r',1,  '%gchange','r',1, 
   'broadcast','c',1,
-  'random','r',2, 'print','c',1,   'prf','c',2,  'wait','c',1, 
-  'resett','c',0,   'timer','r',0,   'ticks','r',0, 
+  'random','r',2, 'print','c',1,   'prs', 'c', 1,  'prf','c',2,  
+  'wait','c',1,  'resett','c',0,   'timer','r',0,   'ticks','r',0, 
   'shape','c',1,   'clear','c',0, 'nextshape','c',0,  
   'doton','c',2,  'dotoff','c',2,  'brightness','c',1,
   'accx','r',0,   'accy','r',0,   'accz','r',0, 'acc','r',0,
   'buttona','r',0,  'buttonb','r',0,
-  'send','c',1,  'recv','r','0'
+  'send','c',1,  'recv','r','0',
+  'shiftl','c',0,  'shiftr','c',0
   ];
 
 class Compiler {
@@ -485,7 +486,7 @@ setupGlobal(name){
 
 setup(){
 	var t = this;
-	this.vectorlen = 32;
+	this.vectorlen = 64;
 	this.oblist = {};
 	this.nextglobal = 0;
 	this.procnames = [];
