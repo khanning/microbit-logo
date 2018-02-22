@@ -1,35 +1,50 @@
 to on-buttona
-broadcast 1
+shape 1 wait .5
+repeat 100 [shiftl wait .03]
+clear
 end
 
 to on-buttonb
-broadcast 3
+shape 1
+repeat 20 [shiftr wait .05]
+clear
 end
 
-to on-receive-any
-print recv
-end
-
-to on-receive-1
-shape 2 wait .5 clear
-end
-
-to on-receive-3
-shape 1 wait .5 clear
-end
 
 shapes [
-xxxxx
------
---x--
--x-x-
-x---x
+xxx--
+x--x-
+xxx--
+x--x-
+xxx--
+
+xxx--
+x--x-
+xxx--
+x--x-
+x--x-
+
+xxx--
+-x---
+-x---
+-x---
+xxx--
+
+-xx--
+x--x-
+xxxx-
+x--x-
+x--x-
+
+x--x-
+xx-x-
+xx-x-
+x-xx-
+x--x-
 
 -----
 -----
 --x--
--x-x-
-xxxxx
-
-
+-----
+-----
 ]

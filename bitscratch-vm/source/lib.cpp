@@ -12,7 +12,6 @@ MicroBitButton buttona(MICROBIT_PIN_BUTTON_A, MICROBIT_ID_BUTTON_A);
 MicroBitButton buttonb(MICROBIT_PIN_BUTTON_B, MICROBIT_ID_BUTTON_B);
 MicroBitI2C i2c = MicroBitI2C(I2C_SDA0, I2C_SCL0); 
 MicroBitAccelerometer acc = MicroBitAccelerometer(i2c); 
-MicroBitFont flashshapefont((const unsigned char*)flashshapes, 32+20);
 MicroBitFont ramshapefont((const unsigned char*)directshape, 32+2);
 MicroBitTicker ticker;
 MicroBitRadio radio;
@@ -43,6 +42,7 @@ int16_t zbuf[32];
 int16_t accbuf[32];
 
 int thisshape = 0;
+int shapeoffset = 0;
 int recvchar=-1;
 int pollrecv=-1;
 
@@ -50,7 +50,7 @@ int pollrecv=-1;
 void lib_init(){
   microbit_seed_random();
   radio.enable();
-  display.setDisplayMode(DISPLAY_MODE_GREYSCALE);
+  display.setDisplayMode(DISPLAY_MODE_BLACK_AND_WHITE);
   display.setBrightness(100);
   direct_setshape(0x00,0x00,0x04,0x00,0x00); mwait(50);
   direct_setshape(0x00,0x0e,0x04,0x0e,0x00); mwait(50);
@@ -105,12 +105,14 @@ void setshape(int32_t s){
   else {
     ddots((uint8_t*)&((unsigned char*)flashshapes)[5*(s-1)]);
     thisshape = s;
+    shapeoffset = 0;
   }
 }
 
 void nextshape(){
   unsigned char *font = (unsigned char*)flashshapes;
   thisshape++;
+  shapeoffset = 0;
   if(font[5*(thisshape-1)]==0xff) thisshape = 1;
   ddots(&font[5*(thisshape-1)]);
 }
@@ -130,6 +132,38 @@ void dotoff(uint8_t a, uint8_t b){
 void clear(){
   direct_setshape(0,0,0,0,0);
   thisshape = 0;
+  shapeoffset = 0;
+}
+
+void shiftDraw(){
+  uint8_t *font = (uint8_t*)flashshapes;
+  uint8_t *lefts = &font[5*(thisshape-1)];
+  uint8_t *rights = &font[5*(thisshape)];
+  if(*rights==0xff) rights = font;
+  uint8_t line1 = ((lefts[0]<<shapeoffset)&0x3f)+(rights[0]>>(5-shapeoffset));
+  uint8_t line2 = ((lefts[1]<<shapeoffset)&0x3f)+(rights[1]>>(5-shapeoffset));
+  uint8_t line3 = ((lefts[2]<<shapeoffset)&0x3f)+(rights[2]>>(5-shapeoffset));
+  uint8_t line4 = ((lefts[3]<<shapeoffset)&0x3f)+(rights[3]>>(5-shapeoffset));
+  uint8_t line5 = ((lefts[4]<<shapeoffset)&0x3f)+(rights[4]>>(5-shapeoffset));
+  direct_setshape(line1,line2,line3,line4,line5);
+}
+
+void shiftl(){
+  if(thisshape==0) return;
+  shapeoffset++;
+  if(shapeoffset==5) nextshape();
+  else shiftDraw();
+}
+
+void shiftr(){
+  if(thisshape==0) return;
+  if(shapeoffset==0){
+    uint8_t *font = (uint8_t*)flashshapes;
+    thisshape = 1;
+    while(font[5*thisshape]!=0xff) thisshape++;
+    shapeoffset = 4;
+  } else shapeoffset--;
+  shiftDraw();
 }
 
 void mwait(int32_t d){
@@ -154,6 +188,7 @@ void printnum(int32_t n){
 }
 
 void print(int32_t c){printnum(c); pc.printf("\n");}
+void prs(uint8_t *s){pc.printf("%s\n",s);}
 
 void prf(uint8_t *s, int32_t n) {
   for (; *s; s++) {
