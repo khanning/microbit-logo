@@ -157,12 +157,16 @@ void shiftl(){
 
 void shiftr(){
   if(thisshape==0) return;
-  if(shapeoffset==0){
-    uint8_t *font = (uint8_t*)flashshapes;
-    thisshape = 1;
-    while(font[5*thisshape]!=0xff) thisshape++;
+  if(shapeoffset>0) shapeoffset--;
+  else {
+    if(thisshape>1) thisshape--;
+    else {
+      uint8_t *font = (uint8_t*)flashshapes;
+      thisshape = 1;
+      while(font[5*thisshape]!=0xff) thisshape++;
+    }
     shapeoffset = 4;
-  } else shapeoffset--;
+  }
   shiftDraw();
 }
 
