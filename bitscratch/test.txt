@@ -1,50 +1,59 @@
 to on-buttona
-shape 1 wait .5
-repeat 100 [shiftl wait .03]
+stopothers
+nextshape
+repeat 9 
+ [repeat 5 [wait .05 shiftl]
+  wait .5]
 clear
 end
 
 to on-buttonb
-shape 1
-repeat 20 [shiftr wait .05]
+stopothers
+if eq shape 0 [setshape 4]
+nextshape
+repeat 9 
+ [repeat 5 [wait .05 shiftd]
+  wait .5]
 clear
 end
 
 
+
+
 shapes [
-xxx--
-x--x-
-xxx--
-x--x-
-xxx--
-
-xxx--
-x--x-
-xxx--
-x--x-
-x--x-
-
-xxx--
--x---
--x---
--x---
-xxx--
-
--xx--
-x--x-
 xxxx-
-x--x-
-x--x-
+x---x
+xxxx-
+x---x
+xxxx-
 
-x--x-
-xx-x-
-xx-x-
-x-xx-
-x--x-
+xxxx-
+x---x
+xxxx-
+x---x
+x---x
 
------
------
+-xxx-
 --x--
+--x--
+--x--
+-xxx-
+
+-xxx-
+x---x
+xxxxx
+x---x
+x---x
+
+x---x
+xx--x
+x-x-x
+x--xx
+x---x
+
 -----
+-x-x-
+--x--
+-x-x-
 -----
 ]

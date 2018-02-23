@@ -42,7 +42,8 @@ int16_t zbuf[32];
 int16_t accbuf[32];
 
 int thisshape = 0;
-int shapeoffset = 0;
+int shapeoffh = 0;
+int shapeoffv = 0;
 int recvchar=-1;
 int pollrecv=-1;
 
@@ -105,14 +106,16 @@ void setshape(int32_t s){
   else {
     ddots((uint8_t*)&((unsigned char*)flashshapes)[5*(s-1)]);
     thisshape = s;
-    shapeoffset = 0;
+    shapeoffh = 0;
+    shapeoffv = 0;
   }
 }
 
 void nextshape(){
   unsigned char *font = (unsigned char*)flashshapes;
   thisshape++;
-  shapeoffset = 0;
+  shapeoffh = 0;
+  shapeoffv = 0;
   if(font[5*(thisshape-1)]==0xff) thisshape = 1;
   ddots(&font[5*(thisshape-1)]);
 }
@@ -132,32 +135,35 @@ void dotoff(uint8_t a, uint8_t b){
 void clear(){
   direct_setshape(0,0,0,0,0);
   thisshape = 0;
-  shapeoffset = 0;
+  shapeoffh = 0;
+  shapeoffv = 0;
 }
 
-void shiftDraw(){
+void shifthDraw(){
   uint8_t *font = (uint8_t*)flashshapes;
   uint8_t *lefts = &font[5*(thisshape-1)];
   uint8_t *rights = &font[5*(thisshape)];
   if(*rights==0xff) rights = font;
-  uint8_t line1 = ((lefts[0]<<shapeoffset)&0x3f)+(rights[0]>>(5-shapeoffset));
-  uint8_t line2 = ((lefts[1]<<shapeoffset)&0x3f)+(rights[1]>>(5-shapeoffset));
-  uint8_t line3 = ((lefts[2]<<shapeoffset)&0x3f)+(rights[2]>>(5-shapeoffset));
-  uint8_t line4 = ((lefts[3]<<shapeoffset)&0x3f)+(rights[3]>>(5-shapeoffset));
-  uint8_t line5 = ((lefts[4]<<shapeoffset)&0x3f)+(rights[4]>>(5-shapeoffset));
+  uint8_t line1 = ((lefts[0]<<shapeoffh)&0x3f)+(rights[0]>>(5-shapeoffh));
+  uint8_t line2 = ((lefts[1]<<shapeoffh)&0x3f)+(rights[1]>>(5-shapeoffh));
+  uint8_t line3 = ((lefts[2]<<shapeoffh)&0x3f)+(rights[2]>>(5-shapeoffh));
+  uint8_t line4 = ((lefts[3]<<shapeoffh)&0x3f)+(rights[3]>>(5-shapeoffh));
+  uint8_t line5 = ((lefts[4]<<shapeoffh)&0x3f)+(rights[4]>>(5-shapeoffh));
   direct_setshape(line1,line2,line3,line4,line5);
 }
 
 void shiftl(){
   if(thisshape==0) return;
-  shapeoffset++;
-  if(shapeoffset==5) nextshape();
-  else shiftDraw();
+  if(shapeoffv>0) shapeoffv=0;
+  shapeoffh++;
+  if(shapeoffh==5) nextshape();
+  else shifthDraw();
 }
 
 void shiftr(){
   if(thisshape==0) return;
-  if(shapeoffset>0) shapeoffset--;
+  if(shapeoffv>0) shapeoffv=0;
+  if(shapeoffh>0) shapeoffh--;
   else {
     if(thisshape>1) thisshape--;
     else {
@@ -165,10 +171,46 @@ void shiftr(){
       thisshape = 1;
       while(font[5*thisshape]!=0xff) thisshape++;
     }
-    shapeoffset = 4;
+    shapeoffh = 4;
   }
-  shiftDraw();
+  shifthDraw();
 }
+
+void shiftvDraw(){
+  uint8_t *font = (uint8_t*)flashshapes;
+  uint8_t *top = &font[5*(thisshape-1)+shapeoffv];
+  uint8_t line1 = *top++; if(*top==0xff) top = font;
+  uint8_t line2 = *top++; if(*top==0xff) top = font;
+  uint8_t line3 = *top++; if(*top==0xff) top = font;
+  uint8_t line4 = *top++; if(*top==0xff) top = font;
+  uint8_t line5 = *top++; if(*top==0xff) top = font;
+  direct_setshape(line1,line2,line3,line4,line5);
+}
+
+void shiftd(){
+  if(thisshape==0) return;
+  if(shapeoffh>0) shapeoffh=0;
+  shapeoffv++;
+  if(shapeoffv==5) nextshape();
+  else shiftvDraw();
+}
+
+void shiftu(){
+  if(thisshape==0) return;
+  if(shapeoffh>0) shapeoffh=0;
+  if(shapeoffv>0) shapeoffv--;
+  else {
+    if(thisshape>1) thisshape--;
+    else {
+      uint8_t *font = (uint8_t*)flashshapes;
+      thisshape = 1;
+      while(font[5*thisshape]!=0xff) thisshape++;
+    }
+    shapeoffv = 4;
+  }
+  shiftvDraw();
+}
+
 
 void mwait(int32_t d){
   if(d<0) return;

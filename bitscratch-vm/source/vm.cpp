@@ -31,6 +31,7 @@ void prf(uint8_t*,int32_t);
 void resett(void);
 int32_t timer(void);
 int32_t get_ticks(void);
+
 void clear();
 void setshape(int32_t);
 void nextshape(void);
@@ -38,7 +39,10 @@ void doton(uint8_t, uint8_t);
 void dotoff(uint8_t, uint8_t);
 void shiftl(void);
 void shiftr(void);
+void shiftd(void);
+void shiftu(void);
 void setbrightness(int32_t);
+
 int32_t accx(void);
 int32_t accy(void);
 int32_t accz(void);
@@ -59,6 +63,7 @@ bool yieldnow;
 int32_t boxes[20];
 
 extern volatile int32_t ticks;
+extern int32_t thisshape;
 
 void vm_run(){
     int32_t *stack = stacks;
@@ -216,6 +221,11 @@ void prim_stopall(){
     vm_stop();
     yieldnow = true;
 }
+
+void prim_stopothers(){
+    vm_stop();
+}
+
 
 void prim_repeat(){
     *sp++ = (int32_t)ip;
@@ -391,7 +401,8 @@ void prim_prf(){
     prf(format,val);
 }
 
-void prim_shape(){setshape((int32_t)(((float)*--sp)/100));}
+void prim_setshape(){setshape((int32_t)(((float)*--sp)/100));}
+void prim_shape(){*sp++=thisshape*100;}
 void prim_clear(){clear();}
 void prim_nextshape(){nextshape();}
 void prim_resett(){resett();}
@@ -419,6 +430,8 @@ void prim_dotoff(){
 
 void prim_shiftl(){shiftl();}
 void prim_shiftr(){shiftr();}
+void prim_shiftd(){shiftd();}
+void prim_shiftu(){shiftu();}
 
 void prim_accx(){*sp++=accx()*100;}
 void prim_accy(){*sp++=accy()*100;}
@@ -435,7 +448,8 @@ void(*prims[])() = {
     eval_list, eval_eol, 
     eval_lthing, eval_lset, eval_lchange, 
     eval_ufun, 
-    prim_stop, prim_output, prim_stopall, 
+    prim_stop, prim_output, 
+    prim_stopall, prim_stopothers, 
     prim_repeat, prim_forever, prim_if, prim_ifelse,
     prim_waituntil, prim_repeatuntil,
     prim_add, prim_subtract, prim_multiply, prim_divide,
@@ -447,10 +461,10 @@ void(*prims[])() = {
     prim_broadcast,
     prim_random, prim_print, prim_prs, prim_prf, 
     prim_wait, prim_resett, prim_timer, prim_ticks,
-    prim_shape, prim_clear, prim_nextshape,
+    prim_setshape, prim_shape, prim_clear, prim_nextshape,
     prim_doton, prim_dotoff, prim_brightness,
     prim_accx, prim_accy, prim_accz, prim_acc,
     prim_buttona, prim_buttonb,
     prim_rsend, prim_rrecc,
-    prim_shiftl, prim_shiftr,
+    prim_shiftl, prim_shiftr, prim_shiftd, prim_shiftu
 };
