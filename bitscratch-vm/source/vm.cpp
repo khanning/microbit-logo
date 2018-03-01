@@ -35,6 +35,7 @@ int32_t get_ticks(void);
 void clear();
 void setshape(int32_t);
 void nextshape(void);
+void prevshape(void);
 void doton(uint8_t, uint8_t);
 void dotoff(uint8_t, uint8_t);
 void shiftl(void);
@@ -405,6 +406,7 @@ void prim_setshape(){setshape((int32_t)(((float)*--sp)/100));}
 void prim_shape(){*sp++=thisshape*100;}
 void prim_clear(){clear();}
 void prim_nextshape(){nextshape();}
+void prim_prevshape(){prevshape();}
 void prim_resett(){resett();}
 void prim_timer(){*sp++=timer()/10;}
 void prim_ticks(){*sp++=get_ticks()*100;}
@@ -461,7 +463,8 @@ void(*prims[])() = {
     prim_broadcast,
     prim_random, prim_print, prim_prs, prim_prf, 
     prim_wait, prim_resett, prim_timer, prim_ticks,
-    prim_setshape, prim_shape, prim_clear, prim_nextshape,
+    prim_setshape, prim_shape, prim_clear, 
+    prim_nextshape, prim_prevshape,
     prim_doton, prim_dotoff, prim_brightness,
     prim_accx, prim_accy, prim_accz, prim_acc,
     prim_buttona, prim_buttonb,

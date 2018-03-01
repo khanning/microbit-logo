@@ -120,6 +120,18 @@ void nextshape(){
   ddots(&font[5*(thisshape-1)]);
 }
 
+void prevshape(){
+  unsigned char *font = (unsigned char*)flashshapes;
+  shapeoffh = 0;
+  shapeoffv = 0;
+  if(thisshape>1) thisshape--;
+  else {
+    thisshape = 1;
+    while(font[5*thisshape]!=0xff) thisshape++;
+  }
+  ddots(&font[5*(thisshape-1)]);
+}
+
 void doton(uint8_t a, uint8_t b){
   a%=5; b%=5;
   directshape[4-b] |= 1<<(4-a);
