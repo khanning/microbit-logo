@@ -372,6 +372,7 @@ void prim_changebox(){
 void prim_wait(){
     (*(sp-1)) *= 10;
     (*(sp-1)) += now();
+    (*(sp-1)) -= 51;
     yield((int32_t)wait_again);
 }
 
@@ -405,13 +406,13 @@ void prim_prf(){
 
 void frameWait(){
     if(fps==0) return;
-    *sp++ = now()+100000/fps;
+    *sp++ = now()+100000/fps-51;
     wait_again();
 }
 
 void shiftWait(){
     if(fps==0) return;
-    *sp++ = now()+20000/fps;
+    *sp++ = now()+20000/fps-51;
     wait_again();
 }
 
