@@ -8,6 +8,7 @@ MicroBitMessageBus messageBus;
 
 void lib_init(void);
 void direct_setshape(uint8_t a, uint8_t b, uint8_t c,  uint8_t d,  uint8_t e);
+void setbrightness(int32_t);
 
 uint8_t ugetc(){return pc.read(SYNC_SPINWAIT);}
 int ugetcAsync(){return pc.read(ASYNC);}
@@ -89,6 +90,10 @@ void setshapecmd(){
     direct_setshape(ugetc(), ugetc(), ugetc(), ugetc(), ugetc());
 }
 
+void setbrightnesscmd(){
+    setbrightness(ugetc());
+}
+
 void getaddrs(){
     int32_t addrs[2];
     int8_t* bytes = (int8_t*) addrs;
@@ -108,6 +113,7 @@ void dispatch(uint8_t c){
     else if(c==0xf8) vm_stop();
     else if(c==0xf7) getaddrs();
     else if(c==0xf6) send_io_state();
+    else if(c==0xf5) setbrightnesscmd();
     else uputc(c);
 }
 

@@ -354,7 +354,8 @@ setup-prims
   accx r 0  accy r 0  accz r 0  acc r 0
   buttona r 0  buttonb r 0
   send c 1  recv r 0
-  shiftl c 0  shiftr c 0  shiftd c 0  shiftu c 0]
+  shiftl c 0  shiftr c 0  shiftd c 0  shiftu c 0
+  setfps c 1]
 end
 
 to compiler-startup

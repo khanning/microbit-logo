@@ -149,6 +149,7 @@ openSerialPort(){
 	function connected(r){
 //		console.log(r);
 		if(t.serialID==undefined) chrome.serial.onReceive.addListener(onrecc);
+		if(t.serialID==undefined) chrome.serial.onReceiveError.addListener(console.log);
 		t.serialID = r.connectionId;
 		println('connected');
 

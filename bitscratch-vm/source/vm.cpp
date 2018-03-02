@@ -62,6 +62,7 @@ int32_t eoltype;
 bool yieldnow;
 
 int32_t boxes[20];
+int32_t fps = 0;
 
 extern volatile int32_t ticks;
 extern int32_t thisshape;
@@ -402,11 +403,24 @@ void prim_prf(){
     prf(format,val);
 }
 
-void prim_setshape(){setshape((int32_t)(((float)*--sp)/100));}
+void frameWait(){
+    if(fps==0) return;
+    *sp++ = now()+100000/fps;
+    wait_again();
+}
+
+void shiftWait(){
+    if(fps==0) return;
+    *sp++ = now()+20000/fps;
+    wait_again();
+}
+
+
+void prim_setshape(){setshape((int32_t)(((float)*--sp)/100)); frameWait();}
 void prim_shape(){*sp++=thisshape*100;}
-void prim_clear(){clear();}
-void prim_nextshape(){nextshape();}
-void prim_prevshape(){prevshape();}
+void prim_clear(){clear(); frameWait();}
+void prim_nextshape(){nextshape(); frameWait();}
+void prim_prevshape(){prevshape(); frameWait();}
 void prim_resett(){resett();}
 void prim_timer(){*sp++=timer()/10;}
 void prim_ticks(){*sp++=get_ticks()*100;}
@@ -430,10 +444,11 @@ void prim_dotoff(){
     dotoff(x,y);
 }
 
-void prim_shiftl(){shiftl();}
-void prim_shiftr(){shiftr();}
-void prim_shiftd(){shiftd();}
-void prim_shiftu(){shiftu();}
+void prim_shiftl(){shiftl(); shiftWait();}
+void prim_shiftr(){shiftr(); shiftWait();}
+void prim_shiftd(){shiftd(); shiftWait();}
+void prim_shiftu(){shiftu(); shiftWait();}
+void prim_setfps(){fps = (int32_t)((float)*--sp);}
 
 void prim_accx(){*sp++=accx()*100;}
 void prim_accy(){*sp++=accy()*100;}
@@ -443,6 +458,7 @@ void prim_buttona(){*sp++=get_buttona()*100;}
 void prim_buttonb(){*sp++=get_buttonb()*100;}
 void prim_rsend(){rsend((uint8_t)(((float)*--sp)/100));}
 void prim_rrecc(){*sp++=rrecc()*100;}
+
 
 void(*prims[])() = {
     eval_done,
@@ -469,5 +485,6 @@ void(*prims[])() = {
     prim_accx, prim_accy, prim_accz, prim_acc,
     prim_buttona, prim_buttonb,
     prim_rsend, prim_rrecc,
-    prim_shiftl, prim_shiftr, prim_shiftd, prim_shiftu
+    prim_shiftl, prim_shiftr, prim_shiftd, prim_shiftu,
+    prim_setfps
 };

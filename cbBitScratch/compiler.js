@@ -17,6 +17,7 @@ var primlist =
   'buttona','r',0,  'buttonb','r',0,
   'send','c',1,  'recv','r','0',
   'shiftl','c',0,  'shiftr','c',0,  'shiftd','c',0,  'shiftu','c',0,  
+  'setfps','c',1
   ];
 
 class Compiler {
