@@ -1,8 +1,8 @@
 to on-buttona
 stopothers
-nextshape
+setshape 1
 repeat 9 
- [repeat 5 [wait .05 shiftl]
+ [repeat 5 [shiftl]
   wait .5]
 clear
 end

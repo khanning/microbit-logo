@@ -62,7 +62,7 @@ int32_t eoltype;
 bool yieldnow;
 
 int32_t boxes[20];
-int32_t fps = 0;
+int32_t framewait = 50;
 
 extern volatile int32_t ticks;
 extern int32_t thisshape;
@@ -405,14 +405,14 @@ void prim_prf(){
 }
 
 void frameWait(){
-    if(fps==0) return;
-    *sp++ = now()+100000/fps-51;
+    if(framewait==0) return;
+    *sp++ = now()+framewait*10-51;
     wait_again();
 }
 
 void shiftWait(){
-    if(fps==0) return;
-    *sp++ = now()+20000/fps-51;
+    if(framewait==0) return;
+    *sp++ = now()+framewait*2-51;
     wait_again();
 }
 
@@ -449,7 +449,7 @@ void prim_shiftl(){shiftl(); shiftWait();}
 void prim_shiftr(){shiftr(); shiftWait();}
 void prim_shiftd(){shiftd(); shiftWait();}
 void prim_shiftu(){shiftu(); shiftWait();}
-void prim_setfps(){fps = (int32_t)((float)*--sp);}
+void prim_setframewait(){framewait = *--sp;}
 
 void prim_accx(){*sp++=accx()*100;}
 void prim_accy(){*sp++=accy()*100;}
@@ -487,5 +487,5 @@ void(*prims[])() = {
     prim_buttona, prim_buttonb,
     prim_rsend, prim_rrecc,
     prim_shiftl, prim_shiftr, prim_shiftd, prim_shiftu,
-    prim_setfps
+    prim_setframewait
 };

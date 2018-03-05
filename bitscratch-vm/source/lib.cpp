@@ -46,6 +46,7 @@ int shapeoffh = 0;
 int shapeoffv = 0;
 int recvchar=-1;
 int pollrecv=-1;
+int pollinhibit = 0;
 
 
 void lib_init(){
@@ -62,6 +63,7 @@ void lib_init(){
 }
 
 void evt_poll(){
+  if(pollinhibit>0){pollinhibit--; return;}
   int this_btna = buttona.isPressed();
   if(this_btna&!last_btna) btna_evt=1;
   last_btna = this_btna;
@@ -199,7 +201,7 @@ void shiftvDraw(){
   direct_setshape(line1,line2,line3,line4,line5);
 }
 
-void shiftd(){
+void shiftu(){
   if(thisshape==0) return;
   if(shapeoffh>0) shapeoffh=0;
   shapeoffv++;
@@ -207,7 +209,7 @@ void shiftd(){
   else shiftvDraw();
 }
 
-void shiftu(){
+void shiftd(){
   if(thisshape==0) return;
   if(shapeoffh>0) shapeoffh=0;
   if(shapeoffv>0) shapeoffv--;
@@ -307,6 +309,7 @@ void uputc16(int32_t n){
 }
 
 void send_io_state(){
+  pollinhibit = 10;
   uputc(buttona.isPressed());
   uputc(buttonb.isPressed());
   uputc(pollrecv); pollrecv=-1;
