@@ -13,12 +13,9 @@ end
 
 to \ :line
 clearcom
-let [bytes se compile-line :line 0
-     addrs getaddrs
-     sp (nth 0 :addrs) + 15 * 512
-     vm nth 1 :addrs]
-wl :sp + $1c0 :bytes
-wl :sp (se bytes :sp + 20 bytes :vm bytes :sp + $1c0 bytes 0 bytes 0) 
+let [bytes se compile-line :line 0]
+sendl (se $f8 count :bytes :bytes)
+ignore get-packet
 end
 
 to compile-file :file

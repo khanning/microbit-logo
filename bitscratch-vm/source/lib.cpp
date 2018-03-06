@@ -41,6 +41,9 @@ int16_t ybuf[32];
 int16_t zbuf[32];
 int16_t accbuf[32];
 
+char prbuf[128];
+char* prptr;
+
 int thisshape = 0;
 int shapeoffh = 0;
 int shapeoffv = 0;
@@ -236,34 +239,45 @@ int32_t lib_random(int32_t min, int32_t max){
   return min+microbit_random(max-min+1);
 }
 
+void sendprbuf(){
+  int len = strlen(prbuf);
+  uputc(0xf0);
+  uputc(len);
+  for(int i=0;i<len;i++) uputc(prbuf[i]);
+  uputc(0xed);
+}
+
 void printnum(int32_t n){
-  if(n<0) {pc.printf("-"); n=-n;}
+  if(n<0) {*prptr++='-'; n=-n;}
   int32_t k = (int32_t)(n/100);
   int32_t d1 = (int32_t)((n/10)%10);
   int32_t d2 = (int32_t)(n%10);
-  pc.printf("%d", k);
-  if(d1||d2) pc.printf(".");
-  if(d1||d2) pc.printf("%d",d1);
-  if(d2) pc.printf("%d",d2);
+  prptr+= sprintf(prbuf,"%d", (int)k);
+  if(d1||d2) *prptr++='.';
+  if(d1||d2) prptr+= sprintf(prbuf,"%d",(int)d1);
+  if(d2) prptr+= sprintf(prbuf,"%d",(int)d2);
 }
 
-void print(int32_t c){printnum(c); pc.printf("\n");}
-void prs(uint8_t *s){pc.printf("%s\n",s);}
+void print(int32_t c){prptr = prbuf; printnum(c); sprintf(prptr,"\n"); sendprbuf();}
+void prs(uint8_t *s){sprintf(prbuf,"%s\n",s); sendprbuf();}
 
 void prf(uint8_t *s, int32_t n) {
+  prptr = prbuf;
   for (; *s; s++) {
     if (*s=='%'){
       s++;
       switch (*s){
-          case 'b': pc.printf("%02x", n); break;
-          case 'h': pc.printf("%04x", n); break;
-          case 'w': pc.printf("%08x", n); break;
+          case 'b': prptr+= sprintf(prbuf,"%02x",(int)n); break;
+          case 'h': prptr+= sprintf(prbuf,"%04x",(int)n); break;
+          case 'w': prptr+= sprintf(prbuf,"%08x",(int)n); break;
           case 'd': printnum(n); break;
           case 0: return;
-          default: pc.sendChar(*s,SYNC_SPINWAIT); break;
+          default: *prptr++=*s; break;
       }
-    } else pc.sendChar(*s,SYNC_SPINWAIT);
+    } else *prptr++=*s;
   }
+  *prptr = 0;
+  sendprbuf();
 }
 
 void setbrightness(int32_t b){display.setBrightness(b);}
@@ -310,6 +324,8 @@ void uputc16(int32_t n){
 
 void send_io_state(){
   pollinhibit = 10;
+  uputc(0xf5);
+  uputc(11);
   uputc(buttona.isPressed());
   uputc(buttonb.isPressed());
   uputc(pollrecv); pollrecv=-1;
@@ -317,5 +333,6 @@ void send_io_state(){
   uputc16(accy());
   uputc16(accz());
   uputc16(accmag());
+  uputc(0xed);
 }
 

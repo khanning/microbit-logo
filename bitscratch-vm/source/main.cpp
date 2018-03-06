@@ -17,7 +17,7 @@ void uputc(uint8_t c){pc.sendChar(c, SYNC_SPINWAIT);}
 void vm_start(uint8_t);
 void vm_run(void);
 void vm_stop(void);
-void vm(void);
+void vm_runcc(uint32_t);
 
 int32_t now(void);
 void evt_poll(void);
@@ -27,13 +27,15 @@ int rpeek(void);
 void send_io_state(void);
 extern int btna_evt, btnb_evt, radio_evt;
 extern volatile int32_t ticks;
-extern int32_t stacks[];
+void prs(uint8_t*);
 
 #define OP_ONSTART 5
 #define OP_ONBUTTONA 0x80
 #define OP_ONBUTTONB 0x81
 #define OP_ONRECEIVE 0x82
 #define OP_ONFLAG 0xF0
+
+uint8_t code[128];
 
 void init(){
     pc.baud(19200);  
@@ -54,22 +56,36 @@ uint32_t read32(){
     return (c4<<24)+(c3<<16)+(c2<<8)+c1;
 }
 
+void sendresponse(uint8_t resp){
+    uputc(resp);
+    uputc(0);
+    uputc(0xed);
+}
+
+void ping(){sendresponse(0xff);}
+
 void readmemory(){
     uint32_t addr = read32();
-    uint32_t count = read16();
+    uint32_t count = ugetc();
     uint32_t i;
+    uputc(0xfe);
+    uputc(count);
     for(i=0;i<count;i++) uputc(*((uint8_t*) addr++));
+    uputc(0xed);
 }
 
 void writememory(){
     uint32_t addr = read32();
-    uint32_t count = read16();
+    uint32_t count = ugetc();
     uint32_t i;
+    uputc(0xfd);
+    uputc(count);
     for(i=0;i<count;i++){
         uint8_t c = ugetc();
         *((uint8_t*) addr++)=c;
         uputc(c);
     }
+    uputc(0xed);
 }
 
 void writeflash(){
@@ -77,13 +93,13 @@ void writeflash(){
     uint32_t dst = read32();
     uint32_t count = read16();
     flash.flash_write((std::uint32_t*)dst, (std::uint32_t*)src, (int)count);
-    uputc(0xbf);
+    sendresponse(0xfc);
 }
 
 void eraseflash(){
     uint32_t addr = read32();
     flash.erase_page((std::uint32_t*)addr);
-    uputc(0xaf);
+    sendresponse(0xfb);
 }
 
 void setshapecmd(){
@@ -94,33 +110,38 @@ void setbrightnesscmd(){
     setbrightness(ugetc());
 }
 
-void getaddrs(){
-    int32_t addrs[2];
-    int8_t* bytes = (int8_t*) addrs;
-    addrs[0] = (int32_t) stacks;
-    addrs[1] = (int32_t) vm;
-    for(int i=0;i<8;i++) uputc(bytes[i]);
+void runcc(){
+    uint32_t count = ugetc();
+    uputc(0xf8);
+    uputc(count);
+    for(uint8_t i=0;i<count;i++){
+        uint8_t c = ugetc();
+        code[i] = c;
+        uputc(c);
+    }
+    uputc(0xed);
+    vm_runcc((uint32_t)code);
 }
 
 void dispatch(uint8_t c){
-    if(c==0xff) uputc(23);
+    if(c==0xff) ping();
     else if(c==0xfe) readmemory();
     else if(c==0xfd) writememory();
-    else if(c==0xfc) vm_start(OP_ONSTART);
-    else if(c==0xfb) writeflash();
-    else if(c==0xfa) eraseflash();
-    else if(c==0xf9) setshapecmd();
-    else if(c==0xf8) vm_stop();
-    else if(c==0xf7) getaddrs();
-    else if(c==0xf6) send_io_state();
-    else if(c==0xf5) setbrightnesscmd();
+    else if(c==0xfc) writeflash();
+    else if(c==0xfb) eraseflash();
+    else if(c==0xfa) vm_start(OP_ONSTART);
+    else if(c==0xf9) vm_stop();
+    else if(c==0xf8) runcc();
+    else if(c==0xf7) setshapecmd();
+    else if(c==0xf6) setbrightnesscmd();
+    else if(c==0xf5) send_io_state();
     else uputc(c);
 }
 
 int main() {
     init();
     lib_init();
-    pc.printf("starting...\n");
+    prs((uint8_t*)"starting...");
     vm_stop();
     int32_t end = now()+25;
     while(1){

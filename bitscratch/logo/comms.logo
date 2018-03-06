@@ -2,17 +2,33 @@
 ; monitor
 ;
 to ticktask
-let [c 0 res "]
-loop
- [make "c .recc
-  if :c = -1 [stop]
-  if :c = $cf [stop]
-  if :c = 13 [stop]
-  ifelse :c = 10
-    [print :monstr make "monstr "]
-    [make "monstr word :monstr char :c]]
+let [c .recc res " p []]
+if :c = -1 [stop]
+make "p gather-packet :c
+if (count :p) < 3  [stop]
+dolist [c bf bf bl :p][monstr-add :c]
 end
 
+to monstr-add :c
+if :c = $cf [stop]
+if :c = 13 [stop]
+ifelse :c = 10
+  [print :monstr make "monstr "]
+  [make "monstr word :monstr char :c]]
+end
+
+to get-packet 
+let [type recc]
+if :type = -1 [output []]
+output gather-packet :type
+end
+
+to gather-packet :type
+let [len recc
+     packet se :type :len]
+repeat :len + 1 [make "packet se :packet recc]
+output :packet
+end
 
 
 ;---------------
@@ -24,9 +40,9 @@ to dump :addr :len
 let [res []]
 if :len = 0 [make "len 1]
 make "len 16 * int (:len + 15) / 16
-let [l rl :addr :len]
 repeat :len / 16
  [make "res se hw :addr "-
+  make "l rl :addr 16
   repeat 16 [make "res se :res hb first :l make "l bf :l]
   print :res
   make "addr :addr + 16]
@@ -38,15 +54,8 @@ clearcom
 sendl (se $fe 
           byte0 :addr byte1 :addr
           byte2 :addr byte3 :addr
-          byte0 :count byte1 :count)
-dotimes [i :count][make "res se :res recc]
-output :res
-end
-
-to getaddrs
-clearcom
-send $f7
-output se recc32 recc32
+          :count)
+output bf bf bl get-packet
 end
 
 to wl :addr :l
@@ -55,47 +64,43 @@ clearcom
 sendl (se $fd
          byte0 :addr byte1 :addr
          byte2 :addr byte3 :addr
-         byte0 :count byte1 :count
+         :count
          :l)
-repeat count :l [ignore recc]
+ignore get-packet
 end
 
 to flash-write :src :dst :count
 clearcom
-sendl (se $fb
+sendl (se $fc
          byte0 :src byte1 :src
          byte2 :src byte3 :src
          byte0 :dst byte1 :dst
          byte2 :dst byte3 :dst
          byte0 :count byte1 :count)
-if (trecc 1000) = -1 [print se [flash write error] hw :dst stopme]
+if empty? get-packet [print se [flash write error] hw :dst stopme]
 end
 
 to erp :addr
 clearcom
-sendl (se $fa
+sendl (se $fb
           byte0 :addr byte1 :addr
           byte2 :addr byte3 :addr)
-if (trecc 1000) = -1 [print [flash erase error]]
+if empty? get-packet [print [flash erase error]]
 end
 
 to setsh :l
-sendl se $f9 :l
-end
-
-to stopvm
-send 0 wait 2
+sendl se $f7 :l
 end
 
 to check
 clearcom
 send $ff
-if recc = 23 [output true]
+if get-packet = [255 0 237] [output true]
 open-serial-port
 wait 15
 clearcom
 send $ff
-output recc = 23
+output get-packet = [255 0 237]
 end
 
 to startvm

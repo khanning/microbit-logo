@@ -5,8 +5,8 @@ constructor(){
 	this.FONT = 0x31000;
 	this.PROCS = 0x30000;
 
-	this.monstr = '';
-	this.packetcallback = null;
+	this.packet = [];
+	this.respfcns = {};
 }
 
 download(bytes, shapes, fcn){
@@ -48,74 +48,51 @@ downloadData(addr, data, fcn){
 ccrun(l,fcn){
 	var t = this;
 	var stack,vm;
-	t.vmstopThenRun(next1);
+	t.vmstopThenRun(next);
 
-	function next1(){t.getaddrs(next2);}
-
-	function next2(a){
-		stack = a[0]+15*512;
-		vm = a[1];
-		t.ramwrite(stack+0x1c0,l,next3);
-	}
-
-	function next3(){
-		var header = [].concat(t.fourbytes(stack+20),t.fourbytes(vm),t.fourbytes(stack+0x1c0),0,0,0,0,0,0,0,0);
-		t.ramwrite(stack,header,fcn);
+	function next(){
+		var cmd = [].concat(0xf8,l.length,l);
+		t.sendReceive(cmd);
 	}
 
 }
 
 vmstopThenRun(fcn){
 	var t = this;
-	t.sendl([0xf8]);		//stop the vm if runninf
+	t.sendl([0xf9]);		//stop the vm if running
 	setTimeout(next1, 300);
 
 	function next1(){chrome.serial.flush(t.serialID, fcn);}
 }
 
 flasherase(addr,fcn){
-	var cmd = [].concat([0xfa], this.fourbytes(addr));
-	this.sendReceive(cmd,1,fcn);
+	var cmd = [].concat([0xfb], this.fourbytes(addr));
+	this.sendReceive(cmd,fcn);
 }
 
 flashwrite(src, dst, count, fcn){
-	var cmd = [].concat([0xfb], this.fourbytes(src), this.fourbytes(dst), this.twobytes(count));
-	this.sendReceive(cmd,1,fcn);
+	var cmd = [].concat([0xfc], this.fourbytes(src), this.fourbytes(dst), this.twobytes(count));
+	this.sendReceive(cmd,fcn);
 }
 
 ramwrite(addr,l,fcn){
-	var cmd = [].concat([0xfd], this.fourbytes(addr), this.twobytes(l.length), l);
-	this.sendReceive(cmd,l.length,fcn);
+	var cmd = [].concat([0xfd], this.fourbytes(addr), l.length, l);
+	this.sendReceive(cmd,fcn);
 }
 
 rread(addr,len,fcn){
-	var cmd = [].concat([0xfe], this.fourbytes(addr), this.twobytes(len));
-	this.sendReceive(cmd,len,fcn);
-}
-
-getaddrs(fcn){
-	this.sendReceive([0xf7],8,next1);
-
-	function next1(l){fcn([l[0]+(l[1]<<8)+(l[2]<<16)+(l[3]<<24),l[4]+(l[5]<<8)+(l[6]<<16)+(l[7]<<24)]);}
-//	function next1(l){fcn(l);}
+	var cmd = [].concat([0xfe], this.fourbytes(addr), len);
+	this.sendReceive(cmd,fcn);
 }
 
 twobytes(n){return [n&0xff, (n>>8)&0xff];}
 fourbytes(n){return [n&0xff, (n>>8)&0xff, (n>>16)&0xff, (n>>24)&0xff];}
 	
-sendReceive(l, n, fcn){
-	var rec = {response: [], rlen: 0, fcn: fcn, t: this};
-	this.packetcallback = (c)=>{srrecc(c,rec);}
+sendReceive(l, fcn){
+	console.log('sending:',l);
+	this.respfcns[l[0]] = fcn;
 //	console.log('sending: ',l);
 	this.sendl(l);
-
-	function srrecc(c,rec){
-		rec.response.push(c);
-//		console.log('received:',l,rec.response.length,n,);
-		if(rec.response.length!=n) return;
-		rec.t.packetcallback=null; 
-		if(rec.fcn) rec.fcn(rec.response);
-	}
 }
 
 sendl(l){
@@ -155,16 +132,27 @@ openSerialPort(){
 
 		function onrecc(r){
 			var l = Array.from(new Uint8Array(r.data));
-			for(var i in l) {
-				if (t.packetcallback!=null) t.packetcallback(l[i]);
-				else gotChar(l[i]);
-			}
+			for(var i in l) gotChar(l[i]);
+		}
 
-			function gotChar(c){
-				if(c==10){println(t.monstr); t.monstr='';}
-				if(c<32) return;
-				if(c==207) return;
-				t.monstr+= String.fromCharCode(c);
+		function gotChar(c){
+			if((t.packet.length==0)&&(c>=0xf0)) t.packet.push(c);
+			else if(c==0xed){
+				if(t.packet.length==t.packet[1]+2) handlePacket(t.packet);
+				t.packet = [];
+			} else t.packet.push(c);
+		}
+
+		function handlePacket(p){
+			var type = p[0];
+			var data = p.slice(2);
+			if(type==0xf0) insert(String.fromCharCode.apply(null, data));
+			else {
+				console.log('received:',p);
+				if(t.respfcns[type]){
+					t.respfcns[type](data);
+					delete t.respfcns[type];
+				}
 			}
 		}
 	}

@@ -12,7 +12,7 @@ stopothers
 if eq shape 0 [setshape 4]
 nextshape
 repeat 9 
- [repeat 5 [wait .05 shiftd]
+ [repeat 5 [wait .05 shiftu]
   wait .5]
 clear
 end

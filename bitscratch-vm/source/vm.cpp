@@ -93,8 +93,14 @@ void vm_start(uint8_t type){
     }
 }
 
+void vm_runcc(uint32_t startaddr){
+//    setup_stack(&stacks[STACKLEN*(NSTACKS-1)], startaddr, 0);
+    setup_stack(stacks, startaddr, 0);
+}
+
 void setup_stack(int32_t *stack, uint32_t startaddr, uint8_t type){
-    if((*((uint8_t*) startaddr))!=type) return;
+    uint8_t firstop = *((uint8_t*) startaddr);
+    if((type!=0)&&(type!=firstop)) return;
     int32_t *sp = stack;
     sp += 1;                // leave space for the sp
     *sp++ = (int32_t) vm;   // continuation
