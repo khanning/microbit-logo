@@ -24,9 +24,11 @@ shapetest(n){
 	setInterval(sendshape,n);
 
 	function sendshape(){
-		t.setshape([(t.n>>5)&0x1f,t.n&0x1f,0,0,0]);
+		t.setshape([(t.n>>15)&0x1f,(t.n>>10)&0x1f,(t.n>>5)&0x1f,t.n&0x1f,0]);
 		t.n++;
+		t.poll(next)
 	}
+	function next(l){t.polldata=l;}
 }
 
 download(bytes, shapes, fcn){
