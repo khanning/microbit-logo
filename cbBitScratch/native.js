@@ -7,6 +7,26 @@ constructor(){
 
 	this.packet = [];
 	this.respfcns = {};
+
+	this.n = 0;
+}
+
+polltest(n){
+	var t = this;
+
+	setInterval(()=>{this.poll(next);},n);
+	function next(l){t.polldata=l;}
+}
+
+shapetest(n){
+	var t = this;
+
+	setInterval(sendshape,n);
+
+	function sendshape(){
+		t.setshape([(t.n>>5)&0x1f,t.n&0x1f,0,0,0]);
+		t.n++;
+	}
 }
 
 download(bytes, shapes, fcn){
@@ -85,13 +105,19 @@ rread(addr,len,fcn){
 	this.sendReceive(cmd,fcn);
 }
 
+poll(fcn){
+	var cmd = [0xf5];
+	this.sendReceive(cmd,fcn);
+}
+
+setshape(l,fcn){this.sendl([].concat(0xf7,l));}
+
 twobytes(n){return [n&0xff, (n>>8)&0xff];}
 fourbytes(n){return [n&0xff, (n>>8)&0xff, (n>>16)&0xff, (n>>24)&0xff];}
 	
 sendReceive(l, fcn){
-	console.log('sending:',l);
-	this.respfcns[l[0]] = fcn;
-//	console.log('sending: ',l);
+//	console.log('sending:',l);
+	if(fcn) this.respfcns[l[0]] = fcn;
 	this.sendl(l);
 }
 
@@ -148,7 +174,7 @@ openSerialPort(){
 			var data = p.slice(2);
 			if(type==0xf0) insert(String.fromCharCode.apply(null, data));
 			else {
-				console.log('received:',p);
+//				console.log('received:',p);
 				if(t.respfcns[type]){
 					t.respfcns[type](data);
 					delete t.respfcns[type];

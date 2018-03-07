@@ -411,13 +411,13 @@ void prim_prf(){
 }
 
 void frameWait(){
-    if(framewait==0) return;
+//    if(framewait==0) return;
     *sp++ = now()+framewait*10-51;
     wait_again();
 }
 
 void shiftWait(){
-    if(framewait==0) return;
+//    if(framewait==0) return;
     *sp++ = now()+framewait*2-51;
     wait_again();
 }
@@ -439,6 +439,11 @@ void prim_brightness(){
     setbrightness(n*255/100);
 }
 
+void prim_setframewait(){
+    int32_t n = *--sp;
+    framewait = (n>=5)?n:5;
+}
+
 void prim_doton(){
     uint8_t y = (uint8_t)(((float)*--sp)/100);
     uint8_t x = (uint8_t)(((float)*--sp)/100);
@@ -455,7 +460,6 @@ void prim_shiftl(){shiftl(); shiftWait();}
 void prim_shiftr(){shiftr(); shiftWait();}
 void prim_shiftd(){shiftd(); shiftWait();}
 void prim_shiftu(){shiftu(); shiftWait();}
-void prim_setframewait(){framewait = *--sp;}
 
 void prim_accx(){*sp++=accx()*100;}
 void prim_accy(){*sp++=accy()*100;}

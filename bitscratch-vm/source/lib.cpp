@@ -252,10 +252,10 @@ void printnum(int32_t n){
   int32_t k = (int32_t)(n/100);
   int32_t d1 = (int32_t)((n/10)%10);
   int32_t d2 = (int32_t)(n%10);
-  prptr+= sprintf(prbuf,"%d", (int)k);
+  prptr+= sprintf(prptr,"%d", (int)k);
   if(d1||d2) *prptr++='.';
-  if(d1||d2) prptr+= sprintf(prbuf,"%d",(int)d1);
-  if(d2) prptr+= sprintf(prbuf,"%d",(int)d2);
+  if(d1||d2) prptr+= sprintf(prptr,"%d",(int)d1);
+  if(d2) prptr+= sprintf(prptr,"%d",(int)d2);
 }
 
 void print(int32_t c){prptr = prbuf; printnum(c); sprintf(prptr,"\n"); sendprbuf();}
