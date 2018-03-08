@@ -1,59 +1,9 @@
 to on-buttona
-stopothers
-setshape 1
-repeat 9 
- [repeat 5 [shiftl]
-  wait .5]
-clear
+repeat 2 [print 123]
 end
 
 to on-buttonb
-stopothers
-if eq shape 0 [setshape 4]
-nextshape
-repeat 9 
- [repeat 5 [wait .05 shiftu]
-  wait .5]
-clear
+print 321
 end
 
-
-
-
-shapes [
-xxxx-
-x---x
-xxxx-
-x---x
-xxxx-
-
-xxxx-
-x---x
-xxxx-
-x---x
-x---x
-
--xxx-
---x--
---x--
---x--
--xxx-
-
--xxx-
-x---x
-xxxxx
-x---x
-x---x
-
-x---x
-xx--x
-x-x-x
-x--xx
-x---x
-
------
--x-x-
---x--
--x-x-
------
-]
+shapes []

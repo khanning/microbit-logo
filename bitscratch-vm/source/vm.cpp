@@ -94,8 +94,8 @@ void vm_start(uint8_t type){
 }
 
 void vm_runcc(uint32_t startaddr){
-//    setup_stack(&stacks[STACKLEN*(NSTACKS-1)], startaddr, 0);
-    setup_stack(stacks, startaddr, 0);
+    setup_stack(&stacks[STACKLEN*(NSTACKS-1)], startaddr, 0);
+//    setup_stack(stacks, startaddr, 0);
 }
 
 void setup_stack(int32_t *stack, uint32_t startaddr, uint8_t type){
@@ -268,7 +268,7 @@ void eol_repeatuntil_cond(){
     if(!res){
         eoltype = (int32_t)eol_repeatuntil_action;
         ip=(uint8_t*)(*(sp-3));
-        yield((int32_t)vm);
+//        yield((int32_t)vm);
     } else {
         eoltype = *--sp;
         ip = (uint8_t*)(*--sp);
@@ -375,18 +375,6 @@ void prim_changebox(){
     boxes[t1] += t0;
 }
 
-void prim_wait(){
-    (*(sp-1)) *= 10;
-    (*(sp-1)) += now();
-    (*(sp-1)) -= 51;
-    yield((int32_t)wait_again);
-}
-
-void wait_again(){
-    if(now()>(*(sp-1))) {sp-=1; yield((int32_t)vm);}
-    else yield((int32_t)wait_again);
-}
-
 void prim_random(){
     int32_t max = (int32_t)(((float)*--sp)/100);
     int32_t min = (int32_t)(((float)*--sp)/100);
@@ -400,7 +388,6 @@ void prim_broadcast(){
     rsend(n);
 }
 
-
 void prim_print(){print(*--sp);}
 void prim_prs(){prs((uint8_t*)*--sp);}
 
@@ -411,15 +398,29 @@ void prim_prf(){
 }
 
 void frameWait(){
-//    if(framewait==0) return;
-    *sp++ = now()+framewait*10-51;
+    if(framewait<=2) return;
+    *sp++ = now()+framewait*10;
     wait_again();
 }
 
 void shiftWait(){
-//    if(framewait==0) return;
+    if(framewait<=2) return;
     *sp++ = now()+framewait*2-51;
     wait_again();
+}
+
+void prim_wait(){
+    if((*(sp-1))>2){
+        *(sp-1) *= 10;
+        (*(sp-1)) += now();
+        wait_again();
+    } else sp--;
+}
+
+void wait_again(){
+    int32_t delta = (*(sp-1))-now();
+    if(delta<80) {sp-=1; yield((int32_t)vm);}
+    else yield((int32_t)wait_again);
 }
 
 
@@ -429,8 +430,9 @@ void prim_clear(){clear(); frameWait();}
 void prim_nextshape(){nextshape(); frameWait();}
 void prim_prevshape(){prevshape(); frameWait();}
 void prim_resett(){resett();}
-void prim_timer(){*sp++=timer()/10;}
+void prim_timer(){*sp++=(timer()+5)/10;}
 void prim_ticks(){*sp++=get_ticks()*100;}
+void prim_setframewait(){framewait = *--sp;}
 
 void prim_brightness(){
     int32_t n = (int32_t)(((float)*--sp)/100);
@@ -439,10 +441,6 @@ void prim_brightness(){
     setbrightness(n*255/100);
 }
 
-void prim_setframewait(){
-    int32_t n = *--sp;
-    framewait = (n>=5)?n:5;
-}
 
 void prim_doton(){
     uint8_t y = (uint8_t)(((float)*--sp)/100);

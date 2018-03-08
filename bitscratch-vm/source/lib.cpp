@@ -66,7 +66,12 @@ void lib_init(){
 }
 
 void evt_poll(){
-  if(pollinhibit>0){pollinhibit--; return;}
+  if(pollinhibit>0){
+    int c = radiorecv();
+    if(c!=-1) pollrecv=c;
+    pollinhibit--; 
+    return;
+  }
   int this_btna = buttona.isPressed();
   if(this_btna&!last_btna) btna_evt=1;
   last_btna = this_btna;
@@ -323,7 +328,7 @@ void uputc16(int32_t n){
 }
 
 void send_io_state(){
-  pollinhibit = 10;
+  pollinhibit = 25;
   uputc(0xf5);
   uputc(11);
   uputc(buttona.isPressed());

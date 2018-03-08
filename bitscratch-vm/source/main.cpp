@@ -143,7 +143,7 @@ int main() {
     lib_init();
     prs((uint8_t*)"starting...");
     vm_stop();
-    int32_t end = now()+25;
+    int32_t end = now()+50;
     while(1){
         while(now()<end){
             int c = ugetcAsync();
@@ -159,7 +159,7 @@ int main() {
             if(rpeek()<8) vm_start(OP_ONFLAG+rpeek());
         }
         vm_run();
-        end += 25;
+        end += 50;
     }
 }
 

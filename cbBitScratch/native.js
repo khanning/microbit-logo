@@ -11,24 +11,16 @@ constructor(){
 	this.n = 0;
 }
 
-polltest(n){
-	var t = this;
-
-	setInterval(()=>{this.poll(next);},n);
-	function next(l){t.polldata=l;}
-}
-
 shapetest(n){
 	var t = this;
 
-	setInterval(sendshape,n);
+	t.ticker = setInterval(sendshape,n);
 
 	function sendshape(){
 		t.setshape([(t.n>>15)&0x1f,(t.n>>10)&0x1f,(t.n>>5)&0x1f,t.n&0x1f,0]);
 		t.n++;
-		t.poll(next)
+		t.sendl([0xf5]);
 	}
-	function next(l){t.polldata=l;}
 }
 
 download(bytes, shapes, fcn){
@@ -175,6 +167,7 @@ openSerialPort(){
 			var type = p[0];
 			var data = p.slice(2);
 			if(type==0xf0) insert(String.fromCharCode.apply(null, data));
+			if(type==0xf5) t.polldata=data;
 			else {
 //				console.log('received:',p);
 				if(t.respfcns[type]){

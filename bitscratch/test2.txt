@@ -1,0 +1,59 @@
+to on-buttona
+stopothers
+setshape 1
+repeat 9 
+ [repeat 5 [shiftl]
+  wait .5]
+clear
+end
+
+to on-buttonb
+stopothers
+if eq shape 0 [setshape 4]
+nextshape
+repeat 9 
+ [repeat 5 [shiftu]
+  wait .5]
+clear
+end
+
+
+
+
+shapes [
+xxxx-
+x---x
+xxxx-
+x---x
+xxxx-
+
+xxxx-
+x---x
+xxxx-
+x---x
+x---x
+
+-xxx-
+--x--
+--x--
+--x--
+-xxx-
+
+-xxx-
+x---x
+xxxxx
+x---x
+x---x
+
+x---x
+xx--x
+x-x-x
+x--xx
+x---x
+
+-----
+-x-x-
+--x--
+-x-x-
+-----
+]
