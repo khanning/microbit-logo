@@ -24,6 +24,7 @@ void evt_poll(void);
 void dev_poll(void);
 void print(int32_t);
 int rpeek(void);
+void rsend(uint8_t);
 void send_io_state(void);
 extern int btna_evt, btnb_evt, radio_evt;
 extern volatile int32_t ticks;
@@ -123,6 +124,11 @@ void runcc(){
     vm_runcc((uint32_t)code);
 }
 
+void rsendcmd(){
+    uint32_t count = ugetc();
+    for(uint8_t i=0;i<count;i++) rsend(ugetc());
+}
+
 void dispatch(uint8_t c){
     if(c==0xff) ping();
     else if(c==0xfe) readmemory();
@@ -135,6 +141,7 @@ void dispatch(uint8_t c){
     else if(c==0xf7) setshapecmd();
     else if(c==0xf6) setbrightnesscmd();
     else if(c==0xf5) send_io_state();
+    else if(c==0xf4) rsendcmd();
     else uputc(c);
 }
 

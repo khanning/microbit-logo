@@ -8,19 +8,6 @@ constructor(){
 	this.packet = [];
 	this.respfcns = {};
 
-	this.n = 0;
-}
-
-shapetest(n){
-	var t = this;
-
-	t.ticker = setInterval(sendshape,n);
-
-	function sendshape(){
-		t.setshape([(t.n>>15)&0x1f,(t.n>>10)&0x1f,(t.n>>5)&0x1f,t.n&0x1f,0]);
-		t.n++;
-		t.sendl([0xf5]);
-	}
 }
 
 download(bytes, shapes, fcn){
@@ -104,7 +91,9 @@ poll(fcn){
 	this.sendReceive(cmd,fcn);
 }
 
-setshape(l,fcn){this.sendl([].concat(0xf7,l));}
+setshape(l){this.sendl([].concat(0xf7,l));}
+rsend(l){this.sendl([].concat(0xf4,l.length,l));}
+
 
 twobytes(n){return [n&0xff, (n>>8)&0xff];}
 fourbytes(n){return [n&0xff, (n>>8)&0xff, (n>>16)&0xff, (n>>24)&0xff];}
