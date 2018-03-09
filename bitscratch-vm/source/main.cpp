@@ -93,13 +93,13 @@ void writeflash(){
     uint32_t src = read32();
     uint32_t dst = read32();
     uint32_t count = read16();
-    flash.flash_write((std::uint32_t*)dst, (std::uint32_t*)src, (int)count);
+    flash.flash_write((uint32_t*)dst, (uint32_t*)src, (int)count);
     sendresponse(0xfc);
 }
 
 void eraseflash(){
     uint32_t addr = read32();
-    flash.erase_page((std::uint32_t*)addr);
+    flash.erase_page((uint32_t*)addr);
     sendresponse(0xfb);
 }
 

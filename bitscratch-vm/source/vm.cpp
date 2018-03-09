@@ -9,19 +9,6 @@ int32_t stacks[NSTACKS*STACKLEN];
 #define OP_ONSTART 5
 #define FIRST_FLAG 0xf0
 
-extern void(*prims[])();
-
-void vm(void);
-void resume(int32_t*);
-void eol_repeat(void);
-void eol_list(void);
-void eol_waituntil(void);
-void eol_repeatuntil_cond(void);
-void eol_repeatuntil_action(void);
-void wait_again(void);
-void eval_ufun(void);
-void setup_stack(int32_t*,uint32_t,uint8_t);
-
 void dev_poll(void);
 int32_t now(void);
 int32_t lib_random(int32_t,int32_t);
@@ -52,6 +39,19 @@ int32_t get_buttona(void);
 int32_t get_buttonb(void);
 void rsend(uint8_t c);
 int32_t rrecc(void);
+
+extern void(*prims[])();
+
+void vm(void);
+void resume(int32_t*);
+void eol_repeat(void);
+void eol_list(void);
+void eol_waituntil(void);
+void eol_repeatuntil_cond(void);
+void eol_repeatuntil_action(void);
+void wait_again(void);
+void eval_ufun(void);
+void setup_stack(int32_t*,uint32_t,uint8_t);
 
 int32_t *stack;
 int32_t *sp;
@@ -247,7 +247,6 @@ void eol_repeat(){
         eoltype = *--sp;
         ip = (uint8_t*)(*--sp); 
         sp-=2;
-        yield((int32_t)vm);
     }
     else {
         (*(sp-4))-=100; 
