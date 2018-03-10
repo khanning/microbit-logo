@@ -124,8 +124,8 @@ void resume(int32_t *newstack){
 void yield(int32_t continuation){
     *sp++ = continuation;
     *sp++ = (int32_t) ip;
-    *sp++ = (int32_t) fp;      
-    *sp++ = eoltype;      
+    *sp++ = (int32_t) fp;
+    *sp++ = eoltype;
     *stack = (int32_t) sp;
     yieldnow = true;
 }
@@ -135,7 +135,7 @@ void vm(){
         dev_poll();
         uint8_t token = *ip++;
         if((token==0)||(token==0xff)){
-            *stack=0; 
+            *stack=0;
             break;
         }
         if(token<0x80){
@@ -245,11 +245,11 @@ void prim_repeat(){
 void eol_repeat(){
     if(*(sp-4)<=50) {
         eoltype = *--sp;
-        ip = (uint8_t*)(*--sp); 
+        ip = (uint8_t*)(*--sp);
         sp-=2;
     }
     else {
-        (*(sp-4))-=100; 
+        (*(sp-4))-=100;
         ip=(uint8_t*)(*(sp-3));
         yield((int32_t)vm);
     }
@@ -330,7 +330,7 @@ void prim_ifelse(){
 }
 
 void eol_list(){
-    ip = (uint8_t*)(*--sp); 
+    ip = (uint8_t*)(*--sp);
     eoltype = *--sp;
 }
 
@@ -471,23 +471,23 @@ void prim_rrecc(){*sp++=rrecc()*100;}
 void(*prims[])() = {
     eval_done,
     eval_byte, eval_num,
-    eval_list, eval_eol, 
-    eval_lthing, eval_lset, eval_lchange, 
-    eval_ufun, 
-    prim_stop, prim_output, 
-    prim_stopall, prim_stopothers, 
+    eval_list, eval_eol,
+    eval_lthing, eval_lset, eval_lchange,
+    eval_ufun,
+    prim_stop, prim_output,
+    prim_stopall, prim_stopothers,
     prim_repeat, prim_forever, prim_if, prim_ifelse,
     prim_waituntil, prim_repeatuntil,
     prim_add, prim_subtract, prim_multiply, prim_divide,
     prim_mod,
     prim_equal, prim_ne, prim_greater, prim_less,
     prim_and, prim_or, prim_xor,
-    prim_not, 
+    prim_not,
     prim_setbox, prim_box, prim_changebox,
     prim_broadcast,
-    prim_random, prim_print, prim_prs, prim_prf, 
+    prim_random, prim_print, prim_prs, prim_prf,
     prim_wait, prim_resett, prim_timer, prim_ticks,
-    prim_setshape, prim_shape, prim_clear, 
+    prim_setshape, prim_shape, prim_clear,
     prim_nextshape, prim_prevshape,
     prim_doton, prim_dotoff, prim_brightness,
     prim_accx, prim_accy, prim_accz, prim_acc,

@@ -1,7 +1,7 @@
 #include "MicroBit.h"
 #include "MicroBitFlash.h"
 
-MicroBitSerial pc(USBTX, USBRX, 200); 
+MicroBitSerial pc(USBTX, USBRX, 200);
 MicroBitStorage storage;
 MicroBitFlash flash;
 MicroBitMessageBus messageBus;
@@ -39,7 +39,7 @@ void prs(uint8_t*);
 uint8_t code[128];
 
 void init(){
-    pc.baud(19200);  
+    pc.baud(19200);
     scheduler_init(messageBus);
 }
 
@@ -161,7 +161,7 @@ int main() {
         if(btna_evt){btna_evt=0; vm_start(OP_ONBUTTONA);}
         if(btnb_evt){btnb_evt=0; vm_start(OP_ONBUTTONB);}
         if(radio_evt){
-            radio_evt=0; 
+            radio_evt=0;
             vm_start(OP_ONRECEIVE);
             if(rpeek()<8) vm_start(OP_ONFLAG+rpeek());
         }
