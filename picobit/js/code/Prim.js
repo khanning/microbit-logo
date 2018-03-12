@@ -21,6 +21,15 @@ Prim.done = function (){
 	 console.log ("Prim.done", Runtime.thread.firstBlock.opcode);
 }
 
+Prim.doClean = function (){ 
+	var t = Runtime.thread;
+	Runtime.stopThreads(Code.scripts)
+	console.log ("Prim.done", Runtime.thread.firstBlock.opcode);
+	Prim.currentShape = {n: undefined, dx:0, dy: 0}
+	HW.shape = [0,0,0,0,0];
+	t.thisblock = undefined;		
+}
+
 Prim.missing  = function (){ 
 	var thread =  Runtime.thread;
 	var b = thread.thisblock;
@@ -168,7 +177,7 @@ Prim.control_stop = function (b){
 	switch (args.STOP_OPTION){
 		case "stopall": Runtime.stopThreads(t.sc); break;
 		case "stop":
-			Runtime.stopThread(t, function(t){t.stop();});
+			Runtime.stopThread(t);
 			break;
 		case "stopothers": Runtime.stopOthers(t); break;
 	}
@@ -245,7 +254,7 @@ Prim.lights_setpace = function (){
 
 Prim.setShape = function (thread, list, faster){
 	if (Prim.pace > 0) {
-		var future = faster ? (200 * Prim.pace) + Date.now() :  (1000 * Prim.pace) + Date.now();
+		var future = faster ? (200 * Prim.pace) + Date.now() - 51 :  (1000 * Prim.pace) + Date.now();
 		thread.waitFcn = function (){return Prim.waitForTime(future);}
 	}
 	HW.shape = list;
@@ -301,12 +310,12 @@ Prim.lights_scroll = function (){
 	switch (option) {
 		case 'right': 		
 			Prim.currentShape.dy = 0;
+			if (Prim.currentShape.n == undefined) Prim.previousShape();
 			if (Prim.currentShape.dx > 0) Prim.currentShape.dx--; 
 			else { 
-				let n = Prim.currentShape.n;
-				n = n ? n-- : 0;
-				Prim.currentShape = {n: Prim.mapValueShape(n), dx:4, dy: 0};
-				} 	
+				Prim.previousShape();
+				Prim.currentShape.dx = 4;
+				} 
 			break;
 		case 'left':
 			Prim.currentShape.dy = 0;
@@ -314,17 +323,20 @@ Prim.lights_scroll = function (){
 			if (Prim.currentShape.dx == 5) Prim.nextShape();
 			break;
 	  case 'up':
+	  	if (Prim.currentShape.n == undefined) Prim.currentShape.n = 0;
 	  	Prim.currentShape.dx = 0;
 			if (Prim.currentShape.dy > 0) Prim.currentShape.dy--; 
 			else  {
-				let n = Prim.currentShape.n;
-				n = n ? n++ : 0;
-				Prim.currentShape = {n: Prim.mapValueShape(n), dx:0, dy: 4};
+				Prim.nextShape();
+				Prim.currentShape.dy = 4;
 			}
+		//	console.log ('up', Prim.currentShape)
 			break;
 		case 'down': 
+			if (Prim.currentShape.n == undefined) Prim.previousShape(); 
 			Prim.currentShape.dx = 0; Prim.currentShape.dy++;
 			if (Prim.currentShape.dy == 5) Prim.previousShape(); 
+		//	console.log ('down', Prim.currentShape)
 			break;
 	}
 	let shape = ShapeEditor.getShapeData(Prim.currentShape)

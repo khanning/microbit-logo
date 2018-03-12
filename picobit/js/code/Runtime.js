@@ -31,20 +31,18 @@ Runtime.stopThreads = function(sc) {
 	Runtime.turnOffStacks(sc);
 	for (var i=0; i <  Runtime.threadsRunning.length; i++) {
 		if (Runtime.threadsRunning[i].isRunning) {
-			Runtime.stopThread(Runtime.threadsRunning[i], doNext);
+			Runtime.stopThread(Runtime.threadsRunning[i]);
 		}
 	}	
-	function doNext(thread){thread.stop();}		
 }
 
 Runtime.stopOthers = function(t) {
 	for (var i=0; i <  Runtime.threadsRunning.length; i++) {
 		if (Runtime.threadsRunning[i] ==  t) continue;
 		if (Runtime.threadsRunning[i].isRunning) {
-			Runtime.stopThread(Runtime.threadsRunning[i], doNext);
+			Runtime.stopThread(Runtime.threadsRunning[i]);
 		}
 	}	
-	function doNext(thread){thread.stop();}		
 }
 
 Runtime.turnOffStacks = function(sc) {
@@ -151,7 +149,7 @@ Runtime.runBlock = function(b) {
 		Runtime.unglowBlock(Runtime.thread, Runtime.thread.onblock);
 		Runtime.thread.onblock = null;
 	}
-	var setoff = ["missing", 'control_onstart', 'control_onpress', 'control_ondistance', 'control_onbrightness', 'control_onstart', 'control_onpress', 'control_ondistance', 'control_repeat']
+	var setoff = ["missing", 'control_repeat', 'events_onbuttona', 'events_onbuttonb', 'events_onreceive']
 	if (setoff.indexOf(b.opcode) < 0) {
 		Runtime.time = new Date().getTime();
 		Runtime.glowBlock(Runtime.thread, b);
@@ -170,7 +168,6 @@ Runtime.endCase = function () {
 }
 
 Runtime.addScript = function(sc, block){
-//	console.log("Runtime.addScript", sc, block)
 	var  newThread =  new Thread(sc, block);
 	Runtime.restartThread(newThread);
 }
@@ -180,8 +177,8 @@ Runtime.restartThread = function (newThread) {
   for (var i = 0; i < Runtime.threadsRunning.length; i++) {  	
    	if (Runtime.threadsRunning[i].firstBlock == newThread.firstBlock) {
       wasRunning = true;
-  //    var thread = Runtime.threadsRunning[i];
-  //    if (thread.trigger) Runtime.stopThread(thread, doNext);
+      var thread = Runtime.threadsRunning[i];
+     	Runtime.stopThread(thread, doNext);
     }
   }
   if (!wasRunning) {
@@ -189,7 +186,10 @@ Runtime.restartThread = function (newThread) {
   	 newThread.startGlow();
   	}
   
-//  function doNext (value){thread.restart();}
+  function doNext (value){
+  	Prim.currentShape = {n: undefined, dx:0, dy: 0}
+		HW.shape = [0,0,0,0,0];
+  }
 }
 
 Runtime.stopThread = function (thread, fcn) {
@@ -198,22 +198,8 @@ Runtime.stopThread = function (thread, fcn) {
 		var opcode = thread.sc.blocksContainer.getBlock(procId).opcode
 		if (opcode == "myblocks_definition") thread.exitProcedure()
 	}
-	var b = thread.onblock;
-	if (b) {
-		var op = b.opcode.split("_")[1];
-		var isLight =  Defs.primtives[op][2] == "motion"
-		if (isLight) lightOff(thread, b)
-		else fcn(thread);
-	}
-	else lightDone();
-	
-	function lightOff (thread, b){
-	//	HW.sendShape([0,0,0,0,0]);
-	//	else 
-		lightDone()
-	}
-	
-	function lightDone (val){fcn(thread)}	
+	thread.stop();
+	if (fcn) fcn();
 }
 
 Runtime.stopThreadForBlock = function (topblock, whenDone) {
@@ -222,14 +208,10 @@ Runtime.stopThreadForBlock = function (topblock, whenDone) {
  		var thread = 	Runtime.threadsRunning[i]
    	if (thread.firstBlock.id == topblock.id) {
 			running = true; 
-			Runtime.stopThread(thread, doNext);
+			Runtime.stopThread(thread, whenDone);
    	}
  	}
  	if (!running) whenDone()
- 	function doNext(thread){
- 		thread.stop()
- 		whenDone()
- 	}
 }	
 	
 Runtime.glowBlock = function(t, b) {if (b && t.blockExists(b.id)) Code.workspace.glowBlock(b.id, true);}

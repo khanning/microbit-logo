@@ -1,12 +1,12 @@
 ///////////////////////////
 // Thread specs
 ///////////////////////////
-
+	if((typeof b)=='string') Prim[b]();
 class Thread {
 	constructor (sc, b) {
 		this.sc = sc;
 		this.firstBlock = b;
-		var op = b.opcode.split("_")[1];
+		var op = ((typeof b)=='string') ? b  : b.opcode.split("_")[1];
 		this.trigger = !Defs.primtives[op] ?  false: Defs.primtives[op][1] == "t"		
 		this.waitFcn = undefined;
 		this.isRunning=true;

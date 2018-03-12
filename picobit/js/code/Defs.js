@@ -108,6 +108,7 @@ Defs = function(){}
 	Defs.getXML = (prims) => {
 		Defs.argsKeys = {};
 		Defs.primtives = Defs.getDefinitions(prims)
+		Defs.primtives ["doClean"] = 	["doClean","s","event", "When @icon clicked"];
 		var xml = document.createElement('XML');
 		xml.setAttribute("id", "toolbox-categories"); 
 		xml.style.display= "none";

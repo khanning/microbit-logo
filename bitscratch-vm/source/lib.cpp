@@ -175,7 +175,7 @@ void shifthDraw(){
 }
 
 void shiftl(){
-  if(thisshape==0) return;
+  if(thisshape==0) nextshape();
   if(shapeoffv>0) shapeoffv=0;
   shapeoffh++;
   if(shapeoffh==5) nextshape();
@@ -183,7 +183,7 @@ void shiftl(){
 }
 
 void shiftr(){
-  if(thisshape==0) return;
+  if(thisshape==0) prevshape();
   if(shapeoffv>0) shapeoffv=0;
   if(shapeoffh>0) shapeoffh--;
   else {
@@ -210,7 +210,7 @@ void shiftvDraw(){
 }
 
 void shiftu(){
-  if(thisshape==0) return;
+  if(thisshape==0) nextshape();
   if(shapeoffh>0) shapeoffh=0;
   shapeoffv++;
   if(shapeoffv==5) nextshape();
@@ -218,7 +218,7 @@ void shiftu(){
 }
 
 void shiftd(){
-  if(thisshape==0) return;
+  if(thisshape==0) prevshape();
   if(shapeoffh>0) shapeoffh=0;
   if(shapeoffv>0) shapeoffv--;
   else {

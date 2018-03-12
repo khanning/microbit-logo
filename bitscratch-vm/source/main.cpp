@@ -7,7 +7,7 @@ MicroBitFlash flash;
 MicroBitMessageBus messageBus;
 
 void lib_init(void);
-void direct_setshape(uint8_t a, uint8_t b, uint8_t c,  uint8_t d,  uint8_t e);
+void direct_setshape(uint8_t,uint8_t,uint8_t,uint8_t,uint8_t);
 void setbrightness(int32_t);
 
 uint8_t ugetc(){return pc.read(SYNC_SPINWAIT);}
@@ -18,6 +18,7 @@ void vm_start(uint8_t);
 void vm_run(void);
 void vm_stop(void);
 void vm_runcc(uint32_t);
+int vm_run_toggle(uint8_t);
 
 int32_t now(void);
 void evt_poll(void);
@@ -158,8 +159,8 @@ int main() {
             dev_poll();
         }
         evt_poll();
-        if(btna_evt){btna_evt=0; vm_start(OP_ONBUTTONA);}
-        if(btnb_evt){btnb_evt=0; vm_start(OP_ONBUTTONB);}
+        if(btna_evt){btna_evt=0; vm_run_toggle(OP_ONBUTTONA);}
+        if(btnb_evt){btnb_evt=0; vm_run_toggle(OP_ONBUTTONB);}
         if(radio_evt){
             radio_evt=0;
             vm_start(OP_ONRECEIVE);

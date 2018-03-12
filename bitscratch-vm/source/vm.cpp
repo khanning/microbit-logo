@@ -52,6 +52,7 @@ void eol_repeatuntil_action(void);
 void wait_again(void);
 void eval_ufun(void);
 void setup_stack(int32_t*,uint32_t,uint8_t);
+void toggle_stack(int32_t*,uint32_t,uint8_t);
 
 int32_t *stack;
 int32_t *sp;
@@ -75,6 +76,11 @@ void vm_run(){
     }
 }
 
+void vm_runcc(uint32_t startaddr){
+    setup_stack(&stacks[STACKLEN*(NSTACKS-1)], startaddr, 0);
+//    setup_stack(stacks, startaddr, 0);
+}
+
 void vm_stop(){
     int32_t *stack = stacks;
     for(int i=0;i<NSTACKS;i++){
@@ -93,9 +99,21 @@ void vm_start(uint8_t type){
     }
 }
 
-void vm_runcc(uint32_t startaddr){
-    setup_stack(&stacks[STACKLEN*(NSTACKS-1)], startaddr, 0);
-//    setup_stack(stacks, startaddr, 0);
+void vm_run_toggle(uint8_t type){
+    int32_t *stack = stacks;
+    uint32_t vector = procs;
+    for(int i=0;i<NSTACKS;i++){
+        toggle_stack(stack, vector, type);
+        stack += STACKLEN;
+        vector += 4;
+    }
+}
+
+void toggle_stack(int32_t *stack, uint32_t startaddr, uint8_t type){
+    uint8_t firstop = *((uint8_t*) startaddr);
+    if(type!=firstop) return;
+    if((*stack)==0) setup_stack(stack,startaddr,type);
+    else {*stack = 0; clear();}
 }
 
 void setup_stack(int32_t *stack, uint32_t startaddr, uint8_t type){

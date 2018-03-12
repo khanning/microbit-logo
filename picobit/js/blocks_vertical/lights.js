@@ -43,8 +43,8 @@ Blockly.Blocks['lights_scroll'] = {
             "type": "field_dropdown",
             "name": "SCROLL_OPTION",
             "options": [
+             	['left', 'left'],
               ['right', 'right'],
-              ['left', 'left'],
               ['up', 'up'],
               ['down', 'down']
             ]
