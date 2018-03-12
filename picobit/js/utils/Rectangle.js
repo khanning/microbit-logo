@@ -1,0 +1,78 @@
+	
+////////////////////////////////////////
+// Basic Matrix
+////////////////////////////////////////
+
+
+var Rectangle =function (x,y,w,h){
+	this.x = x;
+	this.y = y;
+	this.width = w;
+	this.height = h;
+}
+
+Rectangle.prototype.hitRect =function (pt){
+	var x = pt.x; var y = pt.y;
+ 	if(x<this.x) return false;
+	if(x>this.x+this.width) return false;
+	if(y<this.y) return false;
+	if(y>this.y + this.height) return false;
+	return true;
+}
+
+Rectangle.prototype.intersects =function (r){
+	var x0 = Math.max(this.x, r.x);
+  var x1 = Math.min(this.x + this.width, r.x + r.width);
+  if (x0 <= x1) {
+    var y0 = Math.max(this.y, r.y);
+    var y1 = Math.min(this.y + this.height, r.y + r.height);
+    if (y0 <= y1) return true;
+  }
+  return false;
+}
+
+Rectangle.prototype.union =function (box2){
+	var box = new Rectangle(0,0,0,0);
+	box.x = (this.x < box2.x) ?  this.x : box2.x;
+	box.y = (this.y < box2.y) ?  this.y : box2.y;
+	this.extentsw = this.x+ this.width;
+	this.extentsh = this.y+ this.height;
+	box2.extentsw =  box2.x+ box2.width;;
+	box2.extentsh =  box2.y+ box2.height;
+	box.width = (this.extentsw > box2.extentsw) ?  this.extentsw : box2.extentsw;
+	box.height = (this.extentsh > box2.extentsh) ? this.extentsh : box2.extentsh;
+	box.width -= box.x;
+	box.height -= box.y;
+	if (box.isEmpty()) box = {x:0, y:0, width:0, height:0};
+	return box;
+}
+
+
+Rectangle.prototype.overlapElemBy =function (box2,percent){return this.overlapElem(box2) >= percent;}
+
+Rectangle.prototype.overlapElem =function (box2){
+	var boxi = this.intersection(box2);
+	if (boxi.isEmpty()) return 0;
+	if (boxi.isEqual(box2)) return 1;
+	if (boxi.isEqual(box1)) return 1;
+	return (boxi.width * boxi.height) / (box2.width * box2.height);
+}
+
+Rectangle.prototype.intersection =function (box2){
+	var dx = Math.max(this.x, box2.x);
+  var dw = Math.min(this.x + this.width, box2.x + box2.width);  
+  if (dx <= dw) {
+    var dy = Math.max(this.y, box2.y);
+    var dh = Math.min(this.y + this.height, box2.y + box2.height);
+    if (dy > dh) return new Rectangle(0,0,0,0);
+    return new Rectangle(dx,dy, dw - dx, dh - dy);
+  }
+  return new Rectangle(0,0,0,0);
+}
+
+Rectangle.prototype.isEqual =function (box2){
+	return (this.x == box2.x ) &&  (this.y == box2.y ) && 
+				(this.width == box2.width) &&  (this.height== box2.height);
+};
+
+Rectangle.prototype.isEmpty =function (){ return (this.x == 0) &&  (this.y == 0) &&  (this.width == 0) &&  (this.height== 0)};

@@ -1,0 +1,16 @@
+{
+  "manifest_version": 2,
+  "name": "micro:bit Scratch 3",
+  "version": "0.2",
+  "minimum_chrome_version": "23",
+  "permissions": ["serial", "storage", {"fileSystem": ["write", "retainEntries", "directory"]}],
+  "icons": {
+    "16": "16_16.png",
+    "128": "128_128.png"
+  },
+  "app": {
+    "background": {
+      "scripts": ["main.js"]
+    }
+  }
+}

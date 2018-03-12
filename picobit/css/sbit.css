@@ -1,0 +1,556 @@
+	    
+html, body, div, h1, h2, h3, h4, h5, h6, p, pre, blockquote, address, img, dl,
+dt, dd, ol, ul, li, table, caption, tbody, tfoot, thead, tr, th, td, form, input,
+fieldset, legend, object, embed {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+	html, body {
+		height: 100%;
+	}
+
+	body {
+		background-color: #fff;
+		font-family: sans-serif;
+		overflow: hidden;
+	}
+
+	h1 {
+		font-weight: normal;
+		font-size: 140%;
+	}
+
+	#blocklyDiv {
+		float: right;
+		height: 100%;
+		width: 100%;
+	}
+      
+*.frame {
+	position: absolute;
+	margin: 0px;
+	padding:0px;
+	height: 100%;
+	width: 100%;
+	overflow: hidden;
+}
+
+
+/* left panel */
+
+#topbar {
+	position: absolute;
+	top:0;
+	left:0;
+	height: 64px;
+	width: 100%;
+	background: #69D2E7;
+	border-bottom: 1px solid #ccc;
+	border-right: 1px solid #ccc;
+}
+
+#sbit{
+ position: absolute;
+ top: 0px;
+ left: 5px;
+ margin: 7px 5px 7px;
+ width: 46px;
+ height: 46px;
+ background: url('../assets/sbit.svg') no-repeat center center;
+}
+
+#vdivider {
+	position: absolute;
+	margin: 0px;
+	top: 0px;
+	left: 219px;
+	width: 1px;
+	height: 100%;
+	background: rgba(255, 255, 255, 0.4)
+}
+
+#filemenu {
+	position: absolute;
+	left: 0px;
+	margin: 6px;
+	width: 48px;
+	height: 48px;
+	padding: 0;
+	background: url('../assets/menu.svg') no-repeat center center;
+}
+
+#topbar  *.microbit {
+  position: absolute;
+ 	margin: 0px 5px 0px;
+	left: 280px;
+  width: 64px;
+  height: 64px;
+  background: url('../assets/ui/microbit.svg') no-repeat center center;
+}
+
+#playbutton {
+	position: absolute;
+	right: 0px;
+	margin: 6px;
+	width: 48px;
+	height: 48px;
+	padding: 0;
+	background: url('../assets/ui/play.svg') no-repeat center center;
+}
+
+#playbutton.on {
+	position: absolute;
+	right: 0px;
+	margin: 6px;
+	width: 48px;
+	height: 48px;
+	padding: 0;
+	background: url('../assets/ui/stop.svg') no-repeat center center;
+}
+
+
+#topbar  *.microbit.off {
+	background: url('../assets/ui/microbitOff.svg')  no-repeat center center;
+}
+
+#topbar  *.microbit.on {
+	background: url('../assets/ui/microbitOn.svg')  no-repeat center center;
+}
+
+@-webkit-keyframes pulsate {
+  from {background: url('../assets/ui/microbitOff.svg')  no-repeat center center;}
+  50% {fill: url('../assets/ui/microbitOn.svg')  no-repeat  center center; }
+  to {fill: url('../assets/ui/microbitOff.svg')  no-repeat center center; }
+}
+	
+#topbar  *.microbit.connecting {
+  -webkit-animation-duration: 1s;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-timing-function: ease-in-out;
+  -webkit-animation-name: pulsate;
+}
+
+#topbar  *.microbit.ok {
+	background: url('../assets/ui/microbitOK.svg')  no-repeat center center;
+}
+
+#topbar *.microbit.fail {
+	background: url('../assets/ui/microbitFailed.svg')  no-repeat center center;
+}
+
+
+#topbar *.microbit.debug {
+	background: url('../assets/ui/microbitDebug.svg')  no-repeat center center;
+}
+
+
+#topbar *.microbit.download {
+	  -webkit-animation: downloadAnimation 0.5s infinite ease-in-out;
+    -webkit-transform-origin: center;
+}
+
+
+@-webkit-keyframes downloadAnimation {
+  from {background:  url('../assets/ui/download0.svg')  no-repeat center center; }
+  5% {background: url('../assets/ui/download1.svg')  no-repeat center center; }
+  25% {background: url('../assets/ui/download2.svg')  no-repeat center center; }
+  45% {background: url('../assets/ui/download3.svg')  no-repeat center center; }
+  65% {background: url('../assets/ui/download2.svg')  no-repeat center center; }
+  85% {background: url('../assets/ui/download1.svg')  no-repeat center center; } 
+  to {background: url('../assets/ui/download0.svg')  no-repeat center center; }
+}
+
+
+
+*.contents {
+	position: absolute;
+	top: 66px;
+	left: 0px;
+	margin: 0px;
+	padding: 0px;
+	height: 100%;
+	width: 100%;
+	background: #fff;
+}
+
+#rightpanel {
+	position: absolute;
+	top: 64px;
+	right: 0px;
+	height: 100%;
+	width:  221px;
+	background: #fff;
+	border-left: 1px solid #ccc;
+}
+
+#connectionstatus {
+	position: absolute;
+  margin: 0px;
+	padding: 0px;
+	top: 0px;
+	right: 5px;
+	height: 56px;
+	width:  56px;
+	z-index: 1000;
+}
+
+/*rgba(240,243,245,0.7)*/
+
+#grid {
+	position: relative;
+	display: inline-block;
+  margin: 0px;
+	padding: 0px;
+	top: 0px;
+	left: 0px;
+	height: 220px;
+	width:  220px;
+	background: #fff;
+}
+
+
+*.gridslot {
+	position: relative;
+	margin: 10px 12px 10px;
+	padding: 0px;
+	width: 20px;
+	height: 20px;
+	background: #ccc;
+	-webkit-border-radius: 14px; 
+}
+
+*.griddot {
+	position: relative;
+	display: inline-block;
+	margin: 0px;
+	padding: 0px;
+	width: 44px;
+	height: 40px;
+	background: #fff;
+}
+
+/*UI drop downs*/
+.dropdownballoon {
+  position: absolute;
+  top: 50px;
+  left: 10px;
+  width: auto;
+  margin: 0px;
+  padding: 0px;
+  z-index: 10000;
+}
+
+.dropdown { 
+  position: absolute;
+  top: 7px;
+  left: 0px;
+ 	margin: 0px;
+  padding: 0px;
+  overflow: hidden; 
+  background: #fff;
+  -webkit-border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+}
+
+.dropdown ul {
+	position: relative;
+  list-style-position: none;
+  min-width: 100px;
+  margin: 0px;
+  padding: 0px;
+  line-height: 49px;
+  font-weight: bold;
+  font-size: 16px;
+  height: 49px;
+  vertical-align: middle;
+  font-weight: normal;
+  color: #69D2E7;
+  z-index: 1000; 
+  cursor: default;
+}
+
+.dropdown li { 
+	display: block;
+	height: 49px;
+	text-align: center;
+	vertical-align: middle;
+	padding: 0px;
+	margin: 0px;
+ }​
+
+.dropdown li.selectmenu {
+  background-color: #69D2E7;
+  color: #FFF;
+  cursor: pointer;
+}
+
+.dropdown li:hover {
+  background-color:  #69D2E7;
+  color: #FFF;
+  margin: 0px;
+  cursor: pointer;
+}
+
+.dropdown li:active {
+  background-color:  #69D2E7;
+  color: #FFF;
+  cursor: pointer;
+}
+
+.dropdown ul li.divider {
+  border-top: 1px solid #69D2E7;
+  height: 1px;
+  margin: 0px;
+  margin: 0px 0px 0px;
+}
+
+*.menuarrow {
+	position: absolute;
+	top: 0px;
+	left: 16px;
+	margin: 0px;
+	padding: 0px;
+	width: 16px;
+	height: 16px;
+	background: #fff;
+	z-index: 200; 
+	-webkit-transform: rotate(45deg);
+}
+
+*.menuarrow.up {-webkit-box-shadow: -1px -1px 0px rgba(0,0, 0, 0.2);}
+
+
+/* Editor Tools */
+
+*.extratools{
+	position: relative;
+	margin: 0px 480px 0px;
+	padding: 0px;
+	overflow: hidden;
+	height: 64px;
+	width: 220px;
+	border-right: 1px solid rgba(0,0,0, 0.1);
+	border-left: 1px solid rgba(0,0,0, 0.1);
+	z-index: 1000;
+}
+
+*.extratools.off {display: none;}
+*.extratools.on {display: block;}
+
+.extratools .icon {
+	display: inline-block;
+	height: 64px;
+	width: 51px;
+	text-align: center;
+	vertical-align: middle;
+	margin: 0px;
+	padding: 0px;
+}
+
+.extratools .icon.scissors {
+  background:  url('../assets/tools/scissorsOff.svg') no-repeat center center; 
+}
+
+.extratools .icon.clone{
+  background:  url('../assets/tools/copyOff.svg') no-repeat center center;
+}
+
+.extratools .icon.undo {
+  background:  url('../assets/tools/undoOff.svg') no-repeat center center;
+}
+
+.extratools .icon.redo  {
+   background:  url('../assets/tools/redoOff.svg') no-repeat center center;
+}
+
+.extratools .icon.scissors.on {
+  background: url('../assets/tools/scissorsOn.svg') no-repeat center center; 
+}
+
+.extratools .icon.clone.on {
+  background: url('../assets/tools/copyOn.svg') no-repeat center center;
+}
+
+.extratools .icon.undo.on {
+  background: url('../assets/tools/undoOn.svg') no-repeat center center;
+}
+
+.extratools .icon.undo.NA {
+  background: url('../assets/tools/undoNA.svg') no-repeat center center;
+}
+
+.extratools .icon.redo.on  {
+   background:  url('../assets/tools/redoOn.svg') no-repeat center center;
+}
+
+.extratools .icon.redo.NA  {
+   background:  url('../assets/tools/redoNA.svg') no-repeat center center;
+}
+
+.extratools ul li.divider {
+  border-top: 1px solid #FFD04D;
+  height: 1px;
+  margin: 0px;
+  padding: 0px;
+  margin-top: 5px;
+  margin-left: 3px;
+  margin-right: 3px;
+}
+
+
+
+*.ledlights {
+	position: absolute;
+	top: 0px;
+	left: 28px;
+	margin: 0px;
+	padding: 4px;
+	width: 128px;
+	height: 128px;
+	-webkit-border-radius: 8px;
+  border: 2px solid #69D2E7;
+  opacity: 0.75;
+	background:  #fff;
+}
+
+*.direct.small > *.deviceactuator > *.ledlights{
+	left: 56px;
+	zoom: 0.53125;
+}
+*.direct > *.deviceactuator > *.swatches{
+	position: absolute;
+	top: 256px;
+	left: 0px;
+	margin: 0;
+	padding: 16px;
+	width: 280px;
+	height: 32px;
+}
+
+*.direct.small > *.deviceactuator > *.swatches{
+	top: 0px;
+	left: 220px;
+	height: 128px;
+	padding: 0px;
+	width: 64px;
+}
+
+/* shapes */
+
+#palette {
+	position: relative;
+	margin: 0;
+	padding: 0;
+	color: #FFFFFF;
+	background: #fff; /*gba(240,243,245,0.8);*/
+	top: 0px;
+	left: 0px;
+	width:  100%;
+  height: 100%;
+  border-top: 1px solid #ccc;
+  overflow-x: hidden;
+	overflow-y: scroll;
+	-webkit-overflow-scrolling: touch;	
+}
+
+#scroll {
+	position: relative;
+	display: inline-block;
+  word-spacing: -1;
+	top: 0px;
+	left: 0px;
+	height: 220px;
+	width:  100%;
+	background: #fff;
+}
+
+.thumbslot{
+  display: inline-block;
+  word-spacing: -1;
+  position: relative;
+  padding: 0px;
+  margin: 4px;
+  margin-left: 8px;
+  margin-top: 8px;
+  margin-bottom: 0px;
+  width: 92px;
+  height: 68px;
+}
+
+.thumbslot.selected {}
+
+
+.thumbnum {
+  position: absolute;
+  top:0px;
+  left:0px;
+  text-align: right;
+ 	color: #999;
+ 	width: 20px;
+ 	height: 16px;
+ 	line-height: 16px;
+}
+
+.thumbslot > .thumbimg {
+  position: absolute;
+  top:0px;
+  left: 20px;
+  border: 1px solid #d3d4d6;
+  margin: 0px;
+  padding: 0px;
+  width: 64px;
+  height: 64px;
+  overflow: hidden;
+  background: white;
+  -webkit-border-top-left-radius: 3px;
+  -webkit-border-top-right-radius: 3px;
+}
+
+
+.thumbslot.selected > .thumbimg { border: 4px solid #69D2E7;}
+
+.thumbimg.newshape {
+	border: 4px dashed #69D2E7;
+	width: 60px;
+  height: 60px;
+	color: #69D2E7;
+	text-align: center;
+  vertical-align: center;
+  font-family:  'Lucida Grande', 'Verdana', 'Arial', 'DejaVu Sans';
+  font-size:  24px;
+  font-weight: bold;
+  line-height: 60px;
+}
+
+.thumbimg > svg{
+	position: absolute;
+	margin: 2px;
+}
+
+
+.deleteshape {
+	position: relative;
+	float: left;
+	top:  -3px;
+	left: 74px;
+	z-index: 5;
+	visibility: hidden;
+  width: 23px;
+  height: 23px;
+	background:  url('../assets/home/close.svg');
+}
+
+.shakeshape{
+    -webkit-animation:swingshape 0.3s infinite ease-in-out;
+    -webkit-transform-origin: center;
+}
+
+@-webkit-keyframes swingshape{
+    0%{-webkit-transform:rotate(0.8deg)}
+    50%{-webkit-transform:rotate(-1.6deg)}
+    100%{-webkit-transform:rotate(0.8deg)}
+}
+
