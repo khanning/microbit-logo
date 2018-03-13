@@ -54,6 +54,42 @@ downloadProcs(str){
 
 /////////////////////////////////
 // 
+// Vectors
+//
+/////////////////////////////////
+
+vectors(){
+	var t = this;
+	var res = [];
+	var nextvector = 0;
+
+	for(var i=0;i<t.vectorlen;i++) res.push(0);
+	setupVectors('on-start',8);
+	setupVectors('on-buttona',0x80);
+	setupVectors('on-buttonb',0x81);
+	setupVectors('on-receive-all',0x82);
+	for(var i=0;i<8;i++) setupVectors('on-receive-'+i,0xf0+i);
+	return res;
+
+	function setupVectors(type,op){
+		setupVector(type,op);
+		for(var i=1;i<t.vectorlen/4;i++) setupVector(type+i,op);
+	}
+
+	function setupVector(name, op){
+		var proc = t.oblist[name];
+		if(proc==undefined) return;
+		var addr = proc.addr;
+		res[nextvector++] = op
+		res[nextvector++] = addr&0xff;
+		res[nextvector++] = (addr>>8)&0xff;
+		nextvector++;
+	}
+}
+
+
+/////////////////////////////////
+// 
 // Procedure Compiler
 //
 /////////////////////////////////
@@ -144,42 +180,6 @@ compileProcs(str){
 }
 
 	
-
-/////////////////////////////////
-// 
-// Vectors
-//
-/////////////////////////////////
-
-vectors(){
-	var t = this;
-	var res = [];
-	var nextvector = 0;
-
-	for(var i=0;i<t.vectorlen;i++) res.push(0);
-	setupVectors('on-start',8);
-	setupVectors('on-buttona',0x80);
-	setupVectors('on-buttonb',0x81);
-	setupVectors('on-receive-all',0x82);
-	for(var i=0;i<8;i++) setupVectors('on-receive-'+i,0xf0+i);
-	return res;
-
-	function setupVectors(type,op){
-		setupVector(type,op);
-		for(var i=1;i<t.vectorlen/4;i++) setupVector(type+i,op);
-	}
-
-	function setupVector(name, op){
-		var proc = t.oblist[name];
-		if(proc==undefined) return;
-		var addr = proc.addr;
-		res[nextvector++] = op
-		res[nextvector++] = addr&0xff;
-		res[nextvector++] = (addr>>8)&0xff;
-		nextvector++;
-	}
-}
-
 /////////////////////////////////
 // 
 // Command Compiler
