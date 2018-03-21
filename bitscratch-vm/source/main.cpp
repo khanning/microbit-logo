@@ -27,14 +27,15 @@ void print(int32_t);
 int rpeek(void);
 void rsend(uint8_t);
 void send_io_state(void);
-extern int btna_evt, btnb_evt, radio_evt;
+extern int btna_evt, btnb_evt, btnab_evt, radio_evt;
 extern volatile int32_t ticks;
 void prs(uint8_t*);
 
 #define OP_ONSTART 5
 #define OP_ONBUTTONA 0x80
 #define OP_ONBUTTONB 0x81
-#define OP_ONRECEIVE 0x82
+#define OP_ONBUTTONAB 0x82
+#define OP_ONRECEIVE 0x83
 #define OP_ONFLAG 0xF0
 
 uint8_t code[128];
@@ -161,6 +162,7 @@ int main() {
         evt_poll();
         if(btna_evt){btna_evt=0; vm_run_toggle(OP_ONBUTTONA);}
         if(btnb_evt){btnb_evt=0; vm_run_toggle(OP_ONBUTTONB);}
+        if(btnab_evt){btnab_evt=0; vm_run_toggle(OP_ONBUTTONAB);}
         if(radio_evt){
             radio_evt=0;
             vm_start(OP_ONRECEIVE);

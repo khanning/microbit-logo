@@ -38,12 +38,7 @@ int32_t *fp;
 int32_t eoltype;
 
 bool yieldnow;
-
 int32_t boxes[20];
-int32_t framewait = 50;
-
-extern volatile int32_t ticks;
-extern int32_t thisshape;
 
 void vm_run(){
     int32_t *stack = stacks;
@@ -358,18 +353,18 @@ void prim_not(){if(*--sp) *sp++=0; else *sp++=100;}
 void prim_setbox(){
     int32_t t0 = *--sp;
     int32_t t1 = *--sp;
-    boxes[t1] = t0;
+    boxes[t1/100] = t0;
 }
 
 void prim_box(){
     int32_t t0 = *--sp;
-    *sp++ = boxes[t0];
+    *sp++ = boxes[t0/100];
 }
 
 void prim_changebox(){
     int32_t t0 = *--sp;
     int32_t t1 = *--sp;
-    boxes[t1] += t0;
+    boxes[t1/100] += t0;
 }
 
 void prim_random(){

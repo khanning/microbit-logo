@@ -73,7 +73,8 @@ vectors(){
 	setupVectors('on-start',8);
 	setupVectors('on-buttona',0x80);
 	setupVectors('on-buttonb',0x81);
-	setupVectors('on-receive-all',0x82);
+	setupVectors('on-buttonab',0x82);
+	setupVectors('on-receive-all',0x83);
 	for(var i=0;i<8;i++) setupVectors('on-receive-'+i,0xf0+i);
 	return res;
 

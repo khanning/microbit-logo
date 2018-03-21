@@ -26,7 +26,8 @@ dotimes[i count :vectors][setnth :i :vectors 0]
 setup-vectors "on-start 8
 setup-vectors "on-buttona $80
 setup-vectors "on-buttonb $81
-setup-vectors "on-receive-any $82
+setup-vectors "on-buttonab $82
+setup-vectors "on-receive-any $83
 setup-receive-vectors
 ;setup-vectors "on-light $83
 output se :vectors :bytes

@@ -32,8 +32,9 @@ void print(int32_t);
 extern volatile uint32_t ticks;
 uint32_t lastticks;
 int32_t t0;
-int btna_evt, last_btna;
-int btnb_evt, last_btnb;
+int btna_evt, btna_count;
+int btnb_evt, btnb_count;
+int btnab_evt;
 int radio_evt;
 
 
@@ -75,12 +76,17 @@ void evt_poll(){
     pollinhibit--;
     return;
   }
-  int this_btna = buttona.isPressed();
-  if(this_btna&!last_btna) btna_evt=1;
-  last_btna = this_btna;
-  int this_btnb = buttonb.isPressed();
-  if(this_btnb&!last_btnb) btnb_evt=1;
-  last_btnb = this_btnb;
+  if(buttona.isPressed()) btna_count++;
+  else btna_count=0;
+  if(buttonb.isPressed()) btnb_count++;
+  else btnb_count=0;
+  if((btna_count<3)&&(btnb_count<3)&&((btna_count*btnb_count)>0)){
+    btna_count=3;
+    btnb_count=3;
+    btnab_evt=1;
+  }
+  if(btna_count==2) btna_evt=1;
+  if(btnb_count==2) btnb_evt=1;
   int c = radiorecv();
   if(c!=-1) {recvchar = c; pollrecv=c; radio_evt=1;}
 }
