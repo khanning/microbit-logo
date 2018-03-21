@@ -80,7 +80,7 @@ void evt_poll(){
   else btna_count=0;
   if(buttonb.isPressed()) btnb_count++;
   else btnb_count=0;
-  if((btna_count<3)&&(btnb_count<3)&&((btna_count*btnb_count)>0)){
+  if((btna_count==1)&&(btnb_count==1)){
     btna_count=3;
     btnb_count=3;
     btnab_evt=1;

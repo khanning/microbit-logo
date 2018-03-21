@@ -3,7 +3,8 @@ HW = function(){}
 HW.compiler = new Compiler();
 HW.comms = new Comms();
 
-HW.state = {apressed: false, bpressed: false, recc: 255, tilts: {x: undefined, y: undefined, z: undefined, w: undefined}};
+HW.state = {acount:0, bcount:0, apressed: false, bpressed: false, abpressed: false};
+//, recc: 255, tilts: {x: undefined, y: undefined, z: undefined, w: undefined}};
 HW.shape = [0,0,0,0,0];
 HW.messages = [];
 HW.brightness = 100;
@@ -68,12 +69,25 @@ HW.doDownload = function (str){HW.compiler.downloadProcs(str);}
 HW.downloadshapes = function(l, fcn){HW.comms.downloadshapes(flatten(l), fcn);}
 
 HW.gotPollPacket = function (l){
-		HW.state.apressed = l[0] == 1;
-		HW.state.bpressed = l[1] == 1;
-		HW.state.recc = l[2];
-	//	console.log("HW.gotPollPacket", l);
-		HW.state.tilts = {x: array2float(l.slice(3, 5)), y: array2float(l.slice(5, 7)), 
-								z: array2float(l.slice(7, 9)), w: array2float(l.slice(9, 11))}			
+	let aPressed = l[0] == 1;
+	let bPressed = l[1] == 1;
+	if (aPressed) HW.state.acount++;
+	else HW.state.acount=0;
+	if (bPressed) HW.state.bcount++;
+	else HW.state.bcount=0;
+	if ((HW.state.acount == 1)&&(HW.state.bcount == 1)){
+		HW.state.acount=3;
+		HW.state.bcount=3;
+		HW.state.abpressed=true;
+	}
+	else HW.state.abpressed=false;
+	HW.state.apressed = (HW.state.acount==2);
+	HW.state.bpressed = (HW.state.bcount==2);
+	HW.state.recc = l[2];
+//	console.log("HW.gotPollPacket", JSON.stringify(HW.state));
+
+	HW.state.tilts = {x: array2float(l.slice(3, 5)), y: array2float(l.slice(5, 7)), 
+							z: array2float(l.slice(7, 9)), w: array2float(l.slice(9, 11))}		
 }
 
 function array2float(l){

@@ -11,6 +11,7 @@ Prim.pace = 0.5;
 
 Prim.events_onbuttona = function ()	{Prim.doNext();}
 Prim.events_onbuttonb = function (){Prim.doNext();}
+Prim.events_onbuttonab = function (){Prim.doNext();}
 Prim.events_onreceive = function (){Prim.doNext();}
 Prim.myblocks_definition = function (){Prim.doNext();}
 
@@ -52,6 +53,52 @@ Prim.control_wait = function() {
 	if (future > 0) thread.waitFcn = function (){return Prim.waitForTime(future);}
 	Prim.doNext();
 }
+
+Prim.control_step = function (){		
+	var t = Runtime.thread;
+	var b = t.thisblock;
+	var args = t.getArgs(b);
+	let varname  = args.VARIABLE;
+	var from = Prim.toNum(args.FROM);
+	var to = Prim.toNum(args.TO);
+	console.log (varname, from, to)
+	let n = Math.abs(from - to);
+	var flow = t.getSubStack (b, "SUBSTACK")
+	Code.variables[varname] = from;
+	if (n < 1){
+		Prim.doNext();
+	}
+	else {	
+		t.stack.push(t.next());
+		t.stack.push(varname);
+		t.stack.push(to);
+		t.stack.push(flow);
+		t.stack.push('stepAgain');
+		t.thisblock = flow;
+	//	console.log ("start", t.stack.length);
+	}
+}
+
+Prim.stepAgain = function(){
+	let t = Runtime.thread;
+	let flow = t.stack.pop();
+	let to = t.stack.pop();
+	let varname = t.stack.pop();
+	var from = Code.variables[varname]
+
+	if (from == to) t.thisblock = t.stack.pop();
+	else {
+		if (from < to) from++;
+		else if (from > to) from--;
+		Code.variables[varname] = from;
+		t.stack.push(varname);
+		t.stack.push(to);
+		t.stack.push(flow);
+		t.stack.push('stepAgain');
+		t.thisblock = flow;
+	}
+}
+
 
 Prim.control_repeat = function (){		
 	var t = Runtime.thread;

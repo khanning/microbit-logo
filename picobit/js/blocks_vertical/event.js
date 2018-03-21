@@ -64,6 +64,34 @@ Blockly.Blocks['events_onbuttona'] = {
   }
 };
 
+Blockly.Blocks['events_onbuttonab'] = {
+  init: function() {
+    this.jsonInit({
+      "message0": "When %1 & %2 pressed",
+      "args0": [
+        {
+ "type": "field_image",
+ "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/event_onpressa.svg",
+ "width": 32,
+ "height": 32,
+ "alt": "playicon",
+ "flip_rtl": false
+        },
+        {
+ "type": "field_image",
+ "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/event_onpressb.svg",
+ "width": 32,
+ "height": 32,
+ "alt": "playicon",
+ "flip_rtl": false
+        }
+      ],
+      "category": Blockly.Categories.event,
+      "extensions": ["colours_event", "shape_hat"]
+    });
+  }
+};
+
 Blockly.Blocks['events_onbuttonb'] = {
   init: function() {
     this.jsonInit({

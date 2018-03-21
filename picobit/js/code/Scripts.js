@@ -162,25 +162,14 @@ class Scripts {
 
 triggerButton (type){
 	let strips = []
+	let hats = {"apressed": "onbuttona", 
+				  "bpressed" : "onbuttonb",
+				  "abpressed" : "onbuttonab"};	
 	if (this[type] == HW.state[type]) return strips;
-	if (HW.state[type]) strips = this.getHats(type == "apressed" ? "onbuttona" : "onbuttonb");		
+	if (HW.state[type]) strips = this.getHats(hats[type]);	
 	this[type] = HW.state[type];
 	return strips;
 }
-
-/*
-triggerButton (type){
-	let strips = []
-	if (this[type] == HW.state[type]) return strips;
-	if (HW.state[type]) {
-		strips = this.getHats(type == "apressed" ? "onbuttona" : "onbuttonb");
-		if ((strips.length == 0 ) && (type =="bpressed" )) strips.push("doClean")
-	}
-	this[type] = HW.state[type];
-	return strips;
-}
-
-*/
 
 
 triggerBroadast (type){

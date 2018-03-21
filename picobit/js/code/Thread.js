@@ -128,9 +128,9 @@ class Thread {
 			var textblock = self.getBlockText(b)
 			var prim  = list.join("_")
 			var hasFlowInputs =  (Defs.primtives[prim]) ?  Defs.primtives[prim][1] == "l" : false 
-			if (self.thisblock == self.firstBlock) {	
+			if (self.thisblock == self.firstBlock) {				
 				if (textblock == "0") return [] // ignore empty procedure name
-				cmd  =  op != "definition" ? "to " + op + n : "to " + textblock 	
+				cmd  =  op != "definition" ? "to " + textblock + n : "to " + textblock 	
 				commands.push (cmd)
 				self.stack.push (null)
 				self.stack.push ("end")
@@ -178,8 +178,9 @@ class Thread {
 		}
 		switch (op) {
 			case 'scroll':
-			case "onreceive":
+			case "onreceive":			
 				text = cmd.join("")
+				console.log ("result", text)
 				break;				
 			case "setglobal":
 				cmd.shift();
@@ -192,7 +193,8 @@ class Thread {
 				text = cmd.join(" ");
 				break;
 		}
-		text = text.replace(/  /g, ' ');
+		text = text.replace(/  /g, ' ');	
+		text = text.replace(/^[\s\xa0]+|[\s\xa0]+$/g, '');
 		return text;
  	}  
 

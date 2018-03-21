@@ -130,6 +130,7 @@ Runtime.scanTriggers = function (){
 		switch (type){	
 			case "apressed": 
 			case "bpressed": 
+			case "abpressed": 
 				blocks = blocks.concat (Code.scripts.triggerButton(type))	
 				break;
 			case "recc": 

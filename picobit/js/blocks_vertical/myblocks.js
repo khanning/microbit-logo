@@ -402,7 +402,8 @@ Blockly.Blocks['myblocks_setglobal'] = {
           "name": "VARIABLE",
            "options": [
               ['box1', 'box1'],
-              ['box2', 'box2']
+              ['box2', 'box2'],
+              ['box3', 'box3']
             ]
         },
         {
@@ -431,7 +432,8 @@ Blockly.Blocks['myblocks_changeglobal'] = {
           "name": "VARIABLE",
            "options": [
               ['box1', 'box1'],
-              ['box2', 'box2']
+              ['box2', 'box2'],
+              ['box3', 'box3']
             ]
         },
         {

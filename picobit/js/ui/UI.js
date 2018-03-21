@@ -85,6 +85,7 @@ UI.doAction = function(e){
 UI.cleanWorkspace =  function (){
 	Code.workspace.clear();
 	Scripts.blocks = {};
+	Prim.pace = 0.5;
 }
 
 UI.cleanUndo = function (){
@@ -145,21 +146,16 @@ UI.updateToolsState = function(t){
 
 
 ///////////////////
-// UI
-///////////////////
-
-
-
-///////////////////
-// new
+// NEW
 ///////////////////
 
 UI.newProject =  function (e){
 	Runtime.stopThreads(Code.scripts);
 	UI.cleanWorkspace(); 
-  var empty = '<xml><variables><variable type="" id="trovb#~|j,=tov4e-`Q]">box1</variable><variable type="" id="s-r)ps3/xflDW$lmeWGD">box2</variable></variables></xml>';
+  var empty = '<xml></xml>';
 	var xml = Blockly.Xml.textToDom(empty);
 	Blockly.Xml.domToWorkspace(xml, Code.workspace);
+	Code.createDefaultVars();
 	ShapeEditor.newSet();	
 	UI.projectID = undefined;
 	UI.cleanUndo();
@@ -242,11 +238,12 @@ UI.loadProject = function (e){
 	}
   function next2(file){fr.readAsText(file);}
   function doNext(str){
-  	UI.cleanWorkspace(); 
+  	UI.cleanWorkspace();
   	UI.loadXML(str, whenDone);
   }
   
   function whenDone(){
+  	Code.createDefaultVars();
   	Code.updatePalette()	
   	UI.cleanUndo();
   }

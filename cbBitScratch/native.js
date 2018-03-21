@@ -155,7 +155,7 @@ openSerialPort(){
 		function handlePacket(p){
 			var type = p[0];
 			var data = p.slice(2);
-			console.log('received:',p);
+//			console.log('received:',p);
 			if(type==0xf0) insert(String.fromCharCode.apply(null, data));
 			if(type==0xf5) t.polldata=data;
 			else {

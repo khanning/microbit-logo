@@ -62,6 +62,63 @@ Blockly.Blocks['control_repeat'] = {
   }
 };
 
+          
+Blockly.Blocks['control_step'] = {
+  /**
+   * Block for repeat n times (external number).
+   * https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#so57n9
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "id": "control_step",
+      "message0": "step %1 from %2 to %3",
+      "message1": "%1", // Statement
+      "message2": "%1", // Icon
+      "lastDummyAlign2": "RIGHT",
+      "args0": [
+            {
+          "type": "field_dropdown",
+          "text": "box1",
+          "name": "VARIABLE",
+           "options": [
+              ['box1', 'box1'],
+              ['box2', 'box2'],
+              ['box3', 'box3']
+            ]
+        },
+        {
+          "type": "input_value",
+          "name": "FROM"
+        }
+        ,
+        {
+          "type": "input_value",
+          "name": "TO"
+        }
+      ],
+      "args1": [
+        {
+          "type": "input_statement",
+          "name": "SUBSTACK"
+        }
+      ],
+      "args2": [
+        {
+          "type": "field_image",
+          "src": Blockly.mainWorkspace.options.pathToMedia + "/repeat.svg",
+          "width": 24,
+          "height": 24,
+          "alt": "*",
+          "flip_rtl": true
+        }
+      ],
+      "category": Blockly.Categories.control,
+      "extensions": ["colours_control", "shape_statement"]
+    });
+  }
+};
+
 Blockly.Blocks['control_if'] = {
   /**
    * Block for if-then.

@@ -38,7 +38,7 @@ Code.updatePalette = function (){
 }
 	
 Code.createDefaultVars = function (){
-	for (let i=1; i < 3; i++) {
+	for (let i=1; i < 4; i++) {
 	 	Code.workspace.createVariable("box" + i);
 		Code.variables["box" + i] =  0;
 	}
