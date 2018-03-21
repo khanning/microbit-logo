@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include "MicroBit.h"
 #include "MicroBitTicker.h"
+#include "vm.h"
 
 
 #define flashshapes 0x31000
@@ -30,16 +31,18 @@ void print(int32_t);
 
 extern volatile uint32_t ticks;
 uint32_t lastticks;
-uint32_t t0;
+int32_t t0;
 int btna_evt, last_btna;
 int btnb_evt, last_btnb;
 int radio_evt;
+
 
 int32_t pollphase;
 int16_t xbuf[32];
 int16_t ybuf[32];
 int16_t zbuf[32];
 int16_t accbuf[32];
+float pace = 0.5;
 
 char prbuf[128];
 char* prptr;
@@ -111,128 +114,6 @@ void ddots(uint8_t* s){
   direct_setshape(s[0],s[1],s[2],s[3],s[4]);
 }
 
-void setshape(int32_t s){
-  if(s<=0) clear();
-  else {
-    ddots((uint8_t*)&((unsigned char*)flashshapes)[5*(s-1)]);
-    thisshape = s;
-    shapeoffh = 0;
-    shapeoffv = 0;
-  }
-}
-
-void nextshape(){
-  unsigned char *font = (unsigned char*)flashshapes;
-  thisshape++;
-  shapeoffh = 0;
-  shapeoffv = 0;
-  if(font[5*(thisshape-1)]==0xff) thisshape = 1;
-  ddots(&font[5*(thisshape-1)]);
-}
-
-void prevshape(){
-  unsigned char *font = (unsigned char*)flashshapes;
-  shapeoffh = 0;
-  shapeoffv = 0;
-  if(thisshape>1) thisshape--;
-  else {
-    thisshape = 1;
-    while(font[5*thisshape]!=0xff) thisshape++;
-  }
-  ddots(&font[5*(thisshape-1)]);
-}
-
-void doton(uint8_t a, uint8_t b){
-  a%=5; b%=5;
-  directshape[4-b] |= 1<<(4-a);
-  display.printChar(32);
-}
-
-void dotoff(uint8_t a, uint8_t b){
-  a%=5; b%=5;
-  directshape[4-b] &= (0x3f^(1<<(4-a)));
-  display.printChar(32);
-}
-
-void clear(){
-  direct_setshape(0,0,0,0,0);
-  thisshape = 0;
-  shapeoffh = 0;
-  shapeoffv = 0;
-}
-
-void shifthDraw(){
-  uint8_t *font = (uint8_t*)flashshapes;
-  uint8_t *lefts = &font[5*(thisshape-1)];
-  uint8_t *rights = &font[5*(thisshape)];
-  if(*rights==0xff) rights = font;
-  uint8_t line1 = ((lefts[0]<<shapeoffh)&0x3f)+(rights[0]>>(5-shapeoffh));
-  uint8_t line2 = ((lefts[1]<<shapeoffh)&0x3f)+(rights[1]>>(5-shapeoffh));
-  uint8_t line3 = ((lefts[2]<<shapeoffh)&0x3f)+(rights[2]>>(5-shapeoffh));
-  uint8_t line4 = ((lefts[3]<<shapeoffh)&0x3f)+(rights[3]>>(5-shapeoffh));
-  uint8_t line5 = ((lefts[4]<<shapeoffh)&0x3f)+(rights[4]>>(5-shapeoffh));
-  direct_setshape(line1,line2,line3,line4,line5);
-}
-
-void shiftl(){
-  if(thisshape==0) nextshape();
-  if(shapeoffv>0) shapeoffv=0;
-  shapeoffh++;
-  if(shapeoffh==5) nextshape();
-  else shifthDraw();
-}
-
-void shiftr(){
-  if(thisshape==0) prevshape();
-  if(shapeoffv>0) shapeoffv=0;
-  if(shapeoffh>0) shapeoffh--;
-  else {
-    if(thisshape>1) thisshape--;
-    else {
-      uint8_t *font = (uint8_t*)flashshapes;
-      thisshape = 1;
-      while(font[5*thisshape]!=0xff) thisshape++;
-    }
-    shapeoffh = 4;
-  }
-  shifthDraw();
-}
-
-void shiftvDraw(){
-  uint8_t *font = (uint8_t*)flashshapes;
-  uint8_t *top = &font[5*(thisshape-1)+shapeoffv];
-  uint8_t line1 = *top++; if(*top==0xff) top = font;
-  uint8_t line2 = *top++; if(*top==0xff) top = font;
-  uint8_t line3 = *top++; if(*top==0xff) top = font;
-  uint8_t line4 = *top++; if(*top==0xff) top = font;
-  uint8_t line5 = *top++; if(*top==0xff) top = font;
-  direct_setshape(line1,line2,line3,line4,line5);
-}
-
-void shiftu(){
-  if(thisshape==0) nextshape();
-  if(shapeoffh>0) shapeoffh=0;
-  shapeoffv++;
-  if(shapeoffv==5) nextshape();
-  else shiftvDraw();
-}
-
-void shiftd(){
-  if(thisshape==0) prevshape();
-  if(shapeoffh>0) shapeoffh=0;
-  if(shapeoffv>0) shapeoffv--;
-  else {
-    if(thisshape>1) thisshape--;
-    else {
-      uint8_t *font = (uint8_t*)flashshapes;
-      thisshape = 1;
-      while(font[5*thisshape]!=0xff) thisshape++;
-    }
-    shapeoffv = 4;
-  }
-  shiftvDraw();
-}
-
 
 void mwait(int32_t d){
   if(d<0) return;
@@ -243,6 +124,17 @@ void mwait(int32_t d){
 int32_t lib_random(int32_t min, int32_t max){
   return min+microbit_random(max-min+1);
 }
+
+void flashwrite(uint32_t* addr, uint32_t data){flash.flashWordWrite(addr, data);}
+void flasherase(uint32_t* addr){flash.flashPageErase(addr);}
+
+
+
+/////////////////////////////////
+// 
+// Serial Printing Primitives
+//
+/////////////////////////////////
 
 void sendprbuf(){
   int len = strlen(prbuf);
@@ -285,19 +177,252 @@ void prf(uint8_t *s, int32_t n) {
   sendprbuf();
 }
 
+void prim_print(){
+  print(vm_pop_raw());
+}
+
+void prim_prs(){
+  prs((uint8_t*)vm_pop_raw());
+}
+
+void prim_prf(){
+    int32_t val = vm_pop();
+    uint8_t *format = (uint8_t*)vm_pop_raw();
+    prf(format,val);
+}
+
+
+
+/////////////////////////////////
+// 
+// Timer Primitives
+//
+/////////////////////////////////
+
+int32_t now(){
+  return ((int32_t)system_timer_current_time())&0x7fffffff;
+}
+
+void prim_resett(){
+  t0 = now();
+}
+
+void prim_timer(){
+  vm_push(now()-t0);
+}
+
+void prim_ticks(){
+  vm_push(ticks);
+}
+
+
+/////////////////////////////////
+// 
+// Shape Primitives
+//
+/////////////////////////////////
+
+
+void clear(){
+  direct_setshape(0,0,0,0,0);
+  thisshape = 0;
+  shapeoffh = 0;
+  shapeoffv = 0;
+}
+
+void setshape(int32_t s){
+  if(s<=0) clear();
+  else {
+    ddots((uint8_t*)&((unsigned char*)flashshapes)[5*(s-1)]);
+    thisshape = s;
+    shapeoffh = 0;
+    shapeoffv = 0;
+  }
+}
+
+void nextshape(){
+  unsigned char *font = (unsigned char*)flashshapes;
+  thisshape++;
+  shapeoffh = 0;
+  shapeoffv = 0;
+  if(font[5*(thisshape-1)]==0xff) thisshape = 1;
+  ddots(&font[5*(thisshape-1)]);
+}
+
+void prevshape(){
+  unsigned char *font = (unsigned char*)flashshapes;
+  shapeoffh = 0;
+  shapeoffv = 0;
+  if(thisshape>1) thisshape--;
+  else {
+    thisshape = 1;
+    while(font[5*thisshape]!=0xff) thisshape++;
+  }
+  ddots(&font[5*(thisshape-1)]);
+}
+void prim_setshape(){
+  setshape(vm_pop()); 
+  vm_wait(pace);
+}
+void prim_shape(){
+  vm_push(thisshape);
+}
+void prim_clear(){
+  clear(); 
+  vm_wait(pace);
+}
+
+void prim_nextshape(){
+  nextshape();
+  vm_wait(pace);
+}
+void prim_prevshape(){
+  prevshape();
+}
+
+
+
+/////////////////////////////////
+// 
+// Scrolling Primitives
+//
+/////////////////////////////////
+
+void scrollhDraw(){
+  uint8_t *font = (uint8_t*)flashshapes;
+  uint8_t *lefts = &font[5*(thisshape-1)];
+  uint8_t *rights = &font[5*(thisshape)];
+  if(*rights==0xff) rights = font;
+  uint8_t line1 = ((lefts[0]<<shapeoffh)&0x3f)+(rights[0]>>(5-shapeoffh));
+  uint8_t line2 = ((lefts[1]<<shapeoffh)&0x3f)+(rights[1]>>(5-shapeoffh));
+  uint8_t line3 = ((lefts[2]<<shapeoffh)&0x3f)+(rights[2]>>(5-shapeoffh));
+  uint8_t line4 = ((lefts[3]<<shapeoffh)&0x3f)+(rights[3]>>(5-shapeoffh));
+  uint8_t line5 = ((lefts[4]<<shapeoffh)&0x3f)+(rights[4]>>(5-shapeoffh));
+  direct_setshape(line1,line2,line3,line4,line5);
+}
+
+void scroll_l(){
+  if(thisshape==0) nextshape();
+  if(shapeoffv>0) shapeoffv=0;
+  shapeoffh++;
+  if(shapeoffh==5) nextshape();
+  else scrollhDraw();
+}
+
+void scroll_r(){
+  if(thisshape==0) prevshape();
+  if(shapeoffv>0) shapeoffv=0;
+  if(shapeoffh>0) shapeoffh--;
+  else {
+    if(thisshape>1) thisshape--;
+    else {
+      uint8_t *font = (uint8_t*)flashshapes;
+      thisshape = 1;
+      while(font[5*thisshape]!=0xff) thisshape++;
+    }
+    shapeoffh = 4;
+  }
+  scrollhDraw();
+}
+
+void scrollvDraw(){
+  uint8_t *font = (uint8_t*)flashshapes;
+  uint8_t *top = &font[5*(thisshape-1)+shapeoffv];
+  uint8_t line1 = *top++; if(*top==0xff) top = font;
+  uint8_t line2 = *top++; if(*top==0xff) top = font;
+  uint8_t line3 = *top++; if(*top==0xff) top = font;
+  uint8_t line4 = *top++; if(*top==0xff) top = font;
+  uint8_t line5 = *top++; if(*top==0xff) top = font;
+  direct_setshape(line1,line2,line3,line4,line5);
+}
+
+void scroll_u(){
+  if(thisshape==0) nextshape();
+  if(shapeoffh>0) shapeoffh=0;
+  shapeoffv++;
+  if(shapeoffv==5) nextshape();
+  else scrollvDraw();
+}
+
+void scroll_d(){
+  if(thisshape==0) prevshape();
+  if(shapeoffh>0) shapeoffh=0;
+  if(shapeoffv>0) shapeoffv--;
+  else {
+    if(thisshape>1) thisshape--;
+    else {
+      uint8_t *font = (uint8_t*)flashshapes;
+      thisshape = 1;
+      while(font[5*thisshape]!=0xff) thisshape++;
+    }
+    shapeoffv = 4;
+  }
+  scrollvDraw();
+}
+
+
+void prim_scroll_l(){
+  scroll_l();
+  vm_wait(pace/5-.051);
+}
+
+void prim_scroll_r(){
+  scroll_r();
+  vm_wait(pace/5-.051);
+}
+
+void prim_scroll_d(){
+  scroll_d();
+  vm_wait(pace/5-.051);
+}
+
+void prim_scroll_u(){
+  scroll_u();
+  vm_wait(pace/5-.051);
+}
+
+
+/////////////////////////////////
+// 
+// Display Primitives
+//
+/////////////////////////////////
+
+
+void prim_setpace(){
+  pace = vm_pop_float();
+}
+
 void setbrightness(int32_t b){display.setBrightness(b);}
 
-void flashwrite(uint32_t* addr, uint32_t data){flash.flashWordWrite(addr, data);}
-void flasherase(uint32_t* addr){flash.flashPageErase(addr);}
+void prim_brightness(){
+    int32_t n = vm_pop();
+    if(n<1) n=1;
+    if(n>100) n=100;
+    display.setBrightness(n*255/100);
+}
 
-void resett(){t0 = (uint32_t)system_timer_current_time();}
-uint32_t timer(){return ((uint32_t)system_timer_current_time()) - t0;}
-uint32_t get_ticks(){return ticks;}
 
-int32_t now(){return (int32_t) system_timer_current_time();}
+void prim_doton(){
+  uint8_t y = (uint8_t)(vm_pop());
+  uint8_t x = (uint8_t)(vm_pop());
+  directshape[4-y] |= 1<<(4-x);
+  display.printChar(32);
+}
 
-uint32_t get_buttona(){return buttona.isPressed();}
-uint32_t get_buttonb(){return buttonb.isPressed();}
+void prim_dotoff(){
+  uint8_t y = (uint8_t)(vm_pop());
+  uint8_t x = (uint8_t)(vm_pop());
+  directshape[4-y] &= (0x3f^(1<<(4-x)));
+  display.printChar(32);
+}
+
+
+/////////////////////////////////
+// 
+// I/O Primitives
+//
+/////////////////////////////////
 
 int32_t buf_ave(int16_t *buf){
   int res=0;
@@ -310,6 +435,30 @@ int32_t accy(){return buf_ave(ybuf);}
 int32_t accz(){return buf_ave(zbuf);}
 int32_t accmag(){return buf_ave(accbuf);}
 
+void prim_accx(){
+  vm_push(accx());
+}
+
+void prim_accy(){
+  vm_push(accy());
+}
+
+void prim_accz(){
+  vm_push(accz());
+}
+
+void prim_acc(){
+  vm_push(accmag());
+}
+
+void prim_buttona(){
+  vm_push(buttona.isPressed());
+}
+
+void prim_buttonb(){
+  vm_push(buttonb.isPressed());
+}
+
 void rsend(uint8_t c){radio.datagram.send(&c, 1);}
 int rrecc(){int c=recvchar; recvchar=-1; return c;}
 int rpeek(){return recvchar;}
@@ -320,6 +469,14 @@ int radiorecv(){
   int len = radio.datagram.recv(&c, 1);
   if(len==MICROBIT_INVALID_PARAMETER) return -1;
   else return c;
+}
+
+void prim_rrecc(){
+  vm_push(rrecc());
+}
+
+void prim_rsend(){
+  rsend((uint8_t)vm_pop());
 }
 
 void uputc16(int32_t n){
@@ -340,4 +497,19 @@ void send_io_state(){
   uputc16(accmag());
   uputc(0xed);
 }
+
+
+
+void(*libprims[])() = {
+  prim_print, prim_prs, prim_prf,
+  prim_resett, prim_timer, prim_ticks,
+  prim_setshape, prim_shape, prim_clear, prim_nextshape, prim_prevshape,
+  prim_scroll_l, prim_scroll_r, prim_scroll_d, prim_scroll_u,
+  prim_doton, prim_dotoff, prim_brightness,
+  prim_setpace,
+  prim_accx, prim_accy, prim_accz, prim_acc,
+  prim_buttona, prim_buttonb,
+  prim_rsend, prim_rrecc,
+};
+
 

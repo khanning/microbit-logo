@@ -8,17 +8,23 @@ var primlist =
   'and','r',-1,   'or','r',-1,   'xor','r',-1,  'not','r',1,  
   '%gwrite','c',2,   '%gread','r',1,  '%gchange','r',1, 
   'broadcast','c',1,
-  'random','r',2, 'print','c',1,   'prs', 'c', 1,  'prf','c',2,  
-  'wait','c',1,  'resett','c',0,   'timer','r',0,   'ticks','r',0, 
+  'random','r',2, 
+  'wait','c',1,  
+  ];
+
+var libprimlist = 
+ ['print','c',1,   'prs', 'c', 1,  'prf','c',2,  
+  'resett','c',0,   'timer','r',0,   'ticks','r',0, 
   'setshape','c',1,   'shape', 'r',0,  'clean','c',0, 
   'nextshape','c',0,  'prevshape','c',0,
+  'scrolll','c',0,  'scrollr','c',0,  'scrolld','c',0,  'scrollu','c',0,  
   'doton','c',2,  'dotoff','c',2,  'brightness','c',1,
+  'setpace','c',1,
   'accx','r',0,   'accy','r',0,   'accz','r',0, 'acc','r',0,
   'buttona','r',0,  'buttonb','r',0,
   'send','c',1,  'recv','r','0',
-  'shiftl','c',0,  'shiftr','c',0,  'shiftd','c',0,  'shiftu','c',0,  
-  'setframewait','c',1
   ];
+
 
 class Compiler {
 
@@ -495,6 +501,7 @@ setup(){
 	this.procnames = [];
 	this.shapes = [];
 	setupBuiltIns('prim', primlist, 9, 1);
+	setupBuiltIns('prim', libprimlist, 0x40, 1);
 	this.oblist['let'] = {type: 'let', outputs: false};
 	this.oblist['waituntil'].type = 'waituntil';
 	this.oblist['repeatuntil'].type = 'repeatuntil';

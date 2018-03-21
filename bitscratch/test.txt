@@ -1,9 +1,59 @@
 to on-buttona
-repeat 2 [print 123]
+stopothers
+setshape 1
+repeat 9 
+ [repeat 5 [scrolll]
+  wait .5]
+clear
 end
 
 to on-buttonb
-print 321
+stopothers
+if eq shape 0 [setshape 4]
+nextshape
+repeat 9 
+ [repeat 5 [scrollu]
+  wait .5]
+clear
 end
 
-shapes []
+
+
+
+shapes [
+xxxx-
+x---x
+xxxx-
+x---x
+xxxx-
+
+xxxx-
+x---x
+xxxx-
+x---x
+x---x
+
+-xxx-
+--x--
+--x--
+--x--
+-xxx-
+
+-xxx-
+x---x
+xxxxx
+x---x
+x---x
+
+x---x
+xx--x
+x-x-x
+x--xx
+x---x
+
+-----
+-x-x-
+--x--
+-x-x-
+-----
+]

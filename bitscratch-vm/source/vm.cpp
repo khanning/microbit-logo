@@ -12,35 +12,12 @@ int32_t stacks[NSTACKS*STACKLEN];
 void dev_poll(void);
 int32_t now(void);
 int32_t lib_random(int32_t,int32_t);
-void print(int32_t);
-void prs(uint8_t*);
-void prf(uint8_t*,int32_t);
-void resett(void);
-int32_t timer(void);
-int32_t get_ticks(void);
 
 void clear();
-void setshape(int32_t);
-void nextshape(void);
-void prevshape(void);
-void doton(uint8_t, uint8_t);
-void dotoff(uint8_t, uint8_t);
-void shiftl(void);
-void shiftr(void);
-void shiftd(void);
-void shiftu(void);
-void setbrightness(int32_t);
-
-int32_t accx(void);
-int32_t accy(void);
-int32_t accz(void);
-int32_t accmag(void);
-int32_t get_buttona(void);
-int32_t get_buttonb(void);
-void rsend(uint8_t c);
-int32_t rrecc(void);
+void rsend(uint8_t);
 
 extern void(*prims[])();
+extern void(*libprims[])();
 
 void vm(void);
 void resume(int32_t*);
@@ -49,7 +26,7 @@ void eol_list(void);
 void eol_waituntil(void);
 void eol_repeatuntil_cond(void);
 void eol_repeatuntil_action(void);
-void wait_again(void);
+void wait_loop(void);
 void eval_ufun(void);
 void setup_stack(int32_t*,uint32_t,uint8_t);
 void toggle_stack(int32_t*,uint32_t,uint8_t);
@@ -78,7 +55,6 @@ void vm_run(){
 
 void vm_runcc(uint32_t startaddr){
     setup_stack(&stacks[STACKLEN*(NSTACKS-1)], startaddr, 0);
-//    setup_stack(stacks, startaddr, 0);
 }
 
 void vm_stop(){
@@ -156,14 +132,18 @@ void vm(){
             *stack=0;
             break;
         }
-        if(token<0x80){
+        if(token<0x40){
             void(*prim)() = prims[token];
+            prim();
+        } else if(token<0x80){
+            void(*prim)() = libprims[token-0x40];
             prim();
         } else eval_ufun();
         if(yieldnow) break;
     }
 }
 
+void yield_vm(){yield((int32_t)vm);}
 
 void eval_done(){}
 
@@ -405,86 +385,30 @@ void prim_broadcast(){
     rsend(n);
 }
 
-void prim_print(){print(*--sp);}
-void prim_prs(){prs((uint8_t*)*--sp);}
-
-void prim_prf(){
-    int32_t val = *--sp;
-    uint8_t *format = (uint8_t*)*--sp;
-    prf(format,val);
-}
-
-void frameWait(){
-    if(framewait<=2) return;
-    *sp++ = now()+framewait*10;
-    wait_again();
-}
-
-void shiftWait(){
-    if(framewait<=2) return;
-    *sp++ = now()+framewait*2-51;
-    wait_again();
-}
-
 void prim_wait(){
     if((*(sp-1))>2){
         *(sp-1) *= 10;
         (*(sp-1)) += now();
-        wait_again();
+        wait_loop();
     } else sp--;
 }
 
-void wait_again(){
+void wait_loop(){
     int32_t delta = (*(sp-1))-now();
     if(delta<80) {sp-=1; yield((int32_t)vm);}
-    else yield((int32_t)wait_again);
+    else yield((int32_t)wait_loop);
 }
 
 
-void prim_setshape(){setshape((int32_t)(((float)*--sp)/100)); frameWait();}
-void prim_shape(){*sp++=thisshape*100;}
-void prim_clear(){clear(); frameWait();}
-void prim_nextshape(){nextshape(); frameWait();}
-void prim_prevshape(){prevshape(); frameWait();}
-void prim_resett(){resett();}
-void prim_timer(){*sp++=(timer()+5)/10;}
-void prim_ticks(){*sp++=get_ticks()*100;}
-void prim_setframewait(){framewait = *--sp;}
-
-void prim_brightness(){
-    int32_t n = (int32_t)(((float)*--sp)/100);
-    if(n<1) n=1;
-    if(n>100) n=100;
-    setbrightness(n*255/100);
+void vm_wait(float secs){
+    *sp++ = (int32_t)(secs*10);
+    prim_wait();
 }
 
-
-void prim_doton(){
-    uint8_t y = (uint8_t)(((float)*--sp)/100);
-    uint8_t x = (uint8_t)(((float)*--sp)/100);
-    doton(x,y);
-}
-
-void prim_dotoff(){
-    uint8_t y = (uint8_t)(((float)*--sp)/100);
-    uint8_t x = (uint8_t)(((float)*--sp)/100);
-    dotoff(x,y);
-}
-
-void prim_shiftl(){shiftl(); shiftWait();}
-void prim_shiftr(){shiftr(); shiftWait();}
-void prim_shiftd(){shiftd(); shiftWait();}
-void prim_shiftu(){shiftu(); shiftWait();}
-
-void prim_accx(){*sp++=accx()*100;}
-void prim_accy(){*sp++=accy()*100;}
-void prim_accz(){*sp++=accz()*100;}
-void prim_acc(){*sp++=accmag()*100;}
-void prim_buttona(){*sp++=get_buttona()*100;}
-void prim_buttonb(){*sp++=get_buttonb()*100;}
-void prim_rsend(){rsend((uint8_t)(((float)*--sp)/100));}
-void prim_rrecc(){*sp++=rrecc()*100;}
-
+void vm_push(int32_t x){*sp++=x*100;}
+int32_t vm_pop(){return (int32_t)((((float)*--sp)+50)/100);}
+int32_t vm_pop_raw(){return *--sp;}
+float vm_pop_float(){return ((float)*--sp)/100;}
 
 void(*prims[])() = {
     eval_done,
@@ -503,14 +427,5 @@ void(*prims[])() = {
     prim_not,
     prim_setbox, prim_box, prim_changebox,
     prim_broadcast,
-    prim_random, prim_print, prim_prs, prim_prf,
-    prim_wait, prim_resett, prim_timer, prim_ticks,
-    prim_setshape, prim_shape, prim_clear,
-    prim_nextshape, prim_prevshape,
-    prim_doton, prim_dotoff, prim_brightness,
-    prim_accx, prim_accy, prim_accz, prim_acc,
-    prim_buttona, prim_buttonb,
-    prim_rsend, prim_rrecc,
-    prim_shiftl, prim_shiftr, prim_shiftd, prim_shiftu,
-    prim_setframewait
+    prim_random, prim_wait, 
 };

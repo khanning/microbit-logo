@@ -1,0 +1,9 @@
+to on-buttona
+repeat 2 [print 123]
+end
+
+to on-buttonb
+print 321
+end
+
+shapes []
