@@ -2,22 +2,27 @@
 var primlist = 
  ['stop','c',0,   'output','c',1,   'stopall','c',0, 'stopothers','c',0, 
   'repeat','c',2,   'forever','c',1,   'if','c',2,   'ifelse','c',3,   
-  'waituntil','c',0,  'repeatuntil','c',0,
+  'waituntil','c',0,  'repeatuntil','c',0, '%stepbox','c',4,
   'add','r',2,  'subtract','r',2,   'multiply','r',2,'divide','r',2, 'modulo','r',2,
  	'equals','r',2,   'notequals','r',2,   'gt','r',2,   'lt','r',2, 
  	'and','r',2,   'or','r',2,   'xor','r',2,  'not','r',1, 
   '%gwrite','c',2,   '%gread','r',1,  '%gchange','r',1, 
    'broadcast','c',1, 
-  'random','r',2, 'print','c',1, 'prs','c',1,  'prf','c',2,  'wait','c',1, 
+  'random','r',2, 'wait','c',1, 
+  ];
+
+var libprimlist = 
+ ['print','c',1, 'prs','c',1,  'prf','c',2, 
   'resett','c',0,   'timer','r',0,   'ticks','r',0, 
-  'setshape','c',1, 'shape','r',0,  'clean','c',0, 'nextshape','c',0,  'previousshape', 'c',0,  
+  'setshape','c',1, 'shape','r',0,  'clean','c',0, 
+  'nextshape','c',0,  'previousshape', 'c',0,  
+  'scrollleft','c','0', 'scrollright','c','0', 'scrolldown','c','0', 'scrollup','c','0',
   'doton','c',2,  'dotoff','c',2, 'setbrightness','c',1,
+  'setpace','c','1',
   'accx','r',0,   'accy','r',0,   'accz','r',0, 'acc','r','0',
   'apressed','r','0',  'bpressed','r','0',
   'send','c','1',  'recv','r','0', 
-  'scrollleft','c','0', 'scrollright','c','0', 'scrollup','c','0', 'scrolldown','c','0',
-  'setpace','c','1'
-  ];
+	];
 
 
 class Compiler {
@@ -54,6 +59,44 @@ downloadProcs(str, shapes, fcn){
  		if (fcn) fcn("download error");
  	}
 }
+
+
+/////////////////////////////////
+// 
+// Vectors
+//
+/////////////////////////////////
+
+vectors(){
+	var t = this;
+	var res = [];
+	var nextvector = 0;
+
+	for(var i=0;i<t.vectorlen;i++) res.push(0);
+	setupVectors('onstart',8);
+	setupVectors('onbuttona',0x80);
+	setupVectors('onbuttonb',0x81);
+	setupVectors('onbuttonab',0x82);
+	setupVectors('onreceiveall',0x83);
+	for(var i=0;i<8;i++) setupVectors('onreceive'+i,0xf0+i);
+	return res;
+
+	function setupVectors(type,op){
+	//	setupVector(type,op);
+		for(var i=0;i<t.vectorlen/4;i++) setupVector(type+i,op);
+	}
+
+	function setupVector(name, op){
+		var proc = t.oblist[name];
+		if(proc==undefined) return;
+		var addr = proc.addr;
+		res[nextvector++] = op
+		res[nextvector++] = addr&0xff;
+		res[nextvector++] = (addr>>8)&0xff;
+		nextvector++;
+	}
+}
+
 
 /////////////////////////////////
 // 
@@ -147,42 +190,6 @@ compileProcs(str){
 }
 
 	
-
-/////////////////////////////////
-// 
-// Vectors
-//
-/////////////////////////////////
-
-vectors(){
-	var t = this;
-	var res = [];
-	var nextvector = 0;
-
-	for(var i=0;i<t.vectorlen;i++) res.push(0);
-	setupVectors('onstart',8);
-	setupVectors('onbuttona',0x80);
-	setupVectors('onbuttonb',0x81);
-	setupVectors('onreceiveall',0x82);
-	for(var i=0;i<8;i++) setupVectors('onreceive'+i,0xf0+i);
-	return res;
-
-	function setupVectors(type,op){
-	//	setupVector(type,op);
-		for(var i=0;i<t.vectorlen/4;i++) setupVector(type+i,op);
-	}
-
-	function setupVector(name, op){
-		var proc = t.oblist[name];
-		if(proc==undefined) return;
-		var addr = proc.addr;
-		res[nextvector++] = op
-		res[nextvector++] = addr&0xff;
-		res[nextvector++] = (addr>>8)&0xff;
-		nextvector++;
-	}
-}
-
 /////////////////////////////////
 // 
 // Command Compiler
@@ -203,7 +210,6 @@ compileCommands(list){
 		else if(item.substring(0,1)==':') compileLocalGet(item);
 		else if(item.substring(0,4)=='set:') compileLocalSet(item);
 		else if(item.substring(0,7)=='change:') compileLocalChange(item);
-		else if(item=='let') compileLet();
 		else compileSymbol(item);
 		var command = (t.oblist[item])&&!t.oblist[item].outputs;
 		if((!command)&&(inputfor==undefined)) throw 'you don\'t say what to do with '+item+thisProc();
@@ -262,6 +268,7 @@ compileCommands(list){
 		else if(sym.type=='changeglobal') compileGlobalChange(sym.index);
 		else if(sym.type=='waituntil') compileWaituntil();
 		else if(sym.type=='repeatuntil') compileRepeatuntil();
+		else if(sym.type=='stepglobal') compileGlobalStep(sym.index);
 		else compileCallSym();
 
 		function compileCallSym(){
@@ -285,6 +292,12 @@ compileCommands(list){
 			addAndCount(['byte',index],2);
 			argloop(1, name);
 			addAndCount(['prim','%gchange'],1);
+		}
+
+		function compileGlobalStep(index){
+			addAndCount(['byte',index],2);
+			argloop(3, name);
+			addAndCount(['prim','%stepbox'],1);
 		}
 
 		function compileWaituntil(){
@@ -350,7 +363,6 @@ compileCommands(list){
 // Special cases
 
 	function compileLet(){
-		if(t.thisproc==undefined) throw 'let can only be used in a procedure';
 		var old = list;
 		list = old.shift();
 		while(list.length>0){
@@ -486,6 +498,7 @@ setupGlobal(name){
 	this.oblist[name] = {type: 'global', index: this.nextglobal, outputs: true};
 	this.oblist['set'+name] = {type: 'setglobal', index: this.nextglobal, outputs: false};;
 	this.oblist['change'+name] = {type: 'changeglobal', index: this.nextglobal, outputs: false};;
+	this.oblist['step'+name] = {type: 'stepglobal', index: this.nextglobal, outputs: false};;
 	this.nextglobal++;
 }
 
@@ -498,11 +511,13 @@ setup(){
 	this.procnames = [];
 	this.shapes = [];
 	setupBuiltIns('prim', primlist, 9, 1);
+	setupBuiltIns('prim', libprimlist, 0x40, 1);
 	this.oblist['let'] = {type: 'let', outputs: false};
 	this.oblist['waituntil'].type = 'waituntil';
-	this.oblist['repeatuntil'].type = 'repeatuntil';	
+	this.oblist['repeatuntil'].type = 'repeatuntil';
 	this.setupGlobal('box1');
 	this.setupGlobal('box2');
+	this.setupGlobal('box3');
 
 	function setupBuiltIns(type, list, index, len){
 		list = [].concat(list);

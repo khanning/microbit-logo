@@ -2,7 +2,7 @@ var primlist =
  ['stop','c',0,   'output','c',1,   
  'stopall','c',0, 'stopothers', 'c',0,
   'repeat','c',2,   'forever','c',1,   'if','c',2,   'ifelse','c',3,   
-  'waituntil','c',0,  'repeatuntil','c',0,
+  'waituntil','c',0,  'repeatuntil','c',0,  '%stepbox','c',4,
   '+','r',-1,  '-','r',-1,   '*','r',-1,   '/','r',-1,  '%','r',-1,
   '=','r',-1,   '!=','r',-1,   '>','r',-1,   '<','r',-1, 
   'and','r',-1,   'or','r',-1,   'xor','r',-1,  'not','r',1,  
@@ -207,7 +207,6 @@ compileCommands(list){
 		else if(item.substring(0,1)==':') compileLocalGet(item);
 		else if(item.substring(0,4)=='set:') compileLocalSet(item);
 		else if(item.substring(0,7)=='change:') compileLocalChange(item);
-		else if(item=='let') compileLet();
 		else compileSymbol(item);
 		var command = (t.oblist[item])&&!t.oblist[item].outputs;
 		if((!command)&&(inputfor==undefined)) throw 'you don\'t say what to do with '+item+thisProc();
@@ -266,6 +265,7 @@ compileCommands(list){
 		else if(sym.type=='changeglobal') compileGlobalChange(sym.index);
 		else if(sym.type=='waituntil') compileWaituntil();
 		else if(sym.type=='repeatuntil') compileRepeatuntil();
+		else if(sym.type=='stepglobal') compileGlobalStep(sym.index);
 		else compileCallSym();
 
 		function compileCallSym(){
@@ -289,6 +289,12 @@ compileCommands(list){
 			addAndCount(['byte',index],2);
 			argloop(1, name);
 			addAndCount(['prim','%gchange'],1);
+		}
+
+		function compileGlobalStep(index){
+			addAndCount(['byte',index],2);
+			argloop(3, name);
+			addAndCount(['prim','%stepbox'],1);
 		}
 
 		function compileWaituntil(){
@@ -354,7 +360,6 @@ compileCommands(list){
 // Special cases
 
 	function compileLet(){
-		if(t.thisproc==undefined) throw 'let can only be used in a procedure';
 		var old = list;
 		list = old.shift();
 		while(list.length>0){
@@ -490,6 +495,7 @@ setupGlobal(name){
 	this.oblist[name] = {type: 'global', index: this.nextglobal, outputs: true};
 	this.oblist['set'+name] = {type: 'setglobal', index: this.nextglobal, outputs: false};;
 	this.oblist['change'+name] = {type: 'changeglobal', index: this.nextglobal, outputs: false};;
+	this.oblist['step'+name] = {type: 'stepglobal', index: this.nextglobal, outputs: false};;
 	this.nextglobal++;
 }
 
@@ -508,6 +514,7 @@ setup(){
 	this.oblist['repeatuntil'].type = 'repeatuntil';
 	this.setupGlobal('box1');
 	this.setupGlobal('box2');
+	this.setupGlobal('box3');
 
 	function setupBuiltIns(type, list, index, len){
 		list = [].concat(list);

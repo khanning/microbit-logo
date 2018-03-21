@@ -339,7 +339,7 @@ setup-prims 9
  [stop c 0  output c 1  
   stopall c 0  stopothers c 0
   repeat c 2  forever c 1  if c 2  ifelse c 3
-  waituntil c 1  repeatuntil c 2
+  waituntil c 1  repeatuntil c 2  step c 4
   add r 2  subtract r 2  multiply r 2  divide r 2
   mod r 2
   eq r 2  ne r 2  gt r 2  lt r 2

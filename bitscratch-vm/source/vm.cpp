@@ -26,6 +26,7 @@ void eol_list(void);
 void eol_waituntil(void);
 void eol_repeatuntil_cond(void);
 void eol_repeatuntil_action(void);
+void eol_step(void);
 void wait_loop(void);
 void eval_ufun(void);
 void setup_stack(int32_t*,uint32_t,uint8_t);
@@ -248,6 +249,42 @@ void eol_repeat(){
     }
 }
 
+void prim_step(){
+    int32_t boxindex = (*(sp-4))/100;
+    int32_t from = (*(sp-3))/100;
+    int32_t to = (*(sp-2))/100;
+    if(from<=to){
+        *(sp-3) = 100;
+        boxes[boxindex] = (from-1)*100;
+    } else {
+        *(sp-3) = -100;
+        boxes[boxindex] = (from+1)*100;
+    }
+    *sp++ = (int32_t)ip;
+    *sp++ = eoltype;
+    eoltype = (int32_t)eol_step;
+    eol_step();
+}
+
+void eol_step(){
+    int32_t boxindex = *(sp-6);
+    int32_t delta = *(sp-5);
+    int32_t to = *(sp-4);
+    uint8_t *newip = (uint8_t*)(*(sp-3));
+    int32_t val = boxes[boxindex];
+    int done = (delta>0) ? val>=to : val<=to;
+    if(done) {
+        eoltype = *--sp;
+        ip = (uint8_t*)(*--sp);
+        sp-=4;
+    }
+    else {
+        boxes[boxindex] +=  delta;
+        ip = newip;
+        yield((int32_t)vm);
+    }
+}
+
 void prim_repeatuntil(){
     *sp++ = (int32_t) ip;
     *sp++ = eoltype;
@@ -396,7 +433,7 @@ void wait_loop(){
 
 
 void vm_wait(float secs){
-    *sp++ = (int32_t)(secs*10);
+    *sp++ = (int32_t)(secs*100);
     prim_wait();
 }
 
@@ -414,7 +451,7 @@ void(*prims[])() = {
     prim_stop, prim_output,
     prim_stopall, prim_stopothers,
     prim_repeat, prim_forever, prim_if, prim_ifelse,
-    prim_waituntil, prim_repeatuntil,
+    prim_waituntil, prim_repeatuntil, prim_step,
     prim_add, prim_subtract, prim_multiply, prim_divide,
     prim_mod,
     prim_equal, prim_ne, prim_greater, prim_less,

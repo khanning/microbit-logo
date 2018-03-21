@@ -284,6 +284,7 @@ void prim_nextshape(){
 }
 void prim_prevshape(){
   prevshape();
+  vm_wait(pace);
 }
 
 
