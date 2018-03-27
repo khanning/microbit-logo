@@ -57,7 +57,7 @@ Defs = function(){}
 		["doton", "c", "motion", "dot on %d.math_whole_number.x %d.math_whole_number.y", 0,0],
 		["dotoff", "c", "motion", "dot off %d.math_whole_number.x %d.math_whole_number.y", 0, 0],
 		["setbrightness", "c", "motion", "set brightness %d.lights_brightness.num", 100],
-		["setpace", "c", "motion", "set setpace %d.math_positive_number.num", 0.5],
+		["setpace", "c", "motion", "set setpace %c..pace_option"],
 		
 		["shape", "r", "motion", "shape"],
 		[ "---" ],
@@ -75,7 +75,7 @@ Defs = function(){}
 		["ifelse","l","control", "ifelse %b..condition"],
 		["waituntil","c","control", "wait until %b..condition"],
  		["repeatuntil","l","control", "repeat until %b..condition"],
- 		["step","l","control", "step %d.math_whole_number.from %d.math_whole_number.to", 1, 3],
+ 		["step","l","control", "step %c..variable %d.math_whole_number.from %d.math_whole_number.to", 1, 3],
  		["stop","c","control", "stop %c..stop_option"],
  		
 		["apressed","r","sensing", "apressed"],  
@@ -89,7 +89,7 @@ Defs = function(){}
 		["multiply","r","operators", "%d..num1 * %d..num2"],  			
 		["divide","r","operators", "%d..num1 / %d..num2"],  	
 		["modulo","r","operators", "%d..num1 mod %d..num2"],  					
-		["random","r","operators", "pick random from %d..from to %d..to", 0, 100],  
+		["random","r","operators", "pick random from %d..from to %d..to", 1, 5],  
 		["---"],
 		["lt","r","operators", "%d..operand1 < %d..operand2"],  		
 		["equals","r","operators", "%d..operand1 < %d..operand2"],  		

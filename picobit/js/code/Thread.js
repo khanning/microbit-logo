@@ -177,6 +177,11 @@ class Thread {
 			text += "]";
 		}
 		switch (op) {
+			case 'step':
+				let prim =	cmd.shift();
+				cmd[0] = prim+cmd[0]
+				text = cmd.join(" ");
+				break;
 			case 'scroll':
 			case "onreceive":			
 				text = cmd.join("")
@@ -260,6 +265,7 @@ class Thread {
 		var inputs = []
 		if (!Defs.argsKeys[opcode]) return ""
 		var keys  = Defs.argsKeys[opcode].args // has the order
+	//	console.log (op, keys)
 		if (args.mutation) {
 			for (let elem in args.mutation) args[elem.toUpperCase()] = args.mutation[elem]
 		}

@@ -438,6 +438,26 @@ fieldset, legend, object, embed {
 	width: 64px;
 }
 
+#title {
+	position: relative;
+  margin: 0px;
+	padding: 0px;
+	padding-left: 16px;
+	top: 0px;
+	left: 0px;
+	height: 48px;
+	color: #FFF;
+	text-align: left;
+  vertical-align: center;
+  font-family:  'Lucida Grande', 'Verdana', 'Arial', 'DejaVu Sans';
+  font-size:  18px;
+  font-weight: bold;
+  line-height: 48px;
+	width: 100%;
+	background: #8FDDEF;
+	text-shadow:  0px -1px rgba(0,0,0, 0.2);
+}
+
 /* shapes */
 
 #palette {
@@ -480,6 +500,10 @@ fieldset, legend, object, embed {
   height: 68px;
 }
 
+.thumbslot.wide {
+  width: 200px;
+}
+
 .thumbslot.selected {}
 
 
@@ -513,16 +537,29 @@ fieldset, legend, object, embed {
 .thumbslot.selected > .thumbimg { border: 4px solid #69D2E7;}
 
 .thumbimg.newshape {
-	border: 4px dashed #69D2E7;
-	width: 60px;
-  height: 60px;
-	color: #69D2E7;
+  -webkit-border-radius: 3px;
+	border: 3px dashed #fff;
+	width: 32px;
+  height: 32px;
+	color: #fff;
 	text-align: center;
   vertical-align: center;
   font-family:  'Lucida Grande', 'Verdana', 'Arial', 'DejaVu Sans';
   font-size:  24px;
   font-weight: bold;
-  line-height: 60px;
+  line-height: 28px;
+}
+
+*.addshape{
+ 	position: absolute;
+  top: 5px;
+  right: 0px;
+  margin: 0px;
+  padding: 0px;
+  padding-right: 22px;
+  width: 44px;
+  height: 44px;
+  overflow: hidden;
 }
 
 .thumbimg > svg{

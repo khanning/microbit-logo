@@ -84,6 +84,7 @@ Code.togglePlay = function(e){
 Code.startOrStop = function(){	
 	UI.unfocus();
 	if (Runtime.isActive()) Runtime.stopThreads(Code.scripts);
+	else  Code.scripts.triggerHats("onbuttona");
 }
 
 

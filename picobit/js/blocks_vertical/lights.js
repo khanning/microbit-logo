@@ -119,10 +119,16 @@ Blockly.Blocks['lights_setpace'] = {
     this.jsonInit({
       "message0": "set pace %1",
       "args0": [
-        {
-          "type": "input_value",
-          "name": "NUM"
-        }
+           {
+            "type": "field_dropdown",
+            "name": "PACE_OPTION",
+            "options": [
+             	['slow', '1'],
+              ['medium', '0.5'],
+              ['fast', '0.1'],
+              ['instant', '0']
+            ]
+          }
       ],
       "category": Blockly.Categories.motion,
       "extensions": ["colours_motion", "shape_statement"]

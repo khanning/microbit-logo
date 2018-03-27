@@ -75,14 +75,15 @@ HW.gotPollPacket = function (l){
 	else HW.state.acount=0;
 	if (bPressed) HW.state.bcount++;
 	else HW.state.bcount=0;
-	if ((HW.state.acount == 1)&&(HW.state.bcount == 1)){
-		HW.state.acount=3;
-		HW.state.bcount=3;
+	let isBoth = ((HW.state.acount>0)&&(HW.state.acount<3)&&(HW.state.bcount>0)&&(HW.state.bcount<3));
+	if (isBoth){
+		HW.state.acount=4;
+		HW.state.bcount=4;
 		HW.state.abpressed=true;
 	}
 	else HW.state.abpressed=false;
-	HW.state.apressed = (HW.state.acount==2);
-	HW.state.bpressed = (HW.state.bcount==2);
+	HW.state.apressed = (HW.state.acount==3);
+	HW.state.bpressed = (HW.state.bcount==3);
 	HW.state.recc = l[2];
 //	console.log("HW.gotPollPacket", JSON.stringify(HW.state));
 

@@ -61,7 +61,6 @@ Prim.control_step = function (){
 	let varname  = args.VARIABLE;
 	var from = Prim.toNum(args.FROM);
 	var to = Prim.toNum(args.TO);
-	console.log (varname, from, to)
 	let n = Math.abs(from - to);
 	var flow = t.getSubStack (b, "SUBSTACK")
 	Code.variables[varname] = from;
@@ -258,7 +257,7 @@ Prim.lights_doton = function (){
 	let b = thread.thisblock;
 	let args = thread.getArgs(b);
 	let states = ShapeEditor.convertRowToState(HW.shape);
-	let pos =  ((4 - Prim.toNum(args.Y).mod(5)) * 5) + Prim.toNum(args.X).mod(5)
+	let pos =  ((4 - Math.round(Prim.toNum(args.Y)).mod(5)) * 5) + Prim.toNum(args.X).mod(5)
 	states [pos] = 1;
 	let list  = ShapeEditor.convertState2Number(states)
 	HW.shape = list;
@@ -271,7 +270,7 @@ Prim.lights_dotoff = function (){
 	let b = thread.thisblock;
 	let args = thread.getArgs(b);
 	let states = ShapeEditor.convertRowToState(HW.shape);
-	let pos =  ((4 - Prim.toNum(args.Y).mod(5)) * 5) + Prim.toNum(args.X).mod(5)
+	let pos =  ((4 - Math.round(Prim.toNum(args.Y)).mod(5)) * 5) + Prim.toNum(args.X).mod(5)
 	states [pos] = 0;
 	let list  = ShapeEditor.convertState2Number(states)
 	HW.shape = list;
@@ -294,7 +293,7 @@ Prim.lights_setpace = function (){
 	var thread =  Runtime.thread;
 	let b = thread.thisblock;
 	let args = thread.getArgs(b);
-	let val = Prim.toNum(args.NUM)
+	let val = Prim.toNum(args.PACE_OPTION)
 	Prim.pace = val;
 	Prim.doNext();
 }
@@ -442,7 +441,7 @@ Prim.myblocks_changeglobal = function () {
 	var b = thread.thisblock;
 	var args = thread.getArgs(b);
 	var value = Prim.toNum(args.NUM); 
-	Code.variables[args.VARIABLE] = Code.variables[args.VARIABLE] + value;
+	Code.variables[args.VARIABLE] = Prim.toNum(Code.variables[args.VARIABLE])+ value;
 	Prim.doNext();
 }
 
@@ -450,13 +449,17 @@ Prim.myblocks_changeglobal = function () {
 // Reporters
 ////////////////////////
 
-Prim.myblocks_box = function (args) {return Code.variables[args.VARNAME]}
+Prim.myblocks_box = function (args) {
+	return Code.variables[args.VARNAME]
+}
 
 Prim.operators_add = function (args){return Prim.toNum(args.NUM1) + Prim.toNum(args.NUM2)}
 Prim.operators_subtract = function (args){ return Prim.toNum(args.NUM1) -  Prim.toNum(args.NUM2)}
 Prim.operators_multiply = function (args){ return Prim.toNum(args.NUM1) * Prim.toNum(args.NUM2)}
 Prim.operators_divide = function (args){return Prim.toNum(args.NUM1)  /  Prim.toNum(args.NUM2)}
-Prim.operators_modulo = function (args){return Prim.toNum(args.NUM1).mod(Prim.toNum(args.NUM2))}
+Prim.operators_modulo = function (args){
+	return Prim.toNum(args.NUM1).mod(Prim.toNum(args.NUM2))
+}
 
 Prim.operators_lt = function (args){return Prim.toNum(args.OPERAND1) < Prim.toNum(args.OPERAND2)}
 Prim.operators_equals = function (args){return Prim.toNum(args.OPERAND1) == Prim.toNum(args.OPERAND2)}

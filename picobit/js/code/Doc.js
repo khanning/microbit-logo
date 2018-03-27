@@ -8,20 +8,30 @@ Doc = function() {};
 Doc.xmlns =  "http://www.w3.org/2000/.svg";
 Doc.xmlnslink = "http://www.w3.org/1999/xlink";
 
-Doc.printStacks = function(){
-	var svg = SVGTools.create(undefined, 1000, 1000)
+Doc.print = function (){
+	var svg = SVGTools.create(undefined, 792, 612)
+	Doc.printStacks(svg)
+	var p =  SVGTools.createGroup(svg)
+	var mtx ="matrix( 1 0 0 1 " + 572 + " " + 0+")" ;
+	p.setAttribute("transform", mtx);	
+	Doc.dumpShapes(p);
+	let svgstr = (new XMLSerializer()).serializeToString(svg)
+	Doc.saveContent (svgstr)
+}
+
+
+Doc.printStacks = function(svg){	
 	let blocks = Code.workspace.svgBlockCanvas_;	
 	for (let i=0; i < blocks.childElementCount; i++) {
 		var rect = new Rectangle(200000,200000,0,0);
 		var g = Doc.getStack(svg, blocks.childNodes[i], rect)
 		let dx =  rect.x
 		let dy = rect.y;
-		var mtx ="matrix( 1 0 0 1 " + dx + " " + dy+")" ;
+		var mtx ="matrix(0.5 0 0 0.5 " + (dx/2) + " " + (dy/2)+")" ;
 		g.setAttribute("transform", mtx);	
 		svg.appendChild(g)
 	}
-	let svgstr = (new XMLSerializer()).serializeToString(svg)
-	Doc.saveContent (svgstr)
+
 }
 
 Doc.getStack = function(svg, p, rect){
@@ -45,6 +55,7 @@ Doc.getStack = function(svg, p, rect){
 	for (let i=0; i < p.childElementCount; i++ ) {
 		let kid = p.childNodes[i];		
 		if (kid.style.visibility == "hidden") continue;
+	//	console.log (kid.tagName)
 		switch (kid.tagName.toLowerCase()) {
 			case 'path':
 				 var elem = SVGTools.getCopy(kid);
@@ -54,7 +65,10 @@ Doc.getStack = function(svg, p, rect){
 				var elem = SVGTools.getCopy(kid);
 				g.appendChild(elem)	
 				break;		; 
-			case 'image':	let icon = Doc.getImage(kid, p); if (icon) g.appendChild(icon); break;
+			case 'image':	
+				let icon = Doc.getImage(kid, p); 
+				if (icon) g.appendChild(icon); 
+				break;
 			case 'text': g.appendChild(Doc.getText(kid, p)); break;
 			case "g": 
 				var grouprect = new Rectangle(200000,200000,0,0);
@@ -73,11 +87,14 @@ Doc.getImage = function(kid, p)	{
 	let name  = kid.getAttribute("xlink:href")
 	if (!name) return null;
 	var iconstr = Doc.icons[name]
-	if (!iconstr) return null;
+	if (!iconstr) {
+		console.warn ("Please add image", name)
+	}
 	if (!iconstr) return null;
 	var icon = SVGTools.toObject(iconstr);
 	var val = new WebKitCSSMatrix(window.getComputedStyle(kid).webkitTransform);
-	var t =  "translate(" + val.e + ", " + val.f+")";
+	var shouldScale  = name.indexOf ('sensing_microbit') > -1;
+	var t =  shouldScale ?  "matrix( 0.75 0 0 0.75 " + val.e + " " + (val.f + 6.5)+")" :  "translate(" + val.e + ", " + val.f+")";
 	icon.setAttribute("transform",t);	
 	icon.setAttribute("height", kid.getAttribute("height"));
 	icon.setAttribute("width", kid.getAttribute("width"));
@@ -92,7 +109,7 @@ Doc.getText = function(kid, p){
 	var cn = kid.getAttribute('class')
 	var pcn = p.getAttribute('class')
 	var val = new WebKitCSSMatrix(window.getComputedStyle(kid).webkitTransform);
-//	console.log ("getText", cn, "---", pcn)
+	console.log ("getText", cn, "---", pcn)
 	switch (cn){
 		case "blocklyText":
 			style =  pcn == 'blocklyEditableText' ? black + style : white + style;	
@@ -112,7 +129,7 @@ Doc.getText = function(kid, p){
 }
  
 Doc.saveContent = function (str){		
-	let name =  'noname.svg'
+	let name =  'noname.svg';                
 	chrome.fileSystem.chooseEntry({type: "saveFile", suggestedName: name}, next1)
 	function next1(fe){
 		if(fe!=undefined) Doc.save(fe, str);
@@ -170,7 +187,7 @@ Doc.dumpShapes = function (p){
 		var sh = SVGTools.createGroup(g);
 		var attr = {"transform": 'matrix(1 0 0 1 23 -1)'};
 	 	for (var val in attr) sh.setAttribute(val, attr[val]);
-	 	var obj  = palette.childNodes[i+1];
+	 	var obj  = palette.childNodes[i];
 	 	if (!obj) return;
 	 	obj = obj.childNodes[1].childNodes[0]
 		let shape = SVGTools.getCopy(obj)
@@ -181,7 +198,7 @@ Doc.dumpShapes = function (p){
 Doc.addframe = function (g, w, h){
 	var shape = document.createElementNS(SVGTools.xmlns, "path");	
 	g.appendChild(shape);
-	let attr = {'d': Doc.roundRect, "transform": 'matrix(1 0 0 1 20 0)', fill: "#F9F9F9", "stroke-width": 1, stroke: "#d3d4d5"};	
+	let attr = {'d': Doc.roundRect, "transform": 'matrix(1 0 0 1 20 0)', fill: "#FFFFFF", "stroke-width": 1, stroke: "#d3d4d5"};	
 	for (var val in attr) shape.setAttribute(val, attr[val]);
 }	
 
@@ -308,6 +325,9 @@ Doc.dir = function(url, fcn){
 }
 
 Doc.icons = {
+'assets/media/microbit/sensing_microbit.svg':'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g xmlns="http://www.w3.org/2000/svg"><g><g><circle fill="#FFFFFF" cx="12.5" cy="12" r="2.3"/><path fill="#2E8EB8" d="M12.5,14.6c-1.4,0-2.6-1.2-2.6-2.6s1.2-2.6,2.6-2.6s2.6,1.2,2.6,2.6S14,14.6,12.5,14.6z M12.5,10    c-1.1,0-2,0.9-2,2s0.9,2,2,2s2-0.9,2-2S13.6,10,12.5,10z"/></g><g><circle fill="#FFFFFF" cx="31.6" cy="12" r="2.3"/><path fill="#2E8EB8" d="M31.6,14.6c-1.4,0-2.6-1.2-2.6-2.6s1.2-2.6,2.6-2.6s2.6,1.2,2.6,2.6S33,14.6,31.6,14.6z M31.6,10    c-1.1,0-2,0.9-2,2s0.9,2,2,2s2-0.9,2-2S32.7,10,31.6,10z"/></g><g><path fill="#FFFFFF" d="M16.2,4.9c2.6,0,5,0,5,0l0,0l0,0c2.5,0,3.7,0,4.6,0c0.5,0,0.9,0,1.5,0c0.9,0,2.2,0,4.5,0    c2.2,0,4.1,0.8,5.4,2.2s1.9,3.3,1.8,5.5c-0.2,3.6-3,6.3-6.6,6.4c-1.4,0-4.7,0.1-8.7,0.1c-4.1,0-8.3,0-11.4-0.1    c-2.2,0-4.1-0.8-5.4-2.2c-1.3-1.4-1.9-3.3-1.8-5.5c0.2-3.6,3-6.3,6.6-6.4C12.7,4.9,14.2,4.9,16.2,4.9 M16.2,0.3    c-1.7,0-3.4,0-4.6,0c-6,0.2-10.7,4.9-11,10.8c-0.4,7,4.6,12.4,11.7,12.5c3.2,0,7.6,0.1,11.5,0.1s7.3,0,8.9-0.1    c6-0.2,10.7-4.9,11-10.8c0.4-7-4.6-12.4-11.7-12.5c-2.5,0-3.7,0-4.6,0c-1.4,0-2.1,0-6.1,0C21.2,0.3,18.8,0.3,16.2,0.3L16.2,0.3z"/><path fill="#2E8EB8" d="M23.6,24c-4.1,0-8.4,0-11.5-0.1c-3.5,0-6.7-1.4-8.9-3.7c-2.2-2.4-3.3-5.6-3.1-9.1C0.5,5,5.4,0.2,11.5,0    c1.1,0,2.6,0,4.7,0c2.6,0,5,0,5,0c2.5,0,3.6,0,4.5,0c1.5,0,2.1,0,6.1,0c3.5,0,6.7,1.4,8.9,3.7c2.2,2.4,3.3,5.6,3.1,9.1    c-0.3,6.1-5.2,10.9-11.3,11.1C31,24,27.8,24,23.6,24z M16.2,0.6c-2,0-3.6,0-4.6,0C5.7,0.8,1.1,5.3,0.7,11.2    c-0.2,3.3,0.9,6.4,2.9,8.6c2.1,2.2,5.1,3.5,8.5,3.6c3,0,7.3,0.1,11.5,0.1s7.4,0,8.9-0.1c5.8-0.2,10.4-4.7,10.8-10.5    c0.2-3.3-0.9-6.4-2.9-8.6c-2.1-2.2-5.1-3.5-8.5-3.6c-4-0.1-4.6,0-6.1,0c-0.9,0-2.1,0-4.6,0C21.2,0.6,18.8,0.6,16.2,0.6z     M23.6,19.4c-4.1,0-8.4,0-11.4-0.1c-2.3,0-4.2-0.8-5.6-2.3c-1.3-1.4-2-3.4-1.9-5.7C5,7.7,7.9,4.8,11.6,4.7c1,0,2.5,0,4.5,0    c2.6,0,5,0,5,0c2.5,0,3.7,0,4.6,0c0.6,0,1,0,1.5,0c0.9,0,2.2,0,4.5,0s4.2,0.8,5.6,2.3c1.3,1.4,2,3.4,1.9,5.7    c-0.2,3.7-3.2,6.6-6.9,6.7C30.9,19.4,27.7,19.4,23.6,19.4z M16.2,5.2c-2,0-3.5,0-4.5,0C8.3,5.3,5.5,8,5.4,11.4    c-0.1,2.1,0.5,3.9,1.7,5.2s3,2.1,5.2,2.1c3,0,7.3,0.1,11.4,0.1s7.3,0,8.7-0.1c3.4-0.1,6.1-2.8,6.3-6.2c0.1-2.1-0.5-3.9-1.7-5.2    s-3-2.1-5.2-2.1c-2.3,0-3.6,0-4.5,0c-0.5,0-0.9,0-1.4,0c-0.9,0-2.2,0-4.6,0C21.1,5.2,18.7,5.2,16.2,5.2z"/></g></g></g></svg>',
+'assets/media//repeat.svg': '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g xmlns="http://www.w3.org/2000/svg"><path fill="#CF8B17" d="M23.3,11c-0.3,0.6-0.9,1-1.5,1h-1.6c-0.1,1.3-0.5,2.5-1.1,3.6c-0.9,1.7-2.3,3.2-4.1,4.1c-1.7,0.9-3.6,1.2-5.5,0.9c-1.8-0.3-3.5-1.1-4.9-2.3c-0.7-0.7-0.7-1.9,0-2.6c0.6-0.6,1.6-0.7,2.3-0.2H7c0.9,0.6,1.9,0.9,2.9,0.9s1.9-0.3,2.7-0.9c1.1-0.8,1.8-2.1,1.8-3.5h-1.5c-0.9,0-1.7-0.7-1.7-1.7c0-0.4,0.2-0.9,0.5-1.2l4.4-4.4c0.7-0.6,1.7-0.6,2.4,0L23,9.2C23.5,9.7,23.6,10.4,23.3,11z"/><path fill="#FFFFFF" d="M21.8,11h-2.6c0,1.5-0.3,2.9-1,4.2c-0.8,1.6-2.1,2.8-3.7,3.6c-1.5,0.8-3.3,1.1-4.9,0.8c-1.6-0.2-3.2-1-4.4-2.1c-0.4-0.3-0.4-0.9-0.1-1.2c0.3-0.4,0.9-0.4,1.2-0.1l0,0c1,0.7,2.2,1.1,3.4,1.1s2.3-0.3,3.3-1c0.9-0.6,1.6-1.5,2-2.6c0.3-0.9,0.4-1.8,0.2-2.8h-2.4c-0.4,0-0.7-0.3-0.7-0.7c0-0.2,0.1-0.3,0.2-0.4l4.4-4.4c0.3-0.3,0.7-0.3,0.9,0L22,9.8c0.3,0.3,0.4,0.6,0.3,0.9S22,11,21.8,11z"/></g></svg>',
+'assets/media/repeat.svg': '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g xmlns="http://www.w3.org/2000/svg"><path fill="#CF8B17" d="M23.3,11c-0.3,0.6-0.9,1-1.5,1h-1.6c-0.1,1.3-0.5,2.5-1.1,3.6c-0.9,1.7-2.3,3.2-4.1,4.1c-1.7,0.9-3.6,1.2-5.5,0.9c-1.8-0.3-3.5-1.1-4.9-2.3c-0.7-0.7-0.7-1.9,0-2.6c0.6-0.6,1.6-0.7,2.3-0.2H7c0.9,0.6,1.9,0.9,2.9,0.9s1.9-0.3,2.7-0.9c1.1-0.8,1.8-2.1,1.8-3.5h-1.5c-0.9,0-1.7-0.7-1.7-1.7c0-0.4,0.2-0.9,0.5-1.2l4.4-4.4c0.7-0.6,1.7-0.6,2.4,0L23,9.2C23.5,9.7,23.6,10.4,23.3,11z"/><path fill="#FFFFFF" d="M21.8,11h-2.6c0,1.5-0.3,2.9-1,4.2c-0.8,1.6-2.1,2.8-3.7,3.6c-1.5,0.8-3.3,1.1-4.9,0.8c-1.6-0.2-3.2-1-4.4-2.1c-0.4-0.3-0.4-0.9-0.1-1.2c0.3-0.4,0.9-0.4,1.2-0.1l0,0c1,0.7,2.2,1.1,3.4,1.1s2.3-0.3,3.3-1c0.9-0.6,1.6-1.5,2-2.6c0.3-0.9,0.4-1.8,0.2-2.8h-2.4c-0.4,0-0.7-0.3-0.7-0.7c0-0.2,0.1-0.3,0.2-0.4l4.4-4.4c0.3-0.3,0.7-0.3,0.9,0L22,9.8c0.3,0.3,0.4,0.6,0.3,0.9S22,11,21.8,11z"/></g></svg>',
 'assets/media/dropdown-arrow.svg':'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g xmlns="http://www.w3.org/2000/svg"><path d="M6.36,7.79a1.43,1.43,0,0,1-1-.42L1.42,3.45a1.44,1.44,0,0,1,0-2c0.56-.56,9.31-0.56,9.87,0a1.44,1.44,0,0,1,0,2L7.37,7.37A1.43,1.43,0,0,1,6.36,7.79Z" fill="#fff"/></g></svg>',
 'assets/media/microbit/event_onpressa.svg':'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g><path fill="#FFFFFF" d="M32,32.5H0.2L32,0.5V32.5z M26.6,29.3h1.7l-3.8-10.9h-1.3l-3.8,10.9H21l0.8-2.4h4L26.6,29.3z M22.3,25.4  l1.5-4.8l0,0l1.5,4.8C25.3,25.4,22.3,25.4,22.3,25.4z"/></g></svg>',
 'assets/media/microbit/event_onpressb.svg':'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g><path fill="#FFFFFF" d="M0,0h31.8L0,32V0z M4.9,14.5h4.4c0.8,0,1.5-0.3,2.1-0.9c0.6-0.5,0.8-1.3,0.9-2.2c0-0.6-0.1-1.1-0.4-1.6  c-0.3-0.5-0.7-0.8-1.3-0.9l0,0c0.3-0.1,0.6-0.3,0.8-0.5s0.4-0.4,0.5-0.6C12,7.4,12.2,7,12.1,6.5c0-0.9-0.3-1.6-0.8-2.1  S10.1,3.6,9,3.6H4.9V14.5z M8.8,5.1c0.6,0,1,0.2,1.3,0.4c0.3,0.3,0.4,0.7,0.4,1.1s-0.1,0.8-0.4,1.1C9.8,8,9.4,8.2,8.8,8.2H6.5V5.1  H8.8z M9,9.7c0.6,0,1,0.2,1.3,0.5s0.4,0.7,0.4,1.2c0,0.4-0.1,0.8-0.4,1.1C10,12.8,9.6,12.9,9,12.9H6.5V9.7H9z"/></g></svg>',

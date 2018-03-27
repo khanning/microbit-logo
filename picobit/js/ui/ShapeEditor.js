@@ -39,9 +39,8 @@ ShapeEditor.displayAll  =  function (){
 }
 
 ShapeEditor.addNew = function(){
-  var parent = gn('palette');
-  var tb = newHTML("div", "thumbslot", parent);
- 	var num = newHTML("div", "thumbnum", tb);
+  var t = gn('title');
+  var tb = newHTML("div", "addshape", t);
  	var img = newHTML("div", "thumbimg newshape", tb);
  	img.textContent = "+";
  	tb.key = "new";

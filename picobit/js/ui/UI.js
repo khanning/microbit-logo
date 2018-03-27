@@ -30,7 +30,7 @@ UI.resize = function(e) {
 	gn("contents").style.top =  dh + "px";
 	gn("contents").style.width = (w - gn("rightpanel").offsetWidth)+ "px";
 	gn("rightpanel").style.height = (h - dh)+ "px";
-	gn("palette").style.height = (h - gn("grid").offsetTop - gn("grid").offsetHeight - dh)+ "px";
+	gn("palette").style.height = (h - gn("grid").offsetTop - gn("grid").offsetHeight - dh - gn("title").offsetHeight)+ "px";
 	Blockly.hideChaff(true);
   Blockly.svgResize(Code.workspace);	
 }

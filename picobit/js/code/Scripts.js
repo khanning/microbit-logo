@@ -156,6 +156,15 @@ class Scripts {
 	}
 
 ////////////////////////
+// On Play
+////////////////////////
+	
+	triggerHats (type){	
+	 	let blocks = this.getHats("onbuttona");
+		for (var i=0; i < blocks.length; i++) Runtime.addScript(this, blocks[i]);
+	}
+		
+////////////////////////
 // Sensing
 ////////////////////////
 		
