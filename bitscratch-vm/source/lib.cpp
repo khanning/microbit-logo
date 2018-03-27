@@ -80,13 +80,13 @@ void evt_poll(){
   else btna_count=0;
   if(buttonb.isPressed()) btnb_count++;
   else btnb_count=0;
-  if((btna_count==1)&&(btnb_count==1)){
-    btna_count=3;
-    btnb_count=3;
+  if((btna_count>0)&&(btna_count<3)&&(btnb_count>0)&&(btnb_count<3)){
+    btna_count=4;
+    btnb_count=4;
     btnab_evt=1;
   }
-  if(btna_count==2) btna_evt=1;
-  if(btnb_count==2) btnb_evt=1;
+  if(btna_count==3) btna_evt=1;
+  if(btnb_count==3) btnb_evt=1;
   int c = radiorecv();
   if(c!=-1) {recvchar = c; pollrecv=c; radio_evt=1;}
 }
