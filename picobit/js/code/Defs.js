@@ -44,7 +44,16 @@ Defs = function(){}
 		"operators" : "Operators",
 		"more" : "More Blocks"	
 	}
-
+	
+	Defs.categoriesTranslation = {
+		"motion" : "Lights",
+		"sensing" : "Sensing",
+		"control" : "Control",
+		"event" : "Events",
+		"operators" : "Operators",
+		"more" : "More Blocks"	
+	}
+	
 
 	Defs.verticalBlocks = [	
 	
@@ -75,7 +84,7 @@ Defs = function(){}
 		["ifelse","l","control", "ifelse %b..condition"],
 		["waituntil","c","control", "wait until %b..condition"],
  		["repeatuntil","l","control", "repeat until %b..condition"],
- 		["step","l","control", "step %c..variable %d.math_whole_number.from %d.math_whole_number.to", 1, 3],
+ 		["step","l","control", "step %c..variable %d.math_whole_number.from %d.math_whole_number.to",'box1', 1, 3],
  		["stop","c","control", "stop %c..stop_option"],
  		
 		["apressed","r","sensing", "apressed"],  
@@ -106,7 +115,66 @@ Defs = function(){}
 		["changeglobal", "c", "more", "change %m.variable %d..num", "1"]
 	]
 
+	Defs.translation = {};
 	
+	Defs.init = function (whenDone) {
+		Defs.loadLanguage(storeLanguage);
+		function storeLanguage(str){
+			Defs.translation = JSON.parse(str);
+			console.log ("whenDone", Defs.lang, Defs.translation)
+			if (!Defs.languagesData[Defs.lang])  {
+				let keypair = {};
+				keypair [Defs.lang] = str;
+				chrome.storage.sync.set(keypair, whenDone);
+			}
+			else whenDone();
+	}
+}
+
+
+Defs.loadLanguage = function(whenDone){
+  chrome.storage.sync.set({'en': undefined}, 	function() {console.log('English keys deleted');});
+  chrome.storage.sync.set({'fr': undefined}, 	function() {console.log('French keys deleted');});    	
+ 	chrome.storage.sync.get(['lang'], doNext);
+
+  function doNext(result) {
+  	console.log ("geting language", result['lang'])
+  	Defs.languagesData = result;
+     let val = result['lang'];
+     if (!val) {
+     		val = 'fr';
+     		keypair = {'lang': val}
+     		let fcn =  	function() {console.log('Value is set to' + val);};
+      	chrome.storage.sync.set(keypair, fcn);
+     }
+  	Defs.lang = val;
+  	
+  	chrome.storage.sync.get([val], doLang);
+  	
+  	function doLang(){
+  		var url = "./languages/"+ Defs.lang +".txt";
+  		if (Defs.languagesData[Defs.lang]) whenDone (Defs.languagesData[Defs.lang]);
+			else Defs.httpload (url, whenDone);
+  	}
+
+	}
+}
+
+Defs.httpload = function(url, whenDone){
+  var xmlrequest=new XMLHttpRequest();
+  xmlrequest.addEventListener("error", transferFailed, false);
+  xmlrequest.onreadystatechange=  function(){
+    if (xmlrequest.readyState == 4)  whenDone(xmlrequest.responseText);
+    }
+  xmlrequest.open("GET", url, true);
+  xmlrequest.send(null);    
+  function transferFailed(e){
+    e.preventDefault();
+    e.stopPropagation();
+    console.log ("Failed Loading", url);
+  }	
+}
+
 	Defs.getXML = (prims) => {
 		Defs.argsKeys = {};
 		Defs.primtives = Defs.getDefinitions(prims)
@@ -124,10 +192,11 @@ Defs = function(){}
 			var c = Blockly.Colours[cattype].primary;
 			var s = Blockly.Colours[cattype].secondary ; 
 			if (!cat || (cat.getAttribute ("colour") != c)) {
+				let myname = Defs.translation["editor"]["categories"][cattype];
 				cat = document.createElement('category');
 				cat.setAttribute("colour", c); 
 				cat.setAttribute("secondaryColour", s); 	
-				cat.setAttribute("name", catname); 
+				cat.setAttribute("name", myname); 
 				if (cattype == "more") cat.setAttribute("custom", Blockly.MINE_CATEGORY_NAME); 
 				xml.appendChild(cat);
 			 }
@@ -139,7 +208,7 @@ Defs = function(){}
 				if (cat) cat.appendChild(b); 
 			}
 		}
-//		console.log (xml);
+		console.log (xml);
 		return xml;
 	}
 
@@ -186,8 +255,8 @@ Defs = function(){}
 			if (!values) Defs.addDefaultValues(b, prim);
 			else {
 				var specs = prim.concat();
-				specs.splice(4);
-				specs = specs.concat(values);
+				Defs.splice(4);
+				specs = Defs.concat(values);
 				Defs.addDefaultValues(b, specs);
 			}
 			return b;

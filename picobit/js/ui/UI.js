@@ -6,10 +6,13 @@ UI.projectID = undefined;
 UI.shiftKey = false;
 
 UI.setup = function(){
+	gn('title').textContent = Defs.translation["editor"]["shapes"];
 	gn("microbitstate")[eventDispatch["start"]] =  UI.checkState;
 	gn('filemenu')[eventDispatch["start"]] = UI.toggleMenu;
+	gn('lang')[eventDispatch["start"]] = UI.changeLang;
  	gn("playbutton")[eventDispatch["start"]] = Code.togglePlay;
 	window[eventDispatch["start"]] = UI.checkStatus;
+	
 	UI.setupToolbar(gn("toolbarmenu"), ["scissors", "clone", "undo", "redo"]);
 	ShapeEditor.init();
 	UI.resize();
@@ -58,14 +61,30 @@ UI.checkStatus = function (e){
 UI.unfocus =  function (){
 	 UI.closeDropdown();
 }
+
+UI.changeLang = function (e){
+	e.preventDefault();
+	e.stopPropagation();
+	let menus = Defs.translation["editor"]["menu"];
+	if (gn('appmenu')) UI.closeDropdown();
+	else {	
+		var hasValidName = UI.projectName && !UI.projectSamples[UI.projectName];	
+		var options = ['Française', "English"];
+		var optionfcns = ["loadFr", "loadEn"];
+		UI.openBalloon(e.target,options,optionfcns);
+		gn('appmenu')[eventDispatch["start"]] = UI.doAction;
+	}
+}
+
 	
 UI.toggleMenu = function (e){
 	e.preventDefault();
 	e.stopPropagation();
+	let menus = Defs.translation["editor"]["menu"];
 	if (gn('appmenu')) UI.closeDropdown();
 	else {	
-		var hasValidName = UI.projectName && !UI.projectSamples[UI.projectName];
-		var options = ["New", "Load", "Save", "Save As"];
+		var hasValidName = UI.projectName && !UI.projectSamples[UI.projectName];	
+		var options = [menus["new"], menus["load"], menus["save"], menus["saveas"]];
 		var optionfcns = ["newProject", "loadProject", "doSave", "doSaveAs"];
 		UI.openBalloon(frame,options,optionfcns);
 		gn('appmenu')[eventDispatch["start"]] = UI.doAction;
@@ -75,6 +94,7 @@ UI.toggleMenu = function (e){
 UI.doAction = function(e){
 	var t = e.target;
 	t.className = "selectmenu";
+	console.log (t.fcn)
 	if (t.fcn) UI[t.fcn](e);
 	var endfcn = function () {
 		if (gn('appmenu')) gn('appmenu').parentNode.removeChild(gn('appmenu'));
@@ -160,6 +180,53 @@ UI.newProject =  function (e){
 	UI.projectID = undefined;
 	UI.cleanUndo();
 }
+
+///////////////////
+// Save
+///////////////////
+
+UI.loadFr = function (e){
+	e.preventDefault();
+	e.stopPropagation();	
+	UI.changeLanguageTo("fr")
+}
+
+UI.loadEn = function (e){
+	e.preventDefault();
+	e.stopPropagation();	
+	UI.changeLanguageTo("en")
+}
+
+UI.changeLanguageTo = function (str){
+	if (Defs.lang == str) return;
+	Runtime.stopThreads(Code.scripts);
+	var content = UI.getProjectContents();
+	chrome.storage.sync.set({'lang': str}, doNext);
+	
+	function doNext (){
+		Defs.lang = str;
+		console.log ("changeLanguageTo ", chrome.storage.local.language)
+		Defs.loadLanguage(storeLanguage);
+	}
+	
+	function storeLanguage(str){
+			Defs.translation = JSON.parse(str);
+			console.log ("storeLanguage", Defs.lang)
+			if (!Defs.languagesData[Defs.lang])  {
+				let keypair = {};
+				keypair [Defs.lang] = str;
+				chrome.storage.sync.set(keypair, doTranslate);
+			}
+			else doTranslate();
+	}
+	
+	function doTranslate (){
+		console.log (Defs.translation)
+		Code.reset(content);
+	}
+
+}
+
 
 ///////////////////
 // Save
@@ -268,3 +335,6 @@ UI.getProjectContents = function (){
 	str +="\n"
 	return str
 }
+
+/*blockly overrrides */
+Blockly.VerticalFlyout.prototype.DEFAULT_WIDTH = 230;

@@ -18,29 +18,47 @@ Code.cache = '';
 // Init
 Code.start = function(e){
 	libInit();
-	Code.workspace = Blockly.inject('blocklyDiv', Defs.workspaceAttributes);
-	Code.scripts = new Scripts(false, new Blocks());
- 	Code.flyoutworkspace = Code.workspace.getFlyout().getWorkspace();
-  Code.workspace.addChangeListener(Code.blockListener);
- 	Code.flyoutBlocks = new Scripts(true, Code.flyoutworkspace.blocksDB_);
-	Code.flyoutworkspace.addChangeListener(Code.blockListenerFlyout);
-	Code.blocklyOverrides();	
-	Code.updatePalette()
-	Code.createDefaultVars()
-	HW.setup();
-	HW.compiler.setup();
-	UI.setup();
+	Defs.init (doNext);
+	function doNext (){
+		Code.workspace = Blockly.inject('blocklyDiv', Defs.workspaceAttributes);
+		Code.scripts = new Scripts(false, new Blocks());
+		Code.flyoutworkspace = Code.workspace.getFlyout().getWorkspace();
+		Code.workspace.addChangeListener(Code.blockListener);
+		Code.flyoutBlocks = new Scripts(true, Code.flyoutworkspace.blocksDB_);
+		Code.flyoutworkspace.addChangeListener(Code.blockListenerFlyout);
+		Code.blocklyOverrides();	
+		Code.updatePalette()
+		Code.createDefaultVars()
+		HW.setup();
+		HW.compiler.setup();
+		UI.setup();
+	}
  }
 
+Code.reset = function (str){
+	if (gn('blocklyDiv')) gn('blocklyDiv').parentNode.removeChild (gn('blocklyDiv'))
+	let bd = newHTML('div', undefined, gn('contents'),'blocklyDiv');
+	Code.workspace = Blockly.inject('blocklyDiv', Defs.workspaceAttributes);
+	Code.scripts = new Scripts(false, new Blocks());
+	Code.flyoutworkspace = Code.workspace.getFlyout().getWorkspace();
+	Code.workspace.addChangeListener(Code.blockListener);
+	Code.flyoutBlocks = new Scripts(true, Code.flyoutworkspace.blocksDB_);
+	Code.flyoutworkspace.addChangeListener(Code.blockListenerFlyout);
+	Code.blocklyOverrides();	
+	Code.updatePalette();
+	UI.loadXML(str);
+}		
+		
 Code.updatePalette = function (){
 	var xml = Defs.getXML(Defs.verticalBlocks);
 	Code.workspace.updateToolbox(xml)	
 }
 	
 Code.createDefaultVars = function (){
+	let keyname = Defs.translation.editor.blocks['box'];
 	for (let i=1; i < 4; i++) {
 	 	Code.workspace.createVariable("box" + i);
-		Code.variables["box" + i] =  0;
+		Code.variables[keyname + i] =  0;
 	}
 }
 	

@@ -1,11 +1,8 @@
 
-'use strict';
-
-  
 Blockly.Blocks['lights_clean'] = {
   init: function() {
     this.jsonInit({
-      "message0": "clean",
+      "message0": Defs.translation.editor.blocks["clean"],
       "category": Blockly.Categories.motion,
       "extensions": ["colours_motion", "shape_statement"]
     });
@@ -15,7 +12,7 @@ Blockly.Blocks['lights_clean'] = {
 Blockly.Blocks['lights_nextshape'] = {
   init: function() {
     this.jsonInit({
-      "message0": "next shape",
+      "message0":  Defs.translation.editor.blocks["nextshape"],
       "category": Blockly.Categories.motion,
       "extensions": ["colours_motion", "shape_statement"]
     });
@@ -25,28 +22,26 @@ Blockly.Blocks['lights_nextshape'] = {
 Blockly.Blocks['lights_previousshape'] = {
   init: function() {
     this.jsonInit({
-      "message0": "previous shape",
+      "message0": Defs.translation.editor.blocks["previousshape"],
       "category": Blockly.Categories.motion,
       "extensions": ["colours_motion", "shape_statement"]
     });
   }
 };
 
-
-
 Blockly.Blocks['lights_scroll'] = {
   init: function() {
     this.jsonInit({
-      "message0": "scroll %1",
+      "message0": Defs.translation.editor.blocks["scroll"],
         "args0": [
           {
             "type": "field_dropdown",
             "name": "SCROLL_OPTION",
             "options": [
-             	['left', 'left'],
-              ['right', 'right'],
-              ['up', 'up'],
-              ['down', 'down']
+             	[Defs.translation.editor.blocks['menu_left'], 'left'],
+              [Defs.translation.editor.blocks['menu_right'], 'right'],
+              [Defs.translation.editor.blocks['menu_up'], 'up'],
+              [Defs.translation.editor.blocks['menu_down'], 'down']
             ]
           }
         ],
@@ -59,7 +54,7 @@ Blockly.Blocks['lights_scroll'] = {
 Blockly.Blocks['lights_setshape'] = {
   init: function() {
     this.jsonInit({
-      "message0": "set shape %1",
+      "message0":  Defs.translation.editor.blocks["setshape"],
       "args0": [
         {
           "type": "input_value",
@@ -77,7 +72,7 @@ Blockly.Blocks['lights_setshape'] = {
 Blockly.Blocks['lights_doton'] = {
   init: function() {
     this.jsonInit({
-      "message0": "turn on x: %1 y: %2",
+      "message0": Defs.translation.editor.blocks["turnon"],
       "args0": [
         {
           "type": "input_value",
@@ -97,7 +92,7 @@ Blockly.Blocks['lights_doton'] = {
 Blockly.Blocks['lights_dotoff'] = {
   init: function() {
     this.jsonInit({
-      "message0": "turn off x: %1 y: %2",
+      "message0": Defs.translation.editor.blocks["turnoff"],
       "args0": [
         {
           "type": "input_value",
@@ -117,16 +112,16 @@ Blockly.Blocks['lights_dotoff'] = {
 Blockly.Blocks['lights_setpace'] = {
   init: function() {
     this.jsonInit({
-      "message0": "set pace %1",
+      "message0": Defs.translation.editor.blocks["setpace"],
       "args0": [
            {
             "type": "field_dropdown",
             "name": "PACE_OPTION",
             "options": [
-             	['slow', '1'],
-              ['medium', '0.5'],
-              ['fast', '0.1'],
-              ['instant', '0']
+             	[Defs.translation.editor.blocks['menu_slow'], '1'],
+              [Defs.translation.editor.blocks['menu_medium'], '0.5'],
+              [Defs.translation.editor.blocks['menu_fast'], '0.1'],
+              [Defs.translation.editor.blocks['menu_instant'], '0']
             ]
           }
       ],
@@ -170,7 +165,7 @@ Blockly.Blocks['lights_brightness'] = {
 Blockly.Blocks['lights_shape'] = {
   init: function() {
     this.jsonInit({
-      "message0": "shape",
+      "message0":  Defs.translation.editor.blocks["shape"],
       "category": Blockly.Categories.motion,
       "checkboxInFlyout": false,
    	  "extensions": ["colours_motion", "output_number"]  
@@ -184,7 +179,7 @@ Blockly.Blocks['lights_shape'] = {
 Blockly.Blocks['lights_setbrightness'] = {
   init: function() {
     this.jsonInit({
-      "message0": "set brightness %1",
+      "message0":  Defs.translation.editor.blocks["setbrightness"],
       "args0": [
         {
           "type": "input_value",
@@ -202,7 +197,7 @@ Blockly.Blocks['lights_setbrightness'] = {
 Blockly.Blocks['lights_print'] = {
   init: function() {
     this.jsonInit({
-      "message0": "print %1",
+      "message0": Defs.translation.editor.blocks["print"],
       "args0": [
         {
           "type": "input_value",

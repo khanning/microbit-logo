@@ -53,6 +53,9 @@ Blockly.Blocks['myblocks_definition'] = {
   domToMutation: function(xmlElement) {
  // 	console.log (xmlElement)
     this._spec = xmlElement.getAttribute('spec');
+   	let cmd = this._spec.split(" ");
+   	let prim =	cmd.shift();
+   	this._spec = Defs.translation.editor.blocks['define'] + " " + cmd.join(' ');
     this._values = xmlElement.getAttribute('values').split(":");
   //  console.log (this._spec, this._values)
     this._updateDisplay();
@@ -338,7 +341,7 @@ Blockly.Blocks['myblocks_localnumber'] = {
     Blockly.Colours.more.tertiary);
     this.setOutputShape(Blockly.OUTPUT_SHAPE_ROUND);
     this.setOutput(true, "Number");
-    this._varname = 'box1';
+    this._varname = Defs.translation.editor.blocks['box1'];
   },
   mutationToDom: function() {
     var container = document.createElement('mutation');
@@ -380,6 +383,8 @@ Blockly.Blocks['myblocks_box'] = {
   },
   domToMutation: function(xmlElement) {
     this._varname = xmlElement.getAttribute('varname');
+    let num = this._varname.replace(/\D+/g, '');
+    this._varname =  Defs.translation.editor.blocks['box'] + num;
     this._updateDisplay();
   },
   _updateDisplay: function() {
@@ -394,16 +399,16 @@ Blockly.Blocks['myblocks_setglobal'] = {
    */
   init: function() {
     this.jsonInit({
-      "message0": "set %1 to %2",
+      "message0": Defs.translation.editor.blocks["set"],
       "args0": [
         {
           "type": "field_dropdown",
-          "text": "box1",
+          "text": Defs.translation.editor.blocks["box1"],
           "name": "VARIABLE",
            "options": [
-              ['box1', 'box1'],
-              ['box2', 'box2'],
-              ['box3', 'box3']
+              [Defs.translation.editor.blocks['box1'], 'box1'],
+              [Defs.translation.editor.blocks['box2'], 'box2'],
+              [Defs.translation.editor.blocks['box3'], 'box3']
             ]
         },
         {
@@ -424,16 +429,16 @@ Blockly.Blocks['myblocks_changeglobal'] = {
    */
   init: function() {
     this.jsonInit({
-      "message0": "change  %1 by %2",
+      "message0": Defs.translation.editor.blocks["change"],
       "args0": [
         {
           "type": "field_dropdown",
-          "text": "box1",
+          "text": Defs.translation.editor.blocks["box1"],
           "name": "VARIABLE",
            "options": [
-              ['box1', 'box1'],
-              ['box2', 'box2'],
-              ['box3', 'box3']
+              [Defs.translation.editor.blocks['box1'], 'box1'],
+              [Defs.translation.editor.blocks['box2'], 'box2'],
+              [Defs.translation.editor.blocks['box3'], 'box3']
             ]
         },
         {

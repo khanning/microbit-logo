@@ -81,6 +81,16 @@ fieldset, legend, object, embed {
 	background: url('../assets/menu.svg') no-repeat center center;
 }
 
+#lang {
+	position: absolute;
+	left: 56px;
+	margin: 6px;
+	width: 48px;
+	height: 48px;
+	padding: 0;
+	background: url('../assets/lang.svg') no-repeat center center;
+}
+
 #topbar  *.microbit {
   position: absolute;
  	margin: 0px 5px 0px;
@@ -235,7 +245,7 @@ fieldset, legend, object, embed {
 .dropdownballoon {
   position: absolute;
   top: 50px;
-  left: 10px;
+  left: 5px;
   width: auto;
   margin: 0px;
   padding: 0px;
@@ -567,7 +577,6 @@ fieldset, legend, object, embed {
 	margin: 2px;
 }
 
-
 .deleteshape {
 	position: relative;
 	float: left;
@@ -591,3 +600,15 @@ fieldset, legend, object, embed {
     100%{-webkit-transform:rotate(0.8deg)}
 }
 
+/* blockly overrides*/
+
+  .scratchCategoryMenu {
+    width: 72px;
+    background: $colour_toolbox;
+    color: $colour_toolboxText;
+    font-size: .7rem;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }

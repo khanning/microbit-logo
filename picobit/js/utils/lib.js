@@ -35,9 +35,10 @@ function getDocumentWidth(){
 	return Math.max(document.body.clientWidth, document.documentElement.clientWidth);
 }
 
-function newHTML(type, c, p) {
+function newHTML(type, c, p, id) {
 	var e = document.createElement(type);
 	if (c) e.setAttribute ("class", c);
+	if (id) e.setAttribute ("id", id);
 	if (p) p.appendChild(e);
 	return e;
 }

@@ -19,3 +19,9 @@ chrome.app.runtime.onLaunched.addListener(function() {
     }
   });
 });
+
+/*
+ chrome.storage.onChanged.addListener(function(changes, namespace) {
+			console.log (changes, "onChanged", namespace)
+	 });
+	 */

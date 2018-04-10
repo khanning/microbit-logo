@@ -109,7 +109,6 @@ Doc.getText = function(kid, p){
 	var cn = kid.getAttribute('class')
 	var pcn = p.getAttribute('class')
 	var val = new WebKitCSSMatrix(window.getComputedStyle(kid).webkitTransform);
-	console.log ("getText", cn, "---", pcn)
 	switch (cn){
 		case "blocklyText":
 			style =  pcn == 'blocklyEditableText' ? black + style : white + style;	

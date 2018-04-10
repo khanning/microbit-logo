@@ -30,7 +30,7 @@ Blockly.Blocks['control_repeat'] = {
   init: function() {
     this.jsonInit({
       "id": "control_repeat",
-      "message0": "repeat %1",
+      "message0": Defs.translation.editor.blocks["repeat"],
       "message1": "%1", // Statement
       "message2": "%1", // Icon
       "lastDummyAlign2": "RIGHT",
@@ -72,7 +72,7 @@ Blockly.Blocks['control_step'] = {
   init: function() {
     this.jsonInit({
       "id": "control_step",
-      "message0": "step %1 from %2 to %3",
+      "message0": Defs.translation.editor.blocks["step"],
       "message1": "%1", // Statement
       "message2": "%1", // Icon
       "lastDummyAlign2": "RIGHT",
@@ -82,9 +82,9 @@ Blockly.Blocks['control_step'] = {
           "text": "box1",
           "name": "VARIABLE",
            "options": [
-              ['box1', 'box1'],
-              ['box2', 'box2'],
-              ['box3', 'box3']
+              [Defs.translation.editor.blocks['box1'], 'box1'],
+              [Defs.translation.editor.blocks['box2'], 'box2'],
+              [Defs.translation.editor.blocks['box3'], 'box3']
             ]
         },
         {
@@ -127,7 +127,7 @@ Blockly.Blocks['control_if'] = {
   init: function() {
     this.jsonInit({
       "type": "control_if",
-      "message0": "if %1 then",
+      "message0": Defs.translation.editor.blocks["if"],
       "message1": "%1", // Statement
       "args0": [
         {
@@ -161,9 +161,9 @@ Blockly.Blocks['control_ifelse'] = {
   init: function() {
     this.jsonInit({
       "type": "control_if_else",
-      "message0": "if %1 then",
+      "message0": Defs.translation.editor.blocks["ifelse"],
       "message1": "%1",
-      "message2": "else",
+      "message2":  Defs.translation.editor.blocks["else"],
       "message3": "%1",
       "args0": [
         {
@@ -203,7 +203,7 @@ Blockly.Blocks['control_wait'] = {
   init: function() {
     this.jsonInit({
       "id": "control_wait",
-      "message0": "wait %1 sec",
+      "message0": Defs.translation.editor.blocks["wait"],
       "args0": [
         {
           "type": "input_value",
@@ -223,7 +223,7 @@ Blockly.Blocks['control_waituntil'] = {
    */
   init: function() {
     this.jsonInit({
-      "message0": "wait until %1",
+      "message0": Defs.translation.editor.blocks["waituntil"],
       "args0": [
         {
           "type": "input_value",
@@ -248,7 +248,7 @@ Blockly.Blocks['control_repeatuntil'] = {
    */
   init: function() {
     this.jsonInit({
-      "message0": "repeat until %1",
+      "message0": Defs.translation.editor.blocks["repeatuntil"],
       "message1": "%1",
       "message2": "%1",
       "lastDummyAlign2": "RIGHT",
@@ -295,7 +295,7 @@ Blockly.Blocks['control_forever'] = {
   init: function() {
     this.jsonInit({
       "id": "control_forever",
-      "message0": "forever",
+      "message0": Defs.translation.editor.blocks["forever"],
       "message1": "%1", // Statement
       "message2": "%1", // Icon
       "lastDummyAlign2": "RIGHT",
@@ -327,26 +327,27 @@ Blockly.Blocks['control_stop'] = {
    * @this Blockly.Block
    */
   init: function() {
-    var ALL_SCRIPTS = 'stopall';
-    var THIS_SCRIPT = 'stop';
-    var OTHER_SCRIPTS = 'stopothers';
+    var ALL_SCRIPTS = Defs.translation.editor.blocks['menu_all'];
+    var THIS_SCRIPT = Defs.translation.editor.blocks['menu_script'];
+    var OTHER_SCRIPTS = Defs.translation.editor.blocks['menu_other'];
+    var OTHER = 'stopothers';
     var stopDropdown = new Blockly.FieldDropdown(function() {
       if (this.sourceBlock_ &&
           this.sourceBlock_.nextConnection &&
           this.sourceBlock_.nextConnection.isConnected()) {
         return [
-          ['others', OTHER_SCRIPTS]
+          [ OTHER_SCRIPTS, 'stopothers']
         ];
       }
-      return [['all', ALL_SCRIPTS],
-        ['this script', THIS_SCRIPT],
-        ['other scripts', OTHER_SCRIPTS]
+      return [[ALL_SCRIPTS, 'stopall'],
+        [THIS_SCRIPT, 'stop'],
+        [OTHER_SCRIPTS, 'stopothers']
       ];
     }, function(option) {
-      this.sourceBlock_.setNextStatement(option == OTHER_SCRIPTS);
+      this.sourceBlock_.setNextStatement(option == OTHER);
     });
     this.appendDummyInput()
-        .appendField('stop')
+        .appendField(Defs.translation.editor.blocks['stop'])
         .appendField(stopDropdown, 'STOP_OPTION');
     this.setCategory(Blockly.Categories.control);
     this.setColour(Blockly.Colours.control.primary,
@@ -361,7 +362,7 @@ Blockly.Blocks['control_stop'] = {
     container.setAttribute('hasnext', hasNext);
     return container;
   },
-  domToMutation: function(xmlElement) {
+  domToMutation: function(xmlElement) {    
     var hasNext = (xmlElement.getAttribute('hasnext') == 'true');
     this.setNextStatement(hasNext);
   }

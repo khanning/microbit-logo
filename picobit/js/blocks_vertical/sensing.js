@@ -27,7 +27,7 @@ Blockly.Blocks['sensing_apressed'] = {
    */
   init: function() {
     this.jsonInit({
-      "message0": "%1 pressed?",
+      "message0": Defs.translation.editor.blocks["pressed?"], 
       "args0": [
       	{
           "type": "field_image",
@@ -52,7 +52,7 @@ Blockly.Blocks['sensing_bpressed'] = {
    */
   init: function() {
     this.jsonInit({
-      "message0": "%1 pressed?",
+      "message0":  Defs.translation.editor.blocks["pressed?"], 
       "args0": [
       	{
           "type": "field_image",
@@ -77,7 +77,7 @@ Blockly.Blocks['sensing_accx'] = {
    */
   init: function() {
     this.jsonInit({
-      "message0": "%1 tilt",
+      "message0":  Defs.translation.editor.blocks["tilt"],
       "args0": [
       	{
           "type": "field_image",
@@ -102,7 +102,7 @@ Blockly.Blocks['sensing_timer'] = {
    */
   init: function() {
     this.jsonInit({
-      "message0": "timer",
+      "message0": Defs.translation.editor.blocks["timer"], 
       "category": Blockly.Categories.sensing,
       "checkboxInFlyout": false,
       "extensions": ["colours_sensing", "output_number"]
@@ -117,7 +117,7 @@ Blockly.Blocks['sensing_resett'] = {
    */
   init: function() {
     this.jsonInit({
-      "message0": "reset timer",
+      "message0":  Defs.translation.editor.blocks["resettimer"],
       "category": Blockly.Categories.sensing,
       "extensions": ["colours_sensing", "shape_statement"]
     });

@@ -70,7 +70,7 @@ Blockly.CustomBlocks.getProcDefs = function(workspace) {
     block.setAttribute('type', 'myblocks_definition');
     var mut = document.createElement('mutation');
     block.appendChild(mut);
-    mut.setAttribute('spec', 'Define %t');
+    mut.setAttribute('spec', Defs.translation.editor.blocks['define']+ " %t");
   	mut.setAttribute('values', Blockly.CustomBlocks.PROC_DEFAULT);
     block.setAttribute('gap', 32);
     xmlList.push(block);
@@ -79,7 +79,8 @@ Blockly.CustomBlocks.getProcDefs = function(workspace) {
   for (var i = 0; i < procblocks.length; i++) {
     var block = procblocks[i];
     if (block.type != 'myblocks_definition') continue;
-    var spec = block["_spec"].split("Define ")[1];
+    let defkey =  Defs.translation.editor.blocks['define'];
+    var spec = block["_spec"].split(defkey +" ")[1];
     var values = block["_values"].concat();
     var pname  = values[0];
     values = values.length > 1 ? values.join(":") : values;

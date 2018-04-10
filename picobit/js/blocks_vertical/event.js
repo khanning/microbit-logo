@@ -20,34 +20,10 @@
 
 'use strict';
 
-Blockly.Blocks['events_onstart'] = {
-  /**
-   * Block for when flag clicked.
-   * @this Blockly.Block
-   */
-  init: function() {
-    this.jsonInit({
-      "message0": "when %1 clicked",
-      "args0": [
-        {
- "type": "field_image",
- "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/control_play.svg",
- "width": 32,
- "height": 32,
- "alt": "flag",
- "flip_rtl": true
-        }
-      ],
-      "category": Blockly.Categories.event,
-      "extensions": ["colours_event", "shape_hat"]
-    });
-  }
-};
-
 Blockly.Blocks['events_onbuttona'] = {
   init: function() {
     this.jsonInit({
-      "message0": "When %1 pressed",
+      "message0": Defs.translation.editor.blocks["onpressed"],
       "args0": [
         {
  "type": "field_image",
@@ -67,7 +43,7 @@ Blockly.Blocks['events_onbuttona'] = {
 Blockly.Blocks['events_onbuttonab'] = {
   init: function() {
     this.jsonInit({
-      "message0": "When %1 & %2 pressed",
+      "message0": Defs.translation.editor.blocks["onpressed2"],
       "args0": [
         {
  "type": "field_image",
@@ -95,7 +71,7 @@ Blockly.Blocks['events_onbuttonab'] = {
 Blockly.Blocks['events_onbuttonb'] = {
   init: function() {
     this.jsonInit({
-      "message0": "When %1 pressed",
+      "message0": Defs.translation.editor.blocks["onpressed"],
       "args0": [
         {
  "type": "field_image",
@@ -117,18 +93,18 @@ Blockly.Blocks['events_onreceive'] = {
   init: function() {
     this.jsonInit({
       "id": "events_broadcast",
-      "message0": "When I receive %1",
+      "message0": Defs.translation.editor.blocks["onreceive"],
       "args0": [
     		{
 				 "type": "field_dropdown",
 				 "name": "BROADCAST_OPTION",
 				 "options":[
-						 [{"type": "field_image", "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/event_when-broadcast-received_coral.svg","width": 36, "height": 36, "alt": "coral", "flip_rtl": true}, '0'],
-							[{"type": "field_image", "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/event_when-broadcast-received_yellow.svg", "width": 36, "height": 36, "alt": "yellow", "flip_rtl": true}, '1'],
-							[{"type": "field_image", "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/event_when-broadcast-received_green.svg","width": 36, "height": 36,"alt": "green", "flip_rtl": true}, '2'],
-						 	[{"type": "field_image", "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/event_when-broadcast-received_blue.svg","width": 36, "height": 36, "alt": "blue","flip_rtl": true}, '3'],
-						 	[{"type": "field_image", "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/event_when-broadcast-received_purple.svg","width": 36, "height": 36, "alt": "purple","flip_rtl": true}, '4'],
-					 		[{"type": "field_image", "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/event_when-broadcast-received_magenta.svg","width": 36, "height": 36, "alt": "magenta","flip_rtl": true}, '5']
+						 [{"type": "field_image", "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/event_when-broadcast-received_coral.svg","width": 36, "height": 36, "alt": Defs.translation.editor.blocks["menu_coral"], "flip_rtl": true}, '0'],
+							[{"type": "field_image", "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/event_when-broadcast-received_yellow.svg", "width": 36, "height": 36, "alt": Defs.translation.editor.blocks["menu_yellow"], "flip_rtl": true}, '1'],
+							[{"type": "field_image", "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/event_when-broadcast-received_green.svg","width": 36, "height": 36,"alt": Defs.translation.editor.blocks["menu_green"], "flip_rtl": true}, '2'],
+						 	[{"type": "field_image", "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/event_when-broadcast-received_blue.svg","width": 36, "height": 36, "alt": Defs.translation.editor.blocks["menu_blue"],"flip_rtl": true}, '3'],
+						 	[{"type": "field_image", "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/event_when-broadcast-received_purple.svg","width": 36, "height": 36, "alt": Defs.translation.editor.blocks["menu_purple"],"flip_rtl": true}, '4'],
+					 		[{"type": "field_image", "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/event_when-broadcast-received_magenta.svg","width": 36, "height": 36, "alt": Defs.translation.editor.blocks["menu_magenta"],"flip_rtl": true}, '5']
 							]
     		}
       ],
@@ -139,22 +115,23 @@ Blockly.Blocks['events_onreceive'] = {
 };
 
 
+
 Blockly.Blocks['events_broadcast'] = {
   init: function() {
     this.jsonInit({
       "id": "events_broadcast",
-      "message0": "broadcast %1",
+      "message0": Defs.translation.editor.blocks["broadcast"],
       "args0": [
         {
 				 "type": "field_dropdown",
 				 "name": "BROADCAST_OPTION",
 				 "options":[
-						 [{"type": "field_image", "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/event_broadcast_coral.svg","width": 36, "height": 36, "alt": "coral", "flip_rtl": true}, '0'],
-							 [{"type": "field_image", "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/event_broadcast_yellow.svg", "width": 36, "height": 36, "alt": "yellow", "flip_rtl": true}, '1'],
-					 [{"type": "field_image", "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/event_broadcast_green.svg","width": 36, "height": 36,"alt": "green", "flip_rtl": true}, '2'],
-								 [{"type": "field_image", "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/event_broadcast_blue.svg","width": 36, "height": 36, "alt": "blue","flip_rtl": true}, '3'],
-						 [{"type": "field_image", "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/event_broadcast_purple.svg","width": 36, "height": 36, "alt": "purple","flip_rtl": true}, '4'],
-				 [{"type": "field_image", "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/event_broadcast_magenta.svg","width": 36, "height": 36, "alt": "magenta","flip_rtl": true}, '5']
+						 [{"type": "field_image", "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/event_broadcast_coral.svg","width": 36, "height": 36, "alt": Defs.translation.editor.blocks["menu_coral"], "flip_rtl": true}, '0'],
+							 [{"type": "field_image", "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/event_broadcast_yellow.svg", "width": 36, "height": 36, "alt": Defs.translation.editor.blocks["menu_yellow"], "flip_rtl": true}, '1'],
+					 [{"type": "field_image", "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/event_broadcast_green.svg","width": 36, "height": 36,"alt": Defs.translation.editor.blocks["menu_green"], "flip_rtl": true}, '2'],
+								 [{"type": "field_image", "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/event_broadcast_blue.svg","width": 36, "height": 36, "alt":Defs.translation.editor.blocks["menu_blue"],"flip_rtl": true}, '3'],
+						 [{"type": "field_image", "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/event_broadcast_purple.svg","width": 36, "height": 36, "alt": Defs.translation.editor.blocks["menu_purple"],"flip_rtl": true}, '4'],
+				 [{"type": "field_image", "src": Blockly.mainWorkspace.options.pathToMedia + "microbit/event_broadcast_magenta.svg","width": 36, "height": 36, "alt": Defs.translation.editor.blocks["menu_magenta"],"flip_rtl": true}, '5']
 						]
     		}
       ],

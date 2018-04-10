@@ -153,7 +153,7 @@ Blockly.Blocks['operators_random'] = {
   init: function() {
     this.jsonInit(
       {
-        "message0": "pick random %1 to %2",
+        "message0": Defs.translation.editor.blocks["random"],
         "args0": [
           {
             "type": "input_value",
@@ -275,7 +275,7 @@ Blockly.Blocks['operators_and'] = {
    */
   init: function() {
     this.jsonInit({
-      "message0": "%1 and %2",
+      "message0": Defs.translation.editor.blocks["and"],
       "args0": [
         {
           "type": "input_value",
@@ -301,7 +301,7 @@ Blockly.Blocks['operators_or'] = {
    */
   init: function() {
     this.jsonInit({
-      "message0": "%1 or %2",
+      "message0": Defs.translation.editor.blocks["or"],
       "args0": [
         {
           "type": "input_value",
@@ -327,7 +327,7 @@ Blockly.Blocks['operators_not'] = {
    */
   init: function() {
     this.jsonInit({
-      "message0": "not %1",
+      "message0": Defs.translation.editor.blocks["not"],
       "args0": [
         {
           "type": "input_value",
