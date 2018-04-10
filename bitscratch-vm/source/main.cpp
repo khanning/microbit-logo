@@ -131,6 +131,12 @@ void rsendcmd(){
     for(uint8_t i=0;i<count;i++) rsend(ugetc());
 }
 
+
+void pollcmd(){
+    vm_stop();
+    send_io_state();
+}
+
 void dispatch(uint8_t c){
     if(c==0xff) ping();
     else if(c==0xfe) readmemory();
@@ -142,7 +148,7 @@ void dispatch(uint8_t c){
     else if(c==0xf8) runcc();
     else if(c==0xf7) setshapecmd();
     else if(c==0xf6) setbrightnesscmd();
-    else if(c==0xf5) send_io_state();
+    else if(c==0xf5) pollcmd();
     else if(c==0xf4) rsendcmd();
     else uputc(c);
 }

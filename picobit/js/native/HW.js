@@ -26,7 +26,8 @@ HW.setup = function (){
 }
 
 HW.onReceiveError = function (err){
-	console.warn ("onReceiveError", err)
+	console.log ("onReceiveError", err);
+	Runtime.stopThreads(Code.scripts);
 	gn('microbitstate').className = "microbit fail";
 }
 
