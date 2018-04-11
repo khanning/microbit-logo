@@ -91,6 +91,7 @@ class Scripts {
     
 		if (Defs.primtives[prim][1] == "r") {
 			var t =  new Thread(this, block);
+			var token=Prim[block.opcode];			
 			var value = t.getArgs (block);
 			var str = Number(value.toString()).toString() == "NaN" ? value.toString() : value.trim(2).toString()
 			Code.workspace.reportValue(id, str);	

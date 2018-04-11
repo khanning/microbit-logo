@@ -21,9 +21,12 @@ UI.setup = function(){
 	window.onkeyup = UI.handleKeyUp;
 }
 
-UI.handleKeyDown = function(e) {UI.shiftKey = e.shiftKey;}
-UI.handleKeyUp = function(e) { UI.shiftKey = e.shiftKey;}
+UI.handleKeyDown = function(e) {
+	if (e.keyCode == 8) ShapeEditor.clearShape();
+	UI.shiftKey = e.shiftKey;
+}
 
+UI.handleKeyUp = function(e) {UI.shiftKey = e.shiftKey;}
 
 UI.resize = function(e) {
 	var h = getDocumentHeight();
@@ -176,7 +179,9 @@ UI.newProject =  function (e){
 	var xml = Blockly.Xml.textToDom(empty);
 	Blockly.Xml.domToWorkspace(xml, Code.workspace);
 	Code.createDefaultVars();
-	ShapeEditor.newSet();	
+	ShapeEditor.shapes = [];
+	ShapeEditor.unfocus();
+	ShapeEditor.displayAll();
 	UI.projectID = undefined;
 	UI.cleanUndo();
 }

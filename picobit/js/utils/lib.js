@@ -69,6 +69,16 @@ function sindeg(x){return Math.sin(x*2*Math.PI/360);}
 function cosdeg(x){return Math.cos(x*2*Math.PI/360);}
 Number.prototype.mod = function(n) {return ((this%n)+n)%n;}
 String.prototype.splice = function(start, delCount, newSubStr) { return this.slice(0, start) + newSubStr + this.slice(start + Math.abs(delCount));};
+Number.prototype.trim = function (n) {return Number(Number(this).toFixed(n))}
+
+function setTransform (el, transform) {
+  el.style.transform = transform;
+  el.style.webkitTransform = transform;
+  el.style.msTransform = transform;
+  el.style.MozTransform = transform;
+  el.style.OTransform = transform;
+}
+
 
 function gn(str) {return document.getElementById(str);}
 

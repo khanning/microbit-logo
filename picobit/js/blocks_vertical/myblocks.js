@@ -384,11 +384,11 @@ Blockly.Blocks['myblocks_box'] = {
   domToMutation: function(xmlElement) {
     this._varname = xmlElement.getAttribute('varname');
     let num = this._varname.replace(/\D+/g, '');
-    this._varname =  Defs.translation.editor.blocks['box'] + num;
+    this._varname =  'box' + num;
     this._updateDisplay();
   },
   _updateDisplay: function() {
-    this.setFieldValue(this._varname, 'varname');
+    this.setFieldValue(Defs.translation.editor.blocks[this._varname], 'varname');
   }
 };
 

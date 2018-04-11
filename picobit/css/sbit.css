@@ -83,7 +83,7 @@ fieldset, legend, object, embed {
 
 #lang {
 	position: absolute;
-	left: 56px;
+	left: 66px;
 	margin: 6px;
 	width: 48px;
 	height: 48px;
@@ -497,10 +497,12 @@ fieldset, legend, object, embed {
 	background: #fff;
 }
 
+
 .thumbslot{
   display: inline-block;
-  word-spacing: -1;
+  word-spacing: -1px;
   position: relative;
+  white-space: normal;
   padding: 0px;
   margin: 4px;
   margin-left: 8px;
@@ -514,18 +516,16 @@ fieldset, legend, object, embed {
   width: 200px;
 }
 
-.thumbslot.selected {}
-
-
-.thumbnum {
+.thumbslot  > .thumbnum {
   position: absolute;
   top:0px;
   left:0px;
   text-align: right;
  	color: #999;
  	width: 20px;
- 	height: 16px;
+ 	height: 20px;
  	line-height: 16px;
+ 	 -webkit-border-radius: 20px;
 }
 
 .thumbslot > .thumbimg {
@@ -534,7 +534,7 @@ fieldset, legend, object, embed {
   left: 20px;
   border: 1px solid #d3d4d6;
   margin: 0px;
-  padding: 0px;
+  padding: 3px;
   width: 64px;
   height: 64px;
   overflow: hidden;
@@ -543,8 +543,24 @@ fieldset, legend, object, embed {
   -webkit-border-top-right-radius: 3px;
 }
 
+.thumbslot.selected > .thumbimg {
+	 border: 4px solid #69D2E7;
+	 padding: 0px;
+	}
 
-.thumbslot.selected > .thumbimg { border: 4px solid #69D2E7;}
+.thumbslot.lifted  > .thumbimg{
+  -webkit-box-shadow: 0 10px 10px rgba(0, 0, 0, 0.2);
+}
+.thumbslot.lifted   > .thumbnum {
+	background: #fff;
+	-webkit-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+	text-align: center;
+}
+
+.thumbslot.caret  > .thumbimg {
+	border: 1px solid #d3d4d6;
+	background: rgba(0, 0, 0, 0.1);
+}
 
 .thumbimg.newshape {
   -webkit-border-radius: 3px;

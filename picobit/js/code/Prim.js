@@ -449,10 +449,7 @@ Prim.myblocks_changeglobal = function () {
 // Reporters
 ////////////////////////
 
-Prim.myblocks_box = function (args) {
-	return Code.variables[args.VARNAME]
-}
-
+Prim.myblocks_box = function (args) {return Code.variables[args.VARNAME]}
 Prim.operators_add = function (args){return Prim.toNum(args.NUM1) + Prim.toNum(args.NUM2)}
 Prim.operators_subtract = function (args){ return Prim.toNum(args.NUM1) -  Prim.toNum(args.NUM2)}
 Prim.operators_multiply = function (args){ return Prim.toNum(args.NUM1) * Prim.toNum(args.NUM2)}

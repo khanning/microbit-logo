@@ -15,7 +15,7 @@ Events.mouseDownTime= 0;
 Events.lastMouseMove = 0;
 Events.touchID= undefined;
 Events.activeFocus = undefined;
-Events.dragdistance =7;
+Events.dragdistance = 15;
 
 Events.thumbnails = function(divs) {
   var res = new Array();
@@ -40,6 +40,7 @@ Events.extraFingerEvent = function(e){
 }
 
 Events.startDrag = function (c, atstart, atend, atdrag, atclick, athold){
+	console.log ('startDrag')
 //	console.log (c, atstart, atend, atdrag, atclick, athold);
   Events.dragged = false;
   Events.mouseDownTime = (new Date() - 0); 
@@ -106,7 +107,7 @@ Events.mouseUp = function (e){
    	e.preventDefault();
   	e.stopPropagation();
   	return;
- }
+ 	}
   if (Events.timeoutEvent) clearTimeout(Events.timeoutEvent);
   Events.timeoutEvent = undefined;
   Events.clearEvents();

@@ -55,7 +55,7 @@ Code.updatePalette = function (){
 }
 	
 Code.createDefaultVars = function (){
-	let keyname = Defs.translation.editor.blocks['box'];
+	let keyname ='box';
 	for (let i=1; i < 4; i++) {
 	 	Code.workspace.createVariable("box" + i);
 		Code.variables[keyname + i] =  0;
@@ -135,4 +135,6 @@ Code.startDownload = function (){
 	}	
 }
 
-window.onload = Code.start
+document.addEventListener("contextmenu", function(e) {e.preventDefault();});
+
+window.onload = Code.start;
