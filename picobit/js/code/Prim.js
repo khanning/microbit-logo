@@ -25,7 +25,6 @@ Prim.done = function (){
 Prim.doClean = function (){ 
 	var t = Runtime.thread;
 	Runtime.stopThreads(Code.scripts)
-	console.log ("Prim.done", Runtime.thread.firstBlock.opcode);
 	Prim.currentShape = {n: undefined, dx:0, dy: 0}
 	HW.shape = [0,0,0,0,0];
 	t.thisblock = undefined;		
@@ -62,7 +61,8 @@ Prim.control_step = function (){
 	var from = Prim.toNum(args.FROM);
 	var to = Prim.toNum(args.TO);
 	let n = Math.abs(from - to);
-	var flow = t.getSubStack (b, "SUBSTACK")
+	var flow = t.getSubStack (b, "SUBSTACK");
+	var dir  = (from < to);
 	Code.variables[varname] = from;
 	if (n < 1){
 		Prim.doNext();
@@ -70,6 +70,7 @@ Prim.control_step = function (){
 	else {	
 		t.stack.push(t.next());
 		t.stack.push(varname);
+		t.stack.push(dir);
 		t.stack.push(to);
 		t.stack.push(flow);
 		t.stack.push('stepAgain');
@@ -82,22 +83,23 @@ Prim.stepAgain = function(){
 	let t = Runtime.thread;
 	let flow = t.stack.pop();
 	let to = t.stack.pop();
+	let dir = t.stack.pop();
 	let varname = t.stack.pop();
 	var from = Code.variables[varname]
-
-	if (from == to) t.thisblock = t.stack.pop();
+	var done  =  dir ?  !(from < to)  : !(from > to);
+	if (done) t.thisblock = t.stack.pop();
 	else {
 		if (from < to) from++;
 		else if (from > to) from--;
 		Code.variables[varname] = from;
 		t.stack.push(varname);
+		t.stack.push(dir);
 		t.stack.push(to);
 		t.stack.push(flow);
 		t.stack.push('stepAgain');
 		t.thisblock = flow;
 	}
 }
-
 
 Prim.control_repeat = function (){		
 	var t = Runtime.thread;
@@ -123,6 +125,7 @@ Prim.repeatAgain = function(){
 	var t = Runtime.thread;
 	var b = t.stack.pop();
 	var n = t.stack.pop();
+//	console.log ("repeatAgain", n)
 	n--;
 	if(n>0){
 		t.stack.push(n);
@@ -173,7 +176,7 @@ Prim.control_ifelse = function (){
 	t.thisblock = flow;
 }
 
-Prim.control_wait_until = function (){		
+Prim.control_waituntil = function (){		
 	var t = Runtime.thread;
 	var b = t.thisblock;
 	var args = t.getArgs(b);
@@ -181,34 +184,34 @@ Prim.control_wait_until = function (){
 	else Runtime.yield=true;
 }
 
-Prim.control_repeat_until = function (){		
+Prim.control_repeatuntil = function (){		
 	var t = Runtime.thread;
 	var b = t.thisblock;
 	var args = t.getArgs(b);
+	var flow = t.getSubStack (b, "SUBSTACK");
 	if  (!Prim.toBool(args.CONDITION)){
 		var flow = t.getSubStack (b, "SUBSTACK")
 		t.stack.push(b);
 		t.stack.push(flow);
-		t.stack.push('repeatUntil');
+		t.stack.push('doUntil');
 		t.thisblock = flow;	
 	}
 	else Prim.doNext();
 }
 
-Prim.repeatUntil = function(){
+Prim.doUntil = function(){
 	var t = Runtime.thread;
 	var flow = t.stack.pop();
 	var b = t.stack.pop();
 	var args = t.getArgs(b);
-	n--;
 	if (!Prim.toBool(args.CONDITION)){
 		t.stack.push(b);
 		t.stack.push(flow);
-		t.stack.push('repeatUntil');
+		t.stack.push('doUntil');
 		t.thisblock = flow;	
 	}
 	else  {
-		t.thisblock = b.next();
+		t.thisblock = t.next();
 	}
 }
 
@@ -478,21 +481,10 @@ Prim.operators_random = function (args){
     return (Math.random() * (high - low)) + low;
 }
 
-Prim.sensing_pressed = function (args){
-	let port = HW.sensorPorts.indexOf("touch");	
-	var res  = (port > -1)  ? checkTouchTrigger(port) : false;
-	return res;
-	
-	function checkTouchTrigger(p) {
-	 	var value  = HW.sensorValues[p] 
-	 	return value == undefined ?  false : value == 0 ? false : true;
-	}
-}
-
 Prim.lights_shape = function (args) {let n = Prim.currentShape.n; return Prim.mapValueShape(n ? n : 0) + 1}
 Prim.sensing_timer = function (args) {return timer() / 1000}	
-Prim.sensing_apressed = function (args){return HW.state.apressed;}
-Prim.sensing_bpressed = function (args){return HW.state.bpressed;}
+Prim.sensing_apressed = function (args){return HW.state.astate;}
+Prim.sensing_bpressed = function (args){return HW.state.bstate;}
 Prim.sensing_accx = function (args){return HW.state.tilts.x;}
 
 ///////////////////////

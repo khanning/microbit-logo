@@ -80,11 +80,13 @@ HW.gotPollPacket = function (l){
 	if (isBoth){
 		HW.state.acount=4;
 		HW.state.bcount=4;
-		HW.state.abpressed=true;
+		HW.state.abpressed=true; cxz		
 	}
 	else HW.state.abpressed=false;
 	HW.state.apressed = (HW.state.acount==3);
 	HW.state.bpressed = (HW.state.bcount==3);
+	HW.state.astate = aPressed;
+	HW.state.bstate = bPressed;
 	HW.state.recc = l[2];
 //	console.log("HW.gotPollPacket", JSON.stringify(HW.state));
 

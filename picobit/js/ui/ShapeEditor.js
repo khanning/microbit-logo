@@ -456,9 +456,11 @@ ShapeEditor.dropThumb = function (e){
   var pt = Events.getTargetPoint(e);
   let place = getPlace(pt);
   switch (place){
-  	case "delete": 
+  	case "delete":
+  		if (ShapeEditor.paintingShape == Events.jsobject) ShapeEditor.unfocus();
+  	  ShapeEditor.removeCaret();
+  		ShapeEditor.cleanCaret();
   		if (Events.jsobject.parentNode) Events.jsobject.parentNode.removeChild(Events.jsobject); 
-  		ShapeEditor.removeCaret();
   		ShapeEditor.reOrder(); 
   		break;
   	case "move":  
@@ -483,7 +485,6 @@ ShapeEditor.dropThumb = function (e){
 	}
 }  
 
-
 ShapeEditor.cursorOnEdge = function (){
 	if (!Events.jsobject) {
 		ShapeEditor.cleanCaret(); return;
@@ -491,9 +492,12 @@ ShapeEditor.cursorOnEdge = function (){
  	var pt = {x: globalx(Events.jsobject), y: globaly(Events.jsobject) };
  	let bottomEdge = getDocumentHeight()  -  Events.jsobject.offsetHeight - 12;
  	let topEdge = globaly(gn('palette')) + 30;
- 	let last = gn("palette").childNodes[gn("palette").childElementCount - 1];
- 	let maxscroll = last.offsetTop + last.offsetHeight + 4  -  gn("palette").offsetHeight + last.offsetHeight;
- 	if (pt.y >  bottomEdge) gn('palette').scrollTop =  Math.min (maxscroll, gn('palette').scrollTop + 4);
+ 
+ 	if (gn("palette").childElementCount  != 0) {
+ 		let last = gn("palette").childNodes[gn("palette").childElementCount - 1];
+ 		let maxscroll = last.offsetTop + last.offsetHeight + 4  -  gn("palette").offsetHeight + last.offsetHeight;
+ 		if (pt.y >  bottomEdge) gn('palette').scrollTop =  Math.min (maxscroll, gn('palette').scrollTop + 4);
+ 	}
  	if (pt.y <  topEdge) gn('palette').scrollTop =  Math.max (0, gn('palette').scrollTop - 4);
 } 
 

@@ -40,7 +40,6 @@ Events.extraFingerEvent = function(e){
 }
 
 Events.startDrag = function (c, atstart, atend, atdrag, atclick, athold){
-	console.log ('startDrag')
 //	console.log (c, atstart, atend, atdrag, atclick, athold);
   Events.dragged = false;
   Events.mouseDownTime = (new Date() - 0); 

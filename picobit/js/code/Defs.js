@@ -98,7 +98,7 @@ Defs = function(){}
 		["multiply","r","operators", "%d..num1 * %d..num2"],  			
 		["divide","r","operators", "%d..num1 / %d..num2"],  	
 		["modulo","r","operators", "%d..num1 mod %d..num2"],  					
-		["random","r","operators", "pick random from %d..from to %d..to", 1, 5],  
+		["random","r","operators", "pick random from %d..from to %d..to", 0, 4],  
 		["---"],
 		["lt","r","operators", "%d..operand1 < %d..operand2"],  		
 		["equals","r","operators", "%d..operand1 < %d..operand2"],  		
@@ -118,28 +118,23 @@ Defs = function(){}
 	Defs.translation = {};
 	
 	Defs.init = function (whenDone) {
-		Defs.loadLanguage(storeLanguage);
-		function storeLanguage(str){
-			Defs.translation = JSON.parse(str);
-			console.log ("whenDone", Defs.lang, Defs.translation)
-			if (!Defs.languagesData[Defs.lang])  {
-				let keypair = {};
-				keypair [Defs.lang] = str;
-				chrome.storage.sync.set(keypair, whenDone);
-			}
-			else whenDone();
+	 chrome.storage.sync.set({'en': ''}, 	dofrench);
+	 function dofrench (){
+	// 	console.log('Englsh keys deleted');
+	 	chrome.storage.sync.set({'fr': ''}, 	doload);
+	 }
+  function doload(){
+	 //	console.log('French keys deleted');
+	 Defs.loadLanguage(whenDone);
 	}
 }
 
 
 Defs.loadLanguage = function(whenDone){
-  chrome.storage.sync.set({'en': undefined}, 	function() {console.log('English keys deleted');});
-  chrome.storage.sync.set({'fr': undefined}, 	function() {console.log('French keys deleted');});    	
- 	chrome.storage.sync.get(['lang'], doNext);
-
+ 	chrome.storage.sync.get(['lang', 'en', 'fr'], doNext);
   function doNext(result) {
-  	console.log ("geting language", result['lang'])
-  	Defs.languagesData = result;
+ // 	console.log ("geting language", result['lang'] ? result[result['lang']]  : null)
+  	let languagesData = result;
      let val = result['lang'];
      if (!val) {
      		val = 'fr';
@@ -148,16 +143,21 @@ Defs.loadLanguage = function(whenDone){
       	chrome.storage.sync.set(keypair, fcn);
      }
   	Defs.lang = val;
-  	
-  	chrome.storage.sync.get([val], doLang);
-  	
-  	function doLang(){
-  		var url = "./languages/"+ Defs.lang +".txt";
-  		if (Defs.languagesData[Defs.lang]) whenDone (Defs.languagesData[Defs.lang]);
-			else Defs.httpload (url, whenDone);
+  	let url =  "./languages/"+ Defs.lang +".txt";
+  	if (languagesData [val] && (languagesData [val] != '')){
+  		Defs.translation = JSON.parse(languagesData [val]);
+  		whenDone(languagesData [val]);
   	}
-
+  	else Defs.httpload (url, storeLanguage);
 	}
+  	
+		function storeLanguage(str){
+			Defs.translation = JSON.parse(str);
+			let keypair = {};
+			keypair [Defs.lang] = str;
+			chrome.storage.sync.set(keypair, whenDone);
+	}
+	
 }
 
 Defs.httpload = function(url, whenDone){
@@ -208,7 +208,7 @@ Defs.httpload = function(url, whenDone){
 				if (cat) cat.appendChild(b); 
 			}
 		}
-		console.log (xml);
+//		console.log (xml);
 		return xml;
 	}
 

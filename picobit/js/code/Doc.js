@@ -21,6 +21,7 @@ Doc.print = function (){
 
 
 Doc.printStacks = function(svg){	
+	let totalrect = new Rectangle();
 	let blocks = Code.workspace.svgBlockCanvas_;	
 	for (let i=0; i < blocks.childElementCount; i++) {
 		var rect = new Rectangle(200000,200000,0,0);

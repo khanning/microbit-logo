@@ -39,7 +39,7 @@
  			"onpressed": "Quand %1 pressé",
 			"onpressed2": "Quand %1 et %2 pressés",
 			"onreceive": "Quand je reçois %1",
-			"menu_coral": "corail",
+			"menu_coral": "rose",
 			"menu_yellow": "jaune",
 			"menu_green": "vert",
 			"menu_blue": "bleu",

@@ -13,7 +13,7 @@ Runtime.brightness = 100;
 
 Runtime.startTimer = function() {
 	resett()
-	Runtime.stopTimer ()
+	Runtime.stopTimer ();
 	Runtime.intervalId = window.setInterval(function (){Runtime.tickTask();}, Runtime.ticker);
 	if (!HW.comms.serialID) gn('microbitstate').className = "microbit fail";
 	else gn('microbitstate').className = "microbit ok";
@@ -34,6 +34,8 @@ Runtime.stopThreads = function(sc) {
 			Runtime.stopThread(Runtime.threadsRunning[i]);
 		}
 	}	
+  Prim.currentShape = {n: undefined, dx:0, dy: 0}
+	HW.shape = [0,0,0,0,0];
 }
 
 Runtime.stopOthers = function(t) {
@@ -164,43 +166,42 @@ Runtime.endCase = function () {
   else {  
     var b = (Runtime.thread.stack).pop();
     Runtime.thread.thisblock = b;
-  //  Runtime.runPrim();
   }
 }
 
 Runtime.addScript = function(sc, block){
+//	console.log (timer(), "addScript",  block.opcode);
 	var  newThread =  new Thread(sc, block);
 	Runtime.restartThread(newThread);
 }
 
 Runtime.restartThread = function (newThread) {
   var wasRunning = false;
+  var notSpecial = false;
   for (var i = 0; i < Runtime.threadsRunning.length; i++) {  	
    	if (Runtime.threadsRunning[i].firstBlock == newThread.firstBlock) {
+   		let thread = Runtime.threadsRunning[i];
+   		Runtime.stopThread(thread);
       wasRunning = true;
-      var thread = Runtime.threadsRunning[i];
-     	Runtime.stopThread(thread, doNext);
+      notSpecial = newThread.firstBlock.opcode.indexOf('events_onbutton') < 0; 
+     	thread.isRunning = notSpecial;
+     	if (notSpecial) thread.thisblock = thread.firstBlock;
+      else thread.thisblock = undefined;
     }
   }
   if (!wasRunning) {
   	 Runtime.threadsRunning.push(newThread);
   	 newThread.startGlow();
   	}
-  
-  function doNext (value){
-  	Prim.currentShape = {n: undefined, dx:0, dy: 0}
-		HW.shape = [0,0,0,0,0];
-  }
 }
 
-Runtime.stopThread = function (thread, fcn) {
+Runtime.stopThread = function (thread) {
 	if (thread.onblock){
 		var procId = thread.sc.blocksContainer.getTopLevelScript(thread.onblock.id)
 		var opcode = thread.sc.blocksContainer.getBlock(procId).opcode
 		if (opcode == "myblocks_definition") thread.exitProcedure()
 	}
 	thread.stop();
-	if (fcn) fcn();
 }
 
 Runtime.stopThreadForBlock = function (topblock, whenDone) {

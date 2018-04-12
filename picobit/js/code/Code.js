@@ -36,7 +36,7 @@ Code.start = function(e){
  }
 
 Code.reset = function (str){
-	if (gn('blocklyDiv')) gn('blocklyDiv').parentNode.removeChild (gn('blocklyDiv'))
+	if (gn('blocklyDiv')) gn('blocklyDiv').parentNode.removeChild (gn('blocklyDiv'))	
 	let bd = newHTML('div', undefined, gn('contents'),'blocklyDiv');
 	Code.workspace = Blockly.inject('blocklyDiv', Defs.workspaceAttributes);
 	Code.scripts = new Scripts(false, new Blocks());

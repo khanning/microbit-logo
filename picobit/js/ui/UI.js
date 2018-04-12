@@ -72,7 +72,7 @@ UI.changeLang = function (e){
 	if (gn('appmenu')) UI.closeDropdown();
 	else {	
 		var hasValidName = UI.projectName && !UI.projectSamples[UI.projectName];	
-		var options = ['Française', "English"];
+		var options = ['Français', "English"];
 		var optionfcns = ["loadFr", "loadEn"];
 		UI.openBalloon(e.target,options,optionfcns);
 		gn('appmenu')[eventDispatch["start"]] = UI.doAction;
@@ -211,25 +211,13 @@ UI.changeLanguageTo = function (str){
 	function doNext (){
 		Defs.lang = str;
 		console.log ("changeLanguageTo ", chrome.storage.local.language)
-		Defs.loadLanguage(storeLanguage);
-	}
-	
-	function storeLanguage(str){
-			Defs.translation = JSON.parse(str);
-			console.log ("storeLanguage", Defs.lang)
-			if (!Defs.languagesData[Defs.lang])  {
-				let keypair = {};
-				keypair [Defs.lang] = str;
-				chrome.storage.sync.set(keypair, doTranslate);
-			}
-			else doTranslate();
+		Defs.loadLanguage(doTranslate);
 	}
 	
 	function doTranslate (){
-		console.log (Defs.translation)
+		Code.workspace.dispose();
 		Code.reset(content);
 	}
-
 }
 
 
