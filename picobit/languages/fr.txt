@@ -7,7 +7,7 @@
 			"control": "Contrôle",
 			"event": "Événements",
 			"operators": "Opérateurs",
-			"more": "Blocs additionnels"	
+			"more": "Autres blocs"	
 		},
 		"shapes": "Formes",
 		"menu": {
