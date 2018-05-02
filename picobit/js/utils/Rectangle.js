@@ -11,6 +11,15 @@ var Rectangle =function (x,y,w,h){
 	this.height = h;
 }
 
+Rectangle.prototype.include =function (pt){
+	var box = new Rectangle(0,0,0,0);
+	box.x = Math.min(this.x, pt.x)
+	box.y = Math.min(this.y, pt.y)
+	box.width = Math.max(0, Math.max(this.width + this.x, pt.x) - box.x)
+	box.height = Math.max (0, Math.max(this.height + this.y, pt.y)  - box.y)
+	return box;
+}
+
 Rectangle.prototype.hitRect =function (pt){
 	var x = pt.x; var y = pt.y;
  	if(x<this.x) return false;
