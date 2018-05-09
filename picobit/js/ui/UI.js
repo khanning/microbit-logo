@@ -106,6 +106,7 @@ UI.doAction = function(e){
 }
 
 UI.cleanWorkspace =  function (){
+	UI.cleanUndo();
 	Code.workspace.clear();
 	Scripts.blocks = {};
 	Prim.pace = 0.5;
