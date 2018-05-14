@@ -486,28 +486,17 @@ fieldset, legend, object, embed {
 	-webkit-overflow-scrolling: touch;	
 }
 
-#scroll {
-	position: relative;
-	display: inline-block;
-  word-spacing: -1;
-	top: 0px;
-	left: 0px;
-	height: 220px;
-	width:  100%;
-	background: #fff;
-}
-
-
 .thumbslot{
   display: inline-block;
+  vertical-align: top;
   word-spacing: -1px;
   position: relative;
   white-space: normal;
   padding: 0px;
   margin: 4px;
-  margin-left: 8px;
+  margin-left: 6px;
   margin-top: 8px;
-  margin-bottom: 0px;
+  margin-bottom: 8px;
   width: 92px;
   height: 68px;
 }
@@ -525,7 +514,6 @@ fieldset, legend, object, embed {
  	width: 20px;
  	height: 20px;
  	line-height: 16px;
- 	 -webkit-border-radius: 20px;
 }
 
 .thumbslot > .thumbimg {
@@ -552,9 +540,7 @@ fieldset, legend, object, embed {
   -webkit-box-shadow: 0 10px 10px rgba(0, 0, 0, 0.2);
 }
 .thumbslot.lifted   > .thumbnum {
-	background: #fff;
-	-webkit-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-	text-align: center;
+	text-shadow: 0px -1px #fff;
 }
 
 .thumbslot.caret  > .thumbimg {

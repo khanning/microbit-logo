@@ -101,8 +101,10 @@ ShapeEditor.doAction =  function (e){
 			UI.selectTool(undefined);
 			break;
 		case "scissors":
+			let scrollto = gn('palette').scrollTop; 
 			ShapeEditor.shapes.splice(n,1);
-			ShapeEditor.displayAll();	
+			gn('palette').removeChild(gn('palette').childNodes[n]);
+			ShapeEditor.reOrder(); 
 			UI.selectTool(undefined);
 			break;
 		default:
@@ -115,11 +117,10 @@ ShapeEditor.clone =  function (n){  // prim
 	 var shape =  ShapeEditor.shapes[n];
 	 ShapeEditor.shapes.push(shape);
 	 let key = ShapeEditor.shapes.length - 1;
-	 let tb = ShapeEditor.addThumb(key, ShapeEditor.shapes[key]);
-	 var list = ShapeEditor.editShape(ShapeEditor.shapes.length - 1);
-	 HW.shape = list;
+	 let tb = ShapeEditor.addThumb(key, shape);
+	 HW.shape = ShapeEditor.editShape(tb.key);
 	 let pos = tb.offsetTop + tb.offsetHeight + 12;
-	 let h = gn('palette').offsetHeight + gn('palette').scrollTop;
+	 let h = gn('palette').offsetHeight;
 	 if (pos > h) gn('palette').scrollTop = pos - h; 
 }
 			
@@ -325,7 +326,9 @@ ShapeEditor.editShape =  function (key){
 	}
 	gn("thumb_"+key).className = "thumbslot selected";
 	ShapeEditor.paintingShape  = gn("thumb_"+key);
-	var list  = ShapeEditor.shapes[Number(key)] ?ShapeEditor.shapes[Number(key)] : [0,0,0,0,0];
+	let n = Prim.mapValueShape(Number(key));
+	Prim.currentShape = {n: n, dx:0, dy: 0};
+	var list  = ShapeEditor.shapes[n];
 	ShapeEditor.refresh(list);
 	return list;
 }
@@ -378,6 +381,7 @@ ShapeEditor.getMouseTarget = function(e){
 	if (t == frame) return null;
 	if (t && t.className && t.className.indexOf("thumbslot") > -1 )return t;
 	while (t && t.className && (t.className.indexOf("thumbslot") < 0 )) t = t.parentNode;
+	if (t && !t.className) return null;
 	return t;
 }
 
@@ -458,8 +462,6 @@ ShapeEditor.dropThumb = function (e){
   switch (place){
   	case "delete":
   		if (ShapeEditor.paintingShape == Events.jsobject) ShapeEditor.unfocus();
-  	  ShapeEditor.removeCaret();
-  		ShapeEditor.cleanCaret();
   		if (Events.jsobject.parentNode) Events.jsobject.parentNode.removeChild(Events.jsobject); 
   		ShapeEditor.reOrder(); 
   		break;
@@ -469,12 +471,7 @@ ShapeEditor.dropThumb = function (e){
   		ShapeEditor.backToPlace();		
   		break;	
   }
-  ShapeEditor.cleanCaret(); 
-  Events.clearEvents();
-  Events.unregisterTouch();
-	Events.dragged = false;
-	gn('palette')[eventDispatch["start"]] =  ShapeEditor.handleTouchStart;
-	gn('palette')[eventDispatch["end"]] =  ShapeEditor.handleTouchEnd;
+	ShapeEditor.handleThumbActionEnd();
 	
 	function getPlace (pt) {
 		let topEdge = globaly(gn('palette'))
@@ -583,7 +580,6 @@ ShapeEditor.draggingThumb = function (e){
   		break;	
   }
 
-	
 	function getPlace (pt) {
 		let topEdge = globaly(gn('palette'))
 		let leftEdge = globalx(gn('palette'));
@@ -604,20 +600,19 @@ ShapeEditor.getObjectAfter = function (pos){
 }
  	
 ShapeEditor.thumbClicked = function (e){
-	ShapeEditor.handleTouchEnd(e);
-	Events.clearEvents();
+	ShapeEditor.handleThumbActionEnd();
+	ShapeEditor.doAction(e);
+	gn('palette')[eventDispatch["start"]] =  ShapeEditor.handleTouchStart;
+}
+
+ShapeEditor.handleThumbActionEnd = function (){
+  ShapeEditor.cleanCaret(); 
+  Events.clearEvents();
   Events.unregisterTouch();
 	Events.dragged = false;
 	gn('palette')[eventDispatch["start"]] =  ShapeEditor.handleTouchStart;
 }
-
-ShapeEditor.handleTouchEnd = function(e){
-	if (e.touches && (e.touches.length > 1)) return;
-	window[eventDispatch["move"]] =  undefined;
-	if (ShapeEditor.dragging) return;
-	ShapeEditor.doAction(e);
-}
-
+	
 ShapeEditor.cleanCaret = function (){
 	if (ShapeEditor.caret.parentNode) ShapeEditor.caret.parentNode.removeChild(ShapeEditor.caret);
 	if (ShapeEditor.intervalId != null) window.clearInterval(ShapeEditor.intervalId);
