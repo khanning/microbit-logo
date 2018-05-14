@@ -22,6 +22,7 @@ UI.setup = function(){
 }
 
 UI.handleKeyDown = function(e) {
+	if (document.activeElement.nodeName.toLowerCase() == "input") return;
 	if (e.keyCode == 8) ShapeEditor.clearShape();
 	UI.shiftKey = e.shiftKey;
 }
