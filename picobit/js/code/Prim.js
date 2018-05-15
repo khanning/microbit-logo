@@ -339,7 +339,7 @@ Prim.lights_previousshape = function (){
 
 Prim.nextShape = function (){
 	let n = Prim.currentShape.n;
-	n = (n != undefined) ? n + 1 : 1;	
+	n = (n != undefined) ? n + 1 : 0;	
 	Prim.currentShape = {n: Prim.mapValueShape(n), dx:0, dy: 0};
 } 
 
