@@ -579,28 +579,6 @@ fieldset, legend, object, embed {
 	margin: 2px;
 }
 
-.deleteshape {
-	position: relative;
-	float: left;
-	top:  -3px;
-	left: 74px;
-	z-index: 5;
-	visibility: hidden;
-  width: 23px;
-  height: 23px;
-	background:  url('../assets/home/close.svg');
-}
-
-.shakeshape{
-    -webkit-animation:swingshape 0.3s infinite ease-in-out;
-    -webkit-transform-origin: center;
-}
-
-@-webkit-keyframes swingshape{
-    0%{-webkit-transform:rotate(0.8deg)}
-    50%{-webkit-transform:rotate(-1.6deg)}
-    100%{-webkit-transform:rotate(0.8deg)}
-}
 
 /* blockly overrides*/
 
@@ -613,4 +591,24 @@ fieldset, legend, object, embed {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+  }
+  
+.blocklyIconImage {
+    position: relative;
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .blocklyIconText {
+    display: inline-block;
+    position: relative;
+    padding: 0;
+    padding-left: 10px;
+     margin: 0;
+    margin-right: -7em;   /* Override the default Closure 7em on the right for key shortcuts. */
+    vertical-align: top;
+    top: 10px;
+    cursor: pointer;
   }

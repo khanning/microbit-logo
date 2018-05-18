@@ -1,3 +1,23 @@
+/**
+ * @license
+ *
+ * Copyright 2017 Playful Invention Company
+ * Modifications Copyright 2018 Kids Code Jeunesse
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
 ShapeEditor = function() {};
 ShapeEditor.gridsize = 5;
 ShapeEditor.mindist = 10;
@@ -46,6 +66,7 @@ ShapeEditor.addNew = function(){
 ShapeEditor.addShape = function(e) {
 	e.preventDefault();
 	e.stopPropagation();
+	UI.saveForUndo(true);
 	UI.unfocus();
 	HW.shape = ShapeEditor.editShape('new');
 }
@@ -95,6 +116,7 @@ ShapeEditor.doAction =  function (e){
 	if (t.key== undefined) return;
 	let n =  t.key;
 	Runtime.stopThreads(Code.scripts);
+	UI.saveForUndo(true);
 	switch(UI.toolmode) {
 		case "clone":	
 			ShapeEditor.clone(n);
@@ -260,9 +282,10 @@ ShapeEditor.startPaint  = function(e) {
 	UI.unfocus();
 	var t = e.target;
 	ShapeEditor.lastPainted = undefined;
-	if (!ShapeEditor.paintingShape) ShapeEditor.editShape("new");
 	if (t.className == "gridslot")  t = t.parentNode;
 	if (t.className != "griddot") return;
+	UI.saveForUndo(true);
+	if (!ShapeEditor.paintingShape) ShapeEditor.editShape("new");
 	Runtime.stopThreads(Code.scripts);
 	var isOn = t.color == 1;
 	t.childNodes[0].style.background = isOn ?  "#cccccc" : "#DD1A22";
@@ -395,6 +418,7 @@ ShapeEditor.prepareToDrag = function (e){
   e.preventDefault();
   e.stopPropagation();
 	if (Events.extraFingerEvent(e)) return;
+	UI.saveForUndo(true);
   ShapeEditor.cleanCaret();
   ShapeEditor.liftThumb (e);
   if (ShapeEditor.intervalId != null) window.clearInterval(ShapeEditor.intervalId);
@@ -619,3 +643,27 @@ ShapeEditor.cleanCaret = function (){
 	ShapeEditor.intervalId  = null;
 }
 
+/////////////////////////
+//
+//  undo/redo
+//
+/////////////////////////
+
+ShapeEditor.getState = function (){
+	let list  = [];
+	for (let i = 0; i < ShapeEditor.shapes.length; i++) list.push(ShapeEditor.shapes[i].concat());
+//	console.log (list.join (' '), "---",  ShapeEditor.paintingShape ?  ShapeEditor.paintingShape.key : null);
+	return {state: list,  selected: ShapeEditor.paintingShape ?  ShapeEditor.paintingShape.key : null}
+}
+
+ShapeEditor.setState = function (obj){
+//	console.log ("setState", obj);
+	ShapeEditor.shapes = obj.state;
+	ShapeEditor.paintingShape = undefined;
+	ShapeEditor.displayAll();	
+	if (obj.selected)	{
+		HW.shape = ShapeEditor.editShape(obj.selected);
+		ShapeEditor.paintingShape = gn("thumb_" + obj.selected)
+	}
+	else ShapeEditor.refresh([0,0,0,0,0])
+}

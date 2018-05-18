@@ -1,9 +1,32 @@
+/**
+ * @license
+ *
+ * Copyright 2017 Playful Invention Company
+ * Modifications Copyright 2018 Kids Code Jeunesse
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
 UI = function() {};
 
 UI.toolmode = undefined;
 UI.tooldown = false;
 UI.projectID = undefined;	
 UI.shiftKey = false;
+UI.undoStack = [];
+UI.redoStack = [];
+UI.blocklyStacks = {undo: 0, redo: 0};
 
 UI.setup = function(){
 	gn('title').textContent = Defs.translation["editor"]["shapes"];
@@ -109,11 +132,14 @@ UI.doAction = function(e){
 UI.cleanWorkspace =  function (){
 	UI.cleanUndo();
 	Code.workspace.clear();
-	Scripts.blocks = {};
+	UI.blocks = {};
 	Prim.pace = 0.5;
 }
 
 UI.cleanUndo = function (){
+	UI.undoStack = [];
+	UI.redoStack = [];
+	UI.blocklyStacks = {undo: 0, redo: 0};
 	Code.workspace.clearUndo();
 	UI.updateToolsState(undefined);
 }
@@ -147,8 +173,10 @@ UI.pressTool = function(e){
 UI.releaseTool = function(e){
 	var t = e.target;
 	var b = t.id;
-	if(b=='undo') Code.workspace.undo(false);
-	if(b=='redo') Code.workspace.undo(true);
+//	if(b=='undo') Code.workspace.undo(false);
+//	if(b=='redo') Code.workspace.undo(true);
+	if(b=='undo') UI.undo();
+	if(b=='redo') UI.redo();
 	UI.tooldown = false;
 }
 
@@ -164,7 +192,7 @@ UI.updateToolsState = function(t){
 	for(var i=0;i< p.children.length;i++){
 		var mt = p.children[i];
 		if (!mt.id) continue;
-		if ((mt.id == "undo") || (mt.id == "redo")) mt.className =  Code.workspace[mt.id+"Stack_"].length > 0 ?  "icon "+  mt.id : "icon "+  mt.id + " NA";
+		if ((mt.id == "undo") || (mt.id == "redo")) mt.className =  UI.getStackState(mt.id) ?  "icon "+  mt.id : "icon "+  mt.id + " NA";
 		else mt.className = (mt == t) ? "icon "+  mt.id+" on": "icon "+  mt.id;
  }
 }
@@ -333,3 +361,72 @@ UI.getProjectContents = function (){
 
 /*blockly overrrides */
 Blockly.VerticalFlyout.prototype.DEFAULT_WIDTH = 230;
+
+
+/////////////////////////
+//
+//  undo/redo
+//
+/////////////////////////
+
+UI.saveForUndo = function(state){
+	let skip = state ? false : UI.shouldSkipBlocklyAction();
+	if (skip) return;
+	UI.undoStack.push(UI.getShapesState(state));
+	UI.redoStack = [];
+	UI.updateToolsState(undefined);
+}
+
+ UI.shouldSkipBlocklyAction = function () {
+ 		let redolength = Code.workspace.redoStack_.length;
+		let undolength = Code.workspace.undoStack_.length
+ 		let flag = true; // redo is not zero
+		if ((UI.blocklyStacks.undo + UI.blocklyStacks.redo) != (undolength + redolength)) flag = false; // added something new
+		UI.blocklyStacks = {redo: redolength, undo: undolength};		
+		return flag;
+	}
+		
+UI.undo = function(){
+	var obj = UI.undoStack.pop();	
+	if (obj) {
+		if (obj.isEditor) UI.redoStack.push(UI.getShapesState(true));
+		else UI.redoStack.push(UI.getShapesState(false));
+		UI.restoreState(obj, false);	
+	}
+	else if (Code.workspace.undoStack_.length > 0) Code.workspace.undo(false);
+	UI.updateToolsState(undefined);
+}
+
+UI.redo = function(){
+	var obj = UI.redoStack.pop();
+	if (obj) {
+		if (obj.isEditor) UI.undoStack.push(UI.getShapesState(true));
+		else UI.undoStack.push(UI.getShapesState(false));
+		UI.restoreState(obj, true);	
+	}
+	else if (Code.workspace.redoStack_.length > 0) Code.workspace.undo(true);
+	UI.updateToolsState(undefined);
+}
+
+
+UI.getShapesState = function(state){
+	return  {isEditor: state, bloclky: {undos: Code.workspace.undoStack_.length, redos: Code.workspace.redoStack_.length},  editor: ShapeEditor.getState ()};
+}
+
+UI.restoreState = function(obj, isRedo){
+//	console.log ('restoreState is editor', obj.isEditor, isRedo,UI.undoStack.length, UI.redoStack.length );
+	if (!obj.isEditor) Code.workspace.undo(isRedo);
+	else ShapeEditor.setState(obj.editor);
+}
+
+UI.getStackState = function(type){
+	if (Code.workspace[type+"Stack_"].length > 0) return true;
+	if (UI[type+"Stack"].length > 0 ) return true;
+	return false;
+}
+
+// DISABLE ALL BLOCKLY context menus
+
+Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {}
+
+Blockly.BlockSvg.prototype.showContextMenu_ = function(e) {}

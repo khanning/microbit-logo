@@ -3,6 +3,7 @@
  * Visual Blocks Editor
  *
  * Copyright 2016 Massachusetts Institute of Technology
+ * Modifications Copyright 2018 Kids Code Jeunesse
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
