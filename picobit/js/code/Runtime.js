@@ -219,8 +219,11 @@ Runtime.restartThread = function (newThread) {
 Runtime.stopThread = function (thread) {
 	if (thread.onblock){
 		var procId = thread.sc.blocksContainer.getTopLevelScript(thread.onblock.id)
-		var opcode = thread.sc.blocksContainer.getBlock(procId).opcode
-		if (opcode == "myblocks_definition") thread.exitProcedure()
+		let block =  !procId ? undefined : thread.sc.blocksContainer.getBlock(procId);
+		if (block) {
+			var opcode = block.opcode
+			if (opcode == "myblocks_definition") thread.exitProcedure()
+		}
 	}
 	thread.stop();
 }

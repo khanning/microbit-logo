@@ -247,6 +247,7 @@ UI.changeLanguageTo = function (str){
 	function doTranslate (){
 		Code.workspace.dispose();
 		Code.reset(content);
+		gn('title').textContent = Defs.translation["editor"]["shapes"];
 	}
 }
 

@@ -100,7 +100,7 @@ HW.gotPollPacket = function (l){
 	if (isBoth){
 		HW.state.acount=4;
 		HW.state.bcount=4;
-		HW.state.abpressed=true; cxz		
+		HW.state.abpressed=true;		
 	}
 	else HW.state.abpressed=false;
 	HW.state.apressed = (HW.state.acount==3);
