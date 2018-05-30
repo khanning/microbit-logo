@@ -39,6 +39,9 @@ Code.cache = '';
 Code.start = function(e){
 	libInit();
 	Defs.init (doNext);
+	let appwindow = chrome.app.window.current();
+	appwindow.onClosed.addListener(function(){HW.disconnect();});
+
 	function doNext (){
 		Code.workspace = Blockly.inject('blocklyDiv', Defs.workspaceAttributes);
 		Code.scripts = new Scripts(false, new Blocks());
@@ -93,7 +96,7 @@ Code.getToolboxElement= function () {
 }
 
  Code.blockListener= function(e){
- 		UI.unfocus();
+ 	 UI.unfocus();
 	 UI.updateToolsState(undefined);
    Code.scripts.blocksContainer.blocklyListen(e,  Code.scripts);
 }
@@ -110,6 +113,14 @@ Code.getToolboxElement= function () {
 	 Code.scripts.clean(); 
 }
 
+Code.unfocus = function(){
+	if (!document.activeElement) return;
+	if (document.activeElement.className != "blocklyHtmlInput") return;
+	console.log (document.activeElement.className)
+  Blockly.WidgetDiv.hide();
+  Blockly.DropDownDiv.hideWithoutAnimation();
+}
+
 ////////////////////////
 // Toggle tether run
 ////////////////////////
@@ -121,6 +132,7 @@ Code.togglePlay = function(e){
 }
 
 Code.startOrStop = function(){	
+	Code.unfocus();
 	UI.unfocus();
 	if (Runtime.isActive()) Runtime.stopThreads(Code.scripts);
 	else  Code.scripts.triggerHats("onbuttona");
@@ -143,7 +155,7 @@ Code.startDownload = function (){
 		Runtime.startTimer();
 	}
 	
-	var blocktext = Code.scripts.blocksToString()
+	var blocktext = Code.scripts.blocksToString();
 	let msg =  blocktext+' '+flatten(ShapeEditor.shapes).join(' ');
 	if ((Code.cache != msg) && (blocktext != '')) HW.compiler.downloadProcs(blocktext, flatten(ShapeEditor.shapes), doNext)
 	else downloadEnd();

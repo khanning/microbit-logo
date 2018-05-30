@@ -235,11 +235,12 @@ class Blocks {
             // Inform any runtime to forget about glows on this script.
             if (optRuntime && this._blocks[e.blockId].topLevel) {
                 optRuntime.quietGlow(e.blockId);
+           	   if (!optRuntime.isFlyout && this._blocks[e.blockId].opcode == "myblocks_definition") optRuntime.refreshPalette();
             }
             this.deleteBlock(e.blockId);
             break;
         }
-        optRuntime.handleVM(e);
+        if (!optRuntime.isFlyout) optRuntime.handleVM(e);
     }
 
 // ---------------------------------------------------------------------

@@ -77,7 +77,17 @@ class Scripts {
 		}	
 	function  whenDone(){}
 	}
-			
+
+ /* callback from blocks.js */	
+ 		
+	quietGlow(blockId) {
+	//	console.log ("quietGlow",blockId)
+	}
+
+		
+ /* callback from blocks.js */	
+ 	refreshPalette() {Code.updatePalette();}
+ 				
 	 /* ScratchBlocks callbaks */
 	 handleUI (e){
 		switch (e.element){
@@ -173,10 +183,6 @@ class Scripts {
 					break;
 			}
 		}
-	}
-	
-	quietGlow(blockId) {
-	//	console.log ("quietGlow",blockId)
 	}
 
 ////////////////////////

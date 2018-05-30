@@ -29,7 +29,7 @@ UI.redoStack = [];
 UI.blocklyStacks = {undo: 0, redo: 0};
 
 UI.setup = function(){
-	gn('title').textContent = Defs.translation["editor"]["shapes"];
+	gn('nametag').textContent = Defs.translation["editor"]["shapes"];
 	gn("microbitstate")[eventDispatch["start"]] =  UI.checkState;
 	gn('filemenu')[eventDispatch["start"]] = UI.toggleMenu;
 	gn('lang')[eventDispatch["start"]] = UI.changeLang;
@@ -60,7 +60,7 @@ UI.resize = function(e) {
 	gn("contents").style.top =  dh + "px";
 	gn("contents").style.width = (w - gn("rightpanel").offsetWidth)+ "px";
 	gn("rightpanel").style.height = (h - dh)+ "px";
-	gn("palette").style.height = (h - gn("grid").offsetTop - gn("grid").offsetHeight - dh - gn("title").offsetHeight)+ "px";
+	gn("palette").style.height = (h - gn("grid").offsetTop - gn("grid").offsetHeight - dh - gn("shapesbar").offsetHeight)+ "px";
 	Blockly.hideChaff(true);
   Blockly.svgResize(Code.workspace);	
 }
@@ -77,11 +77,12 @@ UI.checkState= function (e){
 		else Runtime.startTimer()
 		return;
 	}
-	if (gn("microbitstate").className == "microbit fail") HW.setup();
+	if (gn("microbitstate").className != "microbit ok") HW.setup();
 	else Code.download();
 }
 
 UI.checkStatus = function (e){
+	Code.unfocus();
 	UI.unfocus();
 }	
 	
@@ -165,6 +166,8 @@ UI.setupToolbar = function(p, tools){
 UI.pressTool = function(e){
 	e.preventDefault();
 	e.stopPropagation();
+	Code.unfocus();
+	UI.unfocus();
 	var t = e.target;
 	UI.selectTool(t);
 	UI.tooldown = true;
@@ -247,7 +250,7 @@ UI.changeLanguageTo = function (str){
 	function doTranslate (){
 		Code.workspace.dispose();
 		Code.reset(content);
-		gn('title').textContent = Defs.translation["editor"]["shapes"];
+		gn('nametag').textContent = Defs.translation["editor"]["shapes"];
 	}
 }
 
@@ -266,6 +269,7 @@ UI.saveAs = function (name){
 	Runtime.stopThreads(Code.scripts);
 	chrome.fileSystem.chooseEntry({type: "saveFile", suggestedName: name}, next1)
 	function next1(fe){
+	 	if(chrome.runtime.lastError) console.warn(chrome.runtime.lastError.message);
 		if(fe!=undefined){
 			UI.projectID=fe; 
 			UI.save(fe);
@@ -320,12 +324,13 @@ UI.loadProject = function (e){
 	Runtime.stopThreads(Code.scripts);
   var fr = new FileReader();
   fr.onload = function(e){doNext(e.target.result)};
-	chrome.fileSystem.chooseEntry(next)
-		function next(fe){
-		if(fe!=undefined) {
-			UI.projectID=fe;
-			fe.file(next2);
-		}
+  chrome.fileSystem.chooseEntry({type: 'openFile'}, next)
+	function next(fe){	
+		 if(chrome.runtime.lastError) console.warn(chrome.runtime.lastError.message);
+		 if(fe!=undefined) {
+				UI.projectID=fe;
+				fe.file(next2);
+			}
 	}
   function next2(file){fr.readAsText(file);}
   function doNext(str){

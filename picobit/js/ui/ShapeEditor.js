@@ -55,7 +55,7 @@ ShapeEditor.displayAll  =  function (){
 }
 
 ShapeEditor.addNew = function(){
-  var t = gn('title');
+  var t = gn('shapesbar');
   var tb = newHTML("div", "addshape", t);
  	var img = newHTML("div", "thumbimg newshape", tb);
  	img.textContent = "+";
@@ -67,6 +67,7 @@ ShapeEditor.addShape = function(e) {
 	e.preventDefault();
 	e.stopPropagation();
 	UI.saveForUndo(true);
+	Code.unfocus();
 	UI.unfocus();
 	HW.shape = ShapeEditor.editShape('new');
 }
@@ -279,6 +280,7 @@ ShapeEditor.convertState2Number = function (list) {
 ShapeEditor.startPaint  = function(e) {
 	e.preventDefault();
 	e.stopPropagation();
+	Code.unfocus();
 	UI.unfocus();
 	var t = e.target;
 	ShapeEditor.lastPainted = undefined;
@@ -378,6 +380,7 @@ ShapeEditor.handleTouchStart = function(e){
   	e.stopPropagation();
   	return;
 	}
+	Code.unfocus();
 	UI.unfocus();
 	let t = e.target;
 	let target  = ShapeEditor.getMouseTarget(e);

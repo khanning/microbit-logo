@@ -46,8 +46,9 @@ HW.setup = function (){
 }
 
 HW.onReceiveError = function (err){
+	HW.comms.serialID = undefined;
 	Runtime.stopThreads(Code.scripts);
-	console.warn ("onReceiveError", err)
+	console.warn ("onReceiveError", err);
 	gn('microbitstate').className = "microbit fail";
 }
 
@@ -57,6 +58,11 @@ HW.poll = function () {
 	let data  = [].concat([0xf5]);
 	if (!HW.comms.serialID) return;
 	HW.comms.sendl(data);
+}
+
+HW.disconnect = function (){
+	chrome.serial.disconnect(HW.comms.serialID, console.log)
+	HW.comms.serialID = undefined;
 }
 
 HW.sendBrightness = function (){
@@ -78,7 +84,7 @@ HW.sendShape = function () {
 
 HW.broadcast = function () {
 	if (HW.messages.length == 0) return;
-	console.log ('broadcast',HW.messages )
+//	console.log ('broadcast',HW.messages )
 	let data  = [].concat([0xf4], HW.messages.length, HW.messages);
 	if (HW.comms.serialID) HW.comms.sendl(data);
 	HW.messages = [];
