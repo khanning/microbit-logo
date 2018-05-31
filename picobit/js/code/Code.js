@@ -39,8 +39,6 @@ Code.cache = '';
 Code.start = function(e){
 	libInit();
 	Defs.init (doNext);
-	let appwindow = chrome.app.window.current();
-	appwindow.onClosed.addListener(function(){HW.disconnect();});
 
 	function doNext (){
 		Code.workspace = Blockly.inject('blocklyDiv', Defs.workspaceAttributes);

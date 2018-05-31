@@ -74,11 +74,6 @@ HW.poll = function () {
 	HW.comms.sendl(data);
 }
 
-HW.disconnect = function (){
-	chrome.serial.disconnect(HW.comms.serialID, console.log)
-	HW.comms.serialID = undefined;
-}
-
 HW.sendBrightness = function (){
 	let val = HW.brightness;
 //	console.log(timer(), val)

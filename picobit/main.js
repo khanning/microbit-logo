@@ -8,8 +8,7 @@ chrome.app.runtime.onLaunched.addListener(function() {
   // Center window on screen.
   var screenWidth = screen.availWidth;
   var screenHeight = screen.availHeight;
-
-  chrome.app.window.create('index.html', {
+	var spec  = {
     id: "microbitScratch3",
     outerBounds: {
       width: screenWidth,
@@ -17,11 +16,23 @@ chrome.app.runtime.onLaunched.addListener(function() {
       left: 0,
       top: 0
     }
-  });
+  };
+
+ var closefcn = function(win) { 
+  win.onClosed.addListener(function () {closeAll()});
+ };
+
+ chrome.app.window.create('index.html', spec, closefcn);  
+ 
 });
 
-/*
- chrome.storage.onChanged.addListener(function(changes, namespace) {
-			console.log (changes, "onChanged", namespace)
-	 });
-	 */
+function closeAll (){
+	chrome.serial.getConnections(closeStrayPorts);
+
+	function closeStrayPorts(l){
+ 		for(var i=0;i<l.length;i++) {
+ 			let id = l[i].connectionId;
+ 			chrome.serial.disconnect(id, (res)=>{})
+ 		}
+ 	}
+}

@@ -77,6 +77,8 @@ Runtime.turnOffStacks = function(sc) {
 }
 	
 Runtime.tickTask = function() { 
+//	if (!HW.comms.serialID) gn('microbitstate').className = "microbit fail";
+//	else gn('microbitstate').className = "microbit ok";
 	Runtime.send();
 	HW.poll();
 	Runtime.run();
