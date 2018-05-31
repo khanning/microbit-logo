@@ -95,12 +95,15 @@ end
 to check
 clearcom
 send $ff
-if get-packet = [255 0 237] [output true]
+let [resp get-packet]
+if (count :resp) > 0 [if and (first :resp) = $ff (last :resp) = $ed [output true]]
 open-serial-port
 wait 15
 clearcom
 send $ff
-output get-packet = [255 0 237]
+let [resp get-packet]
+if (count :resp) > 0 [if and (first :resp) = $ff (last :resp) = $ed [output true]]
+output false
 end
 
 to startvm

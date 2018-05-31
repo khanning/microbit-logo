@@ -1,6 +1,9 @@
 #include "MicroBit.h"
 #include "MicroBitFlash.h"
 
+#define MAJOR_VERSION 1
+#define MINOR_VERSION 1
+
 MicroBitSerial pc(USBTX, USBRX, 200);
 MicroBitStorage storage;
 MicroBitFlash flash;
@@ -65,7 +68,13 @@ void sendresponse(uint8_t resp){
     uputc(0xed);
 }
 
-void ping(){sendresponse(0xff);}
+void ping(){
+    uputc(0xff);
+    uputc(2);
+    uputc(MAJOR_VERSION);
+    uputc(MINOR_VERSION);
+    uputc(0xed);
+}
 
 void readmemory(){
     uint32_t addr = read32();

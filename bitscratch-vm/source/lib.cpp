@@ -492,7 +492,7 @@ void uputc16(int32_t n){
 }
 
 void send_io_state(){
-  pollinhibit = 25;
+  pollinhibit = 40;  // about 2 seconds
   uputc(0xf5);
   uputc(11);
   uputc(buttona.isPressed());
