@@ -30,8 +30,15 @@ HW.messages = [];
 HW.brightness = 100;
 
 HW.setup = function (){	
+	chrome.serial.onReceive.addListener(HW.comms.onrecc);
+	chrome.serial.onReceiveError.addListener(HW.onReceiveError);
+	HW.reopen();
+}
+
+HW.reopen = function(){
+	chrome.serial.getConnections(closeStrayPorts);
  	gn('microbitstate').className = "microbit connecting"
- 	HW.comms.openSerialPort(doNext, HW.onReceiveError)
+ 	HW.comms.openSerialPort(doNext)
  	
  	function doNext(port){
  		if (!port) whenDone("fail")
@@ -43,6 +50,13 @@ HW.setup = function (){
  		else gn('microbitstate').className = "microbit ok";
  		setTimeout(Runtime.startTimer, 500)
  	}	
+
+ 	function closeStrayPorts(l){
+ 		for(var i=0;i<l.length;i++) {
+ 			let id = l[i].connectionId;
+ 			chrome.serial.disconnect(id, (res)=>{if(!chrome.runtime.lastError) console.log('closing', id, res)})
+ 		}
+ 	}
 }
 
 HW.onReceiveError = function (err){

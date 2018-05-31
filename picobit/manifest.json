@@ -10,7 +10,8 @@
   },
   "app": {
     "background": {
-      "scripts": ["main.js"]
+      "scripts": ["main.js"],
+      "persistent": false
     }
   }
 }

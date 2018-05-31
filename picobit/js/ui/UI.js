@@ -77,7 +77,7 @@ UI.checkState= function (e){
 		else Runtime.startTimer()
 		return;
 	}
-	if (gn("microbitstate").className != "microbit ok") HW.setup();
+	if (gn("microbitstate").className != "microbit ok") HW.reopen();
 	else Code.download();
 }
 

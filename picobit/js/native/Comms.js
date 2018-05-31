@@ -135,7 +135,7 @@ sendl(l){
 }
 
 
-openSerialPort(fcn, errfcn){
+openSerialPort(fcn){
 	var t = this;
 	chrome.serial.getDevices(gotDevices);
 	
@@ -160,43 +160,42 @@ openSerialPort(fcn, errfcn){
 
 	function connected(r){
 //		console.log(r);
-		var errorFunction = errfcn ? errfcn : console.log
-		if(t.serialID==undefined) chrome.serial.onReceive.addListener(onrecc);
-		if(t.serialID==undefined) chrome.serial.onReceiveError.addListener(errorFunction);
 		t.serialID = r.connectionId;
 		console.log('connected');
 
 		if (fcn) {
 			fcn(t.serialID)
 		}
+	}
+}
 		
-		function onrecc(r){
-			var l = Array.from(new Uint8Array(r.data));
-			for(var i in l) gotChar(l[i]);
-		}
+onrecc(r){
+	var t = HW.comms;
+	var l = Array.from(new Uint8Array(r.data));
+	for(var i in l) gotChar(l[i]);
 
-		function gotChar(c){
-			if((t.packet.length==0)&&(c>=0xf0)) t.packet.push(c);
-			else if(c==0xed){
-				if(t.packet.length==t.packet[1]+2) handlePacket(t.packet);
-				t.packet = [];
-			} else t.packet.push(c);
-		}
+	function gotChar(c){
+		if((t.packet.length==0)&&(c>=0xf0)) t.packet.push(c);
+		else if(c==0xed){
+			if(t.packet.length==t.packet[1]+2) handlePacket(t.packet);
+			t.packet = [];
+		} else t.packet.push(c);
+	}
 
-		function handlePacket(p){
-			var type = p[0];
-			var data = p.slice(2);
-			if(type==0xf0) HW.gotString(String.fromCharCode.apply(null, data));
-			if(type==0xf5) HW.gotPollPacket(data);
-			else {
+	function handlePacket(p){
+		var type = p[0];
+		var data = p.slice(2);
+		if(type==0xf0) HW.gotString(String.fromCharCode.apply(null, data));
+		if(type==0xf5) HW.gotPollPacket(data);
+		else {
 //				console.log('received:',p);
-				if(t.respfcns[type]){
-					t.respfcns[type](data);
-					delete t.respfcns[type];
-				}
+			if(t.respfcns[type]){
+				t.respfcns[type](data);
+				delete t.respfcns[type];
 			}
 		}
 	}
 }
-
 }
+
+
