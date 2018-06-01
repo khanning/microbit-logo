@@ -161,6 +161,8 @@ openSerialPort(fcn){
 	function connected(r){
 //		console.log(r);
 		t.serialID = r.connectionId;
+		t.packet = [];
+		t.respfcns = {};
 		console.log('connected');
 
 		if (fcn) {

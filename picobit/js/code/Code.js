@@ -34,6 +34,7 @@ Code.timeout = undefined;
 Code.compile = undefined;
 Code.variables = {}
 Code.cache = '';
+Code.timeout = undefined;
 
 // Init
 Code.start = function(e){
@@ -136,7 +137,6 @@ Code.startOrStop = function(){
 	else  Code.scripts.triggerHats("onbuttona");
 }
 
-
 /////////////////////////
 // Download
 /////////////////////////
@@ -144,11 +144,27 @@ Code.startOrStop = function(){
 Code.download = function (){	
 	Runtime.stopTimer();
 	gn("microbitstate").className = "microbit download";
+	Code.timeout = setTimeout(handleRestartButton, 3000);
 	setTimeout(Code.startDownload, 500);
+	
+	function handleRestartButton(e){
+		let id  =HW.comms.serialID;
+		if (id)  {
+			chrome.serial.disconnect(id, (res)=>{if(!chrome.runtime.lastError) console.log('closing', id, res)})
+		}
+		Code.timeout = undefined;
+		gn("microbitstate").className = "microbit fail";
+	}	
+}
+
+Code.cleartimeout  = function (){	
+	if (Code.timeout) window.clearTimeout(Code.timeout);
+	Code.timeout = undefined;
 }
 
 Code.startDownload = function (){		
 	var downloadEnd = (a)=>	{
+		Code.cleartimeout();
 		gn("microbitstate").className = "microbit ok";
 		Runtime.startTimer();
 	}
@@ -157,6 +173,7 @@ Code.startDownload = function (){
 	let msg =  blocktext+' '+flatten(ShapeEditor.shapes).join(' ');
 	if ((Code.cache != msg) && (blocktext != '')) HW.compiler.downloadProcs(blocktext, flatten(ShapeEditor.shapes), doNext)
 	else downloadEnd();
+
 
 	function doNext(str){
 		var value  = str ? "ERROR: "+str : 'downloaded.'
