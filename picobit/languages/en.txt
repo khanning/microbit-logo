@@ -7,7 +7,7 @@
 			"control" : "Control",
 			"event" : "Events",
 			"operators" : "Operators",
-			"more" : "More Blocks"	
+			"more" : "My Blocks"	
 		},
 		"shapes": "Shapes",
 		"menu": {
@@ -18,9 +18,9 @@
 		},
 		"blocks": {
 			"clean": "all off",
-			"setshape": "display shape %1",
-			"nextshape": "display next shape",
-			"previousshape": "display previous shape",
+			"setshape": "set shape %1",
+			"nextshape": "next shape",
+			"previousshape": "previous shape",
 			"scroll": "scroll %1",
 			"menu_left": "left",
 			"menu_right": "right",
