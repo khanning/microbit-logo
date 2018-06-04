@@ -216,6 +216,7 @@ Defs.httpload = function(url, whenDone){
 				cat.setAttribute("colour", c); 
 				cat.setAttribute("secondaryColour", s); 	
 				cat.setAttribute("name", myname); 
+				cat.setAttribute("id", myname); 
 				if (cattype == "more") cat.setAttribute("custom", Blockly.MINE_CATEGORY_NAME); 
 				xml.appendChild(cat);
 			 }
