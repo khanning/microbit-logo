@@ -47,9 +47,14 @@ HW.reopen = function(){
  	
  	function whenDone(str){
  		if (str=="fail") gn('microbitstate').className = "microbit fail";
- 		else gn('microbitstate').className = "microbit ok";
- 		setTimeout(Runtime.startTimer, 500)
+ 		else {
+ 			gn('microbitstate').className = "microbit ok";
+ 			HW.getVersion(showversion);
+ 		}
+ 		setTimeout(Runtime.startTimer, 500)	
  	}	
+ 	
+ 	function showversion (l){gn('fwversion').textContent =  l.join(".");}
 
  	function closeStrayPorts(l){
  		for(var i=0;i<l.length;i++) {
@@ -64,11 +69,13 @@ HW.onReceiveError = function (err){
 	Runtime.stopThreads(Code.scripts);
 	console.warn ("onReceiveError", err);
 	gn('microbitstate').className = "microbit fail";
+	gn('fwversion').textContent = '';
 }
 
 HW.gotString = function (str) {console.log ("HW.gotString:", str);}
 
 HW.poll = function () {
+//	console.log ("polling");
 	let data  = [].concat([0xf5]);
 	if (!HW.comms.serialID) return;
 	HW.comms.sendl(data);
@@ -127,6 +134,10 @@ HW.gotPollPacket = function (l){
 
 	HW.state.tilts = {x: array2float(l.slice(3, 5)), y: array2float(l.slice(5, 7)), 
 							z: array2float(l.slice(7, 9)), w: array2float(l.slice(9, 11))}		
+}
+
+HW.getVersion = function (doNext){
+	HW.comms.sendReceive([0xff], doNext);
 }
 
 function array2float(l){

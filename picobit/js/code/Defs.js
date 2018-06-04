@@ -100,12 +100,11 @@ Defs = function(){}
 		["wait","c","control", "wait %d.math_positive_number.duration", 1],  
 		["repeat","l","control", "repeat %d.math_whole_number.times", 2],
 		["forever","l","control", "forever"], 
+		["stop","c","control", "stop %c..stop_option"],
 		["if","l","control", "if %b..condition"],	
 		["ifelse","l","control", "ifelse %b..condition"],
 		["waituntil","c","control", "wait until %b..condition"],
- 		["repeatuntil","l","control", "repeat until %b..condition"],
  		["step","l","control", "step %c..variable %d.math_whole_number.from %d.math_whole_number.to",'box1', 1, 3],
- 		["stop","c","control", "stop %c..stop_option"],
  		
 		["apressed","r","sensing", "apressed"],  
 		["bpressed","r","sensing", "bpressed"], 	

@@ -107,19 +107,12 @@ fieldset, legend, object, embed {
 	width: 48px;
 	height: 48px;
 	padding: 0;
-	background: url('../assets/ui/play.svg') no-repeat center center;
-}
-
-#playbutton.on {
-	position: absolute;
-	right: 0px;
-	margin: 6px;
-	width: 48px;
-	height: 48px;
-	padding: 0;
+	display: none;
 	background: url('../assets/ui/stop.svg') no-repeat center center;
 }
 
+#playbutton.off {display: none;}
+#playbutton.on {display: block;}
 
 #topbar  *.microbit.off {
 	background: url('../assets/ui/microbitOff.svg')  no-repeat center center;
@@ -172,7 +165,30 @@ fieldset, legend, object, embed {
   to {background: url('../assets/ui/download0.svg')  no-repeat center center; }
 }
 
+*.fwlabel {
+	position: absolute;
+	bottom: 5px;
+	left: 328px;
+	height: 14px;
+}
 
+*.smalltext{
+	position: relative;
+  margin: 0px;
+	padding: 0px;
+	padding-left: 16px;
+	top: 0px;
+	left: 0px;
+	height: 48px;
+	color: #EEFDFF;
+	text-align: left;
+  vertical-align: center;
+  font-family:  'Lucida Grande', 'Verdana', 'Arial', 'DejaVu Sans';
+  font-size:  10px;
+  font-weight: normal;
+  line-height: 12px;
+	width: 100%;
+}
 
 *.contents {
 	position: absolute;

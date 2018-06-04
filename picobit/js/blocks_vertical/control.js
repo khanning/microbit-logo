@@ -337,12 +337,13 @@ Blockly.Blocks['control_stop'] = {
           this.sourceBlock_.nextConnection &&
           this.sourceBlock_.nextConnection.isConnected()) {
         return [
-          [ OTHER_SCRIPTS, 'stopothers']
+          [OTHER_SCRIPTS, 'stopothers']
         ];
       }
-      return [[ALL_SCRIPTS, 'stopall'],
-        [THIS_SCRIPT, 'stop'],
-        [OTHER_SCRIPTS, 'stopothers']
+      return [
+      	[OTHER_SCRIPTS, 'stopothers'],
+      	[ALL_SCRIPTS, 'stopall'],
+        [THIS_SCRIPT, 'stop']    
       ];
     }, function(option) {
       this.sourceBlock_.setNextStatement(option == OTHER);
@@ -356,6 +357,7 @@ Blockly.Blocks['control_stop'] = {
       Blockly.Colours.control.tertiary
     );
     this.setPreviousStatement(true);
+    this.setNextStatement(true);
   },
   mutationToDom: function() {
     var container = document.createElement('mutation');

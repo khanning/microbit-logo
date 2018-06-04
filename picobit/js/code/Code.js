@@ -40,7 +40,6 @@ Code.timeout = undefined;
 Code.start = function(e){
 	libInit();
 	Defs.init (doNext);
-
 	function doNext (){
 		Code.workspace = Blockly.inject('blocklyDiv', Defs.workspaceAttributes);
 		Code.scripts = new Scripts(false, new Blocks());
@@ -57,6 +56,7 @@ Code.start = function(e){
 		UI.cleanUndo();
 	}
  }
+
 
 Code.reset = function (str){
 	if (gn('blocklyDiv')) gn('blocklyDiv').parentNode.removeChild (gn('blocklyDiv'))	

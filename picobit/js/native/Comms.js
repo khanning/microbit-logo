@@ -130,10 +130,9 @@ sendReceive(l, fcn){
 }
 
 sendl(l){
-	//console.log ("sendl " + l.join(' '))
+//	console.log ("sendl " + l.join(' '))
 	chrome.serial.send(this.serialID, new Uint8Array(l), ()=>{});
 }
-
 
 openSerialPort(fcn){
 	var t = this;
