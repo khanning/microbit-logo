@@ -228,6 +228,14 @@ void prim_ticks(){
 //
 /////////////////////////////////
 
+int32_t nshapes(){
+  unsigned char *font = (unsigned char*)flashshapes;
+  int32_t i;
+  for(i=0;i<1000;i++){
+    if(font[5*i]==0xff) return i;
+  }
+}
+
 
 void clear(){
   direct_setshape(0,0,0,0,0);
@@ -267,15 +275,20 @@ void prevshape(){
   ddots(&font[5*(thisshape-1)]);
 }
 void prim_setshape(){
-  setshape(vm_pop()); 
+  int32_t n = vm_pop()-1;
+  int32_t len = nshapes();
+  n%=len;
+  if(n<0) n+=len;
+  setshape(n+1); 
   vm_wait(pace);
 }
+
 void prim_shape(){
   vm_push(thisshape);
 }
 void prim_clear(){
   clear(); 
-  vm_wait(pace);
+//  vm_wait(pace);
 }
 
 void prim_nextshape(){
@@ -409,17 +422,23 @@ void prim_brightness(){
     display.setBrightness(n*255/100);
 }
 
+uint8_t pop_coord(){
+  int32_t n = vm_pop();
+  n %= 5;
+  if(n<0) n+=5;
+  return (uint8_t) n;
+}
 
 void prim_doton(){
-  uint8_t y = (uint8_t)(vm_pop());
-  uint8_t x = (uint8_t)(vm_pop());
+  uint8_t y = pop_coord();
+  uint8_t x = pop_coord();
   directshape[4-y] |= 1<<(4-x);
   display.printChar(32);
 }
 
 void prim_dotoff(){
-  uint8_t y = (uint8_t)(vm_pop());
-  uint8_t x = (uint8_t)(vm_pop());
+  uint8_t y = pop_coord();
+  uint8_t x = pop_coord();
   directshape[4-y] &= (0x3f^(1<<(4-x)));
   display.printChar(32);
 }

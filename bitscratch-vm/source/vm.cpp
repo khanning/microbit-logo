@@ -437,8 +437,13 @@ void vm_wait(float secs){
     prim_wait();
 }
 
+int32_t vm_pop(){
+    int32_t n = *--sp;
+    int32_t d = (n<0)?-50:50;
+    return (int32_t)((((float)n)+d)/100);
+}
+
 void vm_push(int32_t x){*sp++=x*100;}
-int32_t vm_pop(){return (int32_t)((((float)*--sp)+50)/100);}
 int32_t vm_pop_raw(){return *--sp;}
 float vm_pop_float(){return ((float)*--sp)/100;}
 
