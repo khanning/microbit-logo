@@ -284,7 +284,6 @@ fieldset, legend, object, embed {
 .dropdown ul {
 	position: relative;
   list-style-position: none;
-  min-width: 100px;
   margin: 0px;
   padding: 0px;
   line-height: 49px;
@@ -297,6 +296,9 @@ fieldset, legend, object, embed {
   z-index: 1000; 
   cursor: default;
 }
+
+.dropdown.en   {min-width: 100px;}
+.dropdown.fr   {min-width: 160px;}
 
 .dropdown li { 
 	display: block;

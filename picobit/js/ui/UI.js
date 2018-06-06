@@ -122,7 +122,6 @@ UI.toggleMenu = function (e){
 UI.doAction = function(e){
 	var t = e.target;
 	t.className = "selectmenu";
-	console.log (t.fcn)
 	if (t.fcn) UI[t.fcn](e);
 	var endfcn = function () {
 		if (gn('appmenu')) gn('appmenu').parentNode.removeChild(gn('appmenu'));
@@ -243,7 +242,6 @@ UI.changeLanguageTo = function (str){
 	
 	function doNext (){
 		Defs.lang = str;
-		console.log ("changeLanguageTo ", chrome.storage.local.language)
 		Defs.loadLanguage(doTranslate);
 	}
 	
@@ -302,7 +300,7 @@ UI.save = function (fe){
 UI.openBalloon = function(p, labels, fcns){
 	var mm = newHTML("div", 'dropdownballoon', p);
 	var barrow = newHTML("div", "menuarrow up", mm);
-	var mdd= newHTML("div", "dropdown", mm);
+	var mdd= newHTML("div", "dropdown " + Defs.lang, mm);
 	mm.setAttribute('id', 'appmenu');
 	for (var i=0; i < labels.length; i++) {
 		var ul =  newHTML("ul", undefined, mdd);
