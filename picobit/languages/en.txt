@@ -9,6 +9,7 @@
 			"operators" : "Operators",
 			"more" : "My Blocks"	
 		},
+		"cleanup": "Align Stacks",
 		"shapes": "Shapes",
 		"menu": {
 			"new": "New",

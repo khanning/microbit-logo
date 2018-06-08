@@ -23,7 +23,6 @@ UI = function() {};
 UI.toolmode = undefined;
 UI.tooldown = false;
 UI.projectID = undefined;	
-UI.shiftKey = false;
 UI.undoStack = [];
 UI.redoStack = [];
 UI.blocklyStacks = {undo: 0, redo: 0};
@@ -41,16 +40,12 @@ UI.setup = function(){
 	UI.resize();
 	window.onresize = UI.resize;
 	window.onkeydown = UI.handleKeyDown;
-	window.onkeyup = UI.handleKeyUp;
 }
 
 UI.handleKeyDown = function(e) {
 	if (document.activeElement.nodeName.toLowerCase() == "input") return;
 	if (e.keyCode == 8) ShapeEditor.clearShape();
-	UI.shiftKey = e.shiftKey;
 }
-
-UI.handleKeyUp = function(e) {UI.shiftKey = e.shiftKey;}
 
 UI.resize = function(e) {
 	var h = getDocumentHeight();
@@ -72,9 +67,8 @@ UI.updateRunStopButtons = function() {
 UI.checkState= function (e){
 	e.preventDefault();
 	e.stopPropagation();
-	if (UI.shiftKey){
-		if (Runtime.intervalId) Runtime.stopTimer()
-		else Runtime.startTimer()
+	if (e.shiftKey){
+		UI.downloadVM();
 		return;
 	}
 	if (gn("microbitstate").className != "microbit ok") HW.reopen();
@@ -82,7 +76,7 @@ UI.checkState= function (e){
 }
 
 UI.checkStatus = function (e){
-	Code.unfocus();
+	Code.unfocus(e);
 	UI.unfocus();
 }	
 	
@@ -248,6 +242,7 @@ UI.changeLanguageTo = function (str){
 	function doTranslate (){
 		Code.workspace.dispose();
 		Code.reset(content);
+		UI.cleanUndo ();
 		gn('nametag').textContent = Defs.translation["editor"]["shapes"];
 	}
 }
@@ -366,9 +361,11 @@ UI.getProjectContents = function (){
 /*blockly overrrides */
 Blockly.VerticalFlyout.prototype.DEFAULT_WIDTH = 230;
 
-///////////////////
+/////////////////////////
+//
 // Download VM
-///////////////////
+//
+/////////////////////////
 
 UI.downloadVM = function (){
 	Runtime.stopTimer();
@@ -402,8 +399,6 @@ UI.downloadVM = function (){
 		}
 	}
 }
-
-
 
 
 /////////////////////////
@@ -468,8 +463,26 @@ UI.getStackState = function(type){
 	return false;
 }
 
-// DISABLE ALL BLOCKLY context menus
 
-Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {}
+// ENABLE only clean up (align stacks) individual blocks BLOCKLY context menus
+
+Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
+  if (this.options.readOnly || this.isFlyout) {
+    return;
+  }
+  var menuOptions = [];
+  var topBlocks = this.getTopBlocks(true);
+  var ws = this;
+
+  // Option to clean up blocks.
+  if (this.scrollbar) {
+    menuOptions.push(
+        Blockly.ContextMenu.wsCleanupOption(this,topBlocks.length));
+  }
+
+  Blockly.ContextMenu.show(e, menuOptions, this.RTL);
+};
+
+// DISABLE individual blocks BLOCKLY context menus
 
 Blockly.BlockSvg.prototype.showContextMenu_ = function(e) {}

@@ -49,7 +49,7 @@ HW.reopen = function(){
  		if (str=="fail") gn('microbitstate').className = "microbit fail";
  		else {
  			gn('microbitstate').className = "microbit ok";
- 			HW.getVersion(showversion);
+ 			setTimeout (function () {HW.getVersion(showversion);}, 520);
  		}
  		setTimeout(Runtime.startTimer, 500)	
  	}	

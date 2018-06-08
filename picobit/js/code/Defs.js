@@ -64,16 +64,6 @@ Defs = function(){}
 		"operators" : "Operators",
 		"more" : "More Blocks"	
 	}
-	
-	Defs.categoriesTranslation = {
-		"motion" : "Lights",
-		"sensing" : "Sensing",
-		"control" : "Control",
-		"event" : "Events",
-		"operators" : "Operators",
-		"more" : "More Blocks"	
-	}
-	
 
 	Defs.verticalBlocks = [	
 	
@@ -151,12 +141,13 @@ Defs = function(){}
 
 Defs.loadLanguage = function(whenDone){
  	chrome.storage.sync.get(['lang', 'en', 'fr'], doNext);
+ 	
   function doNext(result) {
  // 	console.log ("geting language", result['lang'] ? result[result['lang']]  : null)
   	let languagesData = result;
      let val = result['lang'];
      if (!val) {
-     		val = 'fr';
+     		val = 'en';
      		keypair = {'lang': val}
      		let fcn =  	function() {console.log('Value is set to' + val);};
       	chrome.storage.sync.set(keypair, fcn);
@@ -165,16 +156,21 @@ Defs.loadLanguage = function(whenDone){
   	let url =  "./languages/"+ Defs.lang +".txt";
   	if (languagesData [val] && (languagesData [val] != '')){
   		Defs.translation = JSON.parse(languagesData [val]);
-  		whenDone(languagesData [val]);
+  		doFinal();
   	}
-  	else Defs.httpload (url, storeLanguage);
+  	else Defs.httpload (url, storeLanguage); 
 	}
   	
 		function storeLanguage(str){
 			Defs.translation = JSON.parse(str);
 			let keypair = {};
 			keypair [Defs.lang] = str;
-			chrome.storage.sync.set(keypair, whenDone);
+			chrome.storage.sync.set(keypair, doFinal);
+	}
+	
+	function doFinal(){
+		Blockly.Msg.CLEAN_UP = Defs.translation['editor']["cleanup"];
+		whenDone();
 	}
 	
 }

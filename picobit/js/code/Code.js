@@ -112,10 +112,11 @@ Code.getToolboxElement= function () {
 	 Code.scripts.clean(); 
 }
 
-Code.unfocus = function(){
+Code.unfocus = function(e){
+	let skip = e ? e.target.className.indexOf('menuitem') > -1 : false;
+	if (!skip) Blockly.ContextMenu.hide();
 	if (!document.activeElement) return;
 	if (document.activeElement.className != "blocklyHtmlInput") return;
-	console.log (document.activeElement.className)
   Blockly.WidgetDiv.hide();
   Blockly.DropDownDiv.hideWithoutAnimation();
 }
@@ -142,10 +143,12 @@ Code.startOrStop = function(){
 /////////////////////////
 
 Code.download = function (){	
+	var blocktext = Code.scripts.blocksToString();
+	if (blocktext == '') return;
 	Runtime.stopTimer();
 	gn("microbitstate").className = "microbit download";
 	Code.timeout = setTimeout(handleRestartButton, 3000);
-	setTimeout(Code.startDownload, 500);
+	setTimeout(function () {Code.startDownload(blocktext);}, 500);
 	
 	function handleRestartButton(e){
 		let id  =HW.comms.serialID;
@@ -162,14 +165,13 @@ Code.cleartimeout  = function (){
 	Code.timeout = undefined;
 }
 
-Code.startDownload = function (){		
+Code.startDownload = function (blocktext){		
 	var downloadEnd = (a)=>	{
 		Code.cleartimeout();
 		gn("microbitstate").className = "microbit ok";
 		Runtime.startTimer();
 	}
 	
-	var blocktext = Code.scripts.blocksToString();
 	let msg =  blocktext+' '+flatten(ShapeEditor.shapes).join(' ');
 	if ((Code.cache != msg) && (blocktext != '')) HW.compiler.downloadProcs(blocktext, flatten(ShapeEditor.shapes), doNext)
 	else downloadEnd();

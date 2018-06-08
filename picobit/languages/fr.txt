@@ -9,6 +9,7 @@
 			"operators": "Opérateurs",
 			"more": "Autres blocs"	
 		},
+		"cleanup": "Aligner",
 		"shapes": "Formes",
 		"menu": {
 			"new": "Nouveau",
