@@ -366,6 +366,45 @@ UI.getProjectContents = function (){
 /*blockly overrrides */
 Blockly.VerticalFlyout.prototype.DEFAULT_WIDTH = 230;
 
+///////////////////
+// Download VM
+///////////////////
+
+UI.downloadVM = function (){
+	Runtime.stopTimer();
+	Runtime.stopThreads(Code.scripts);
+	gn("microbitstate").className = "microbit fail";
+	let id  =HW.comms.serialID;
+	if (id) chrome.serial.disconnect(id, (res)=>{if(!chrome.runtime.lastError) console.log('closing', id, res)})
+  var req=new XMLHttpRequest()
+  req.onreadystatechange=next1;
+  req.open('GET','VMhex/bitscratch-vm-combined.hex',true)
+  req.send(null);
+
+	function next1(){
+		console.log(req);
+	  if (req.readyState!=4) return;
+	  if (req.status!=200) return;
+		chrome.fileSystem.chooseEntry({type: 'saveFile', suggestedName: 'picobitVM.hex'}, next2)
+	}
+
+	function next2(fe){
+		var blob = new Blob([req.response], {type: 'plain/text'});
+		fe.createWriter(next3);
+	
+		function next3(writer){
+			writer.onwriteend = next4; 
+			writer.write(blob);
+		}
+		function next4(){
+			writer.onwriteend=undefined; 
+			writer.truncate(blob.size);	
+		}
+	}
+}
+
+
+
 
 /////////////////////////
 //

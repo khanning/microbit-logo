@@ -234,6 +234,7 @@ int32_t nshapes(){
   for(i=0;i<1000;i++){
     if(font[5*i]==0xff) return i;
   }
+  return 0;
 }
 
 
