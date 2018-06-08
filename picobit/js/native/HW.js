@@ -28,7 +28,8 @@ HW.state = {acount:0, bcount:0, apressed: false, bpressed: false, abpressed: fal
 HW.shape = [0,0,0,0,0];
 HW.messages = [];
 HW.brightness = 100;
-
+HW.timeout = undefined;
+ 	
 HW.setup = function (){	
 	chrome.serial.onReceive.addListener(HW.comms.onrecc);
 	chrome.serial.onReceiveError.addListener(HW.onReceiveError);
@@ -47,22 +48,43 @@ HW.reopen = function(){
  	
  	function whenDone(str){
  		if (str=="fail") gn('microbitstate').className = "microbit fail";
- 		else {
- 			gn('microbitstate').className = "microbit ok";
- 			setTimeout (function () {HW.getVersion(showversion);}, 520);
- 		}
+ 		else HW.fetchVersionNumber();
  		setTimeout(Runtime.startTimer, 500)	
  	}	
  	
  	function showversion (l){gn('fwversion').textContent =  l.join(".");}
 
  	function closeStrayPorts(l){
- 		for(var i=0;i<l.length;i++) {
- 			let id = l[i].connectionId;
- 			chrome.serial.disconnect(id, (res)=>{if(!chrome.runtime.lastError) console.log('closing', id, res)})
- 		}
+ 		for(var i=0;i<l.length;i++) HW.serialDisconnec(l[i].connectionId);
  	}
 }
+
+HW.serialDisconnect = function (id, fcn){
+	chrome.serial.disconnect(id, (res)=>{
+		if(!chrome.runtime.lastError) console.log('closing', id, res);
+		if (fcn) fcn();
+	})
+}
+
+HW.fetchVersionNumber = function (){	
+	if (HW.timeout) clearTimeout (HW.timeout)
+	HW.timeout =  setTimeout (notTheRightHex, 1000);
+  setTimeout (function () {HW.getVersion(showversion);}, 520);
+ 
+ function notTheRightHex(){ 		
+ 	HW.serialDisconnect(HW.comms.serialID, function (){gn('microbitstate').className = "microbit badhex";});
+ 	HW.comms.serialID = undefined;
+ }	
+ 
+ function showversion (l){
+ 	gn('microbitstate').className = "microbit ok";
+ 	if (HW.timeout) clearTimeout (HW.timeout);
+ 	HW.timeout = undefined;
+ 	gn('fwversion').textContent =  l.join(".");
+ }
+
+}
+
 
 HW.onReceiveError = function (err){
 	HW.comms.serialID = undefined;

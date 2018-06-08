@@ -144,16 +144,14 @@ fieldset, legend, object, embed {
 }
 
 
-#topbar *.microbit.debug {
-	background: url('../assets/ui/microbitDebug.svg')  no-repeat center center;
+#topbar *.microbit.badhex {
+	background: url('../assets/ui/microbitBadhex.svg')  no-repeat center center;
 }
-
 
 #topbar *.microbit.download {
 	  -webkit-animation: downloadAnimation 0.5s infinite ease-in-out;
     -webkit-transform-origin: center;
 }
-
 
 @-webkit-keyframes downloadAnimation {
   from {background:  url('../assets/ui/download0.svg')  no-repeat center center; }
