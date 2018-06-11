@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
-  "name": "micro:bit Scratch 3",
-  "version": "0.2",
+  "name": "ARTbit",
+  "version": "0.9",
   "minimum_chrome_version": "23",
   "permissions": ["serial", "storage", {"fileSystem": ["write", "retainEntries", "directory"]}],
   "icons": {

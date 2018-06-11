@@ -32,6 +32,7 @@ UI.setup = function(){
 	gn("microbitstate")[eventDispatch["start"]] =  UI.checkState;
 	gn('filemenu')[eventDispatch["start"]] = UI.toggleMenu;
 	gn('lang')[eventDispatch["start"]] = UI.changeLang;
+	gn('about')[eventDispatch["start"]] = UI.openAbout;
  	gn("playbutton")[eventDispatch["start"]] = Code.togglePlay;
 	window[eventDispatch["start"]] = UI.checkStatus;
 	
@@ -55,7 +56,11 @@ UI.resize = function(e) {
 	gn("contents").style.top =  dh + "px";
 	gn("contents").style.width = (w - gn("rightpanel").offsetWidth)+ "px";
 	gn("rightpanel").style.height = (h - dh)+ "px";
+	gn("lang").style.bottom =  "0px";
+	gn("lang").style.display =  "block";
 	gn("palette").style.height = (h - gn("grid").offsetTop - gn("grid").offsetHeight - dh - gn("shapesbar").offsetHeight)+ "px";
+	gn("alertdialog").style.top = Math.floor((h-292) / 2) + "px";
+	gn("alertdialog").style.left = Math.floor((w-670) / 2) + "px";
 	Blockly.hideChaff(true);
   Blockly.svgResize(Code.workspace);	
 }
@@ -93,7 +98,7 @@ UI.changeLang = function (e){
 		var hasValidName = UI.projectName && !UI.projectSamples[UI.projectName];	
 		var options = ['Français', "English"];
 		var optionfcns = ["loadFr", "loadEn"];
-		UI.openBalloon(e.target,options,optionfcns);
+		UI.openBalloon(e.target, "bottomleft",options, optionfcns);
 		gn('appmenu')[eventDispatch["start"]] = UI.doAction;
 	}
 }
@@ -108,7 +113,7 @@ UI.toggleMenu = function (e){
 		var hasValidName = UI.projectName && !UI.projectSamples[UI.projectName];	
 		var options = [menus["new"], menus["load"], menus["save"], menus["saveas"]];
 		var optionfcns = ["newProject", "loadProject", "doSave", "doSaveAs"];
-		UI.openBalloon(frame,options,optionfcns);
+		UI.openBalloon(frame,"topdown", options, optionfcns);
 		gn('appmenu')[eventDispatch["start"]] = UI.doAction;
 	}
 }
@@ -292,9 +297,9 @@ UI.save = function (fe){
 	}
 }
 	
-UI.openBalloon = function(p, labels, fcns){
-	var mm = newHTML("div", 'dropdownballoon', p);
-	var barrow = newHTML("div", "menuarrow up", mm);
+UI.openBalloon = function(p, type,  labels, fcns){
+	var mm = newHTML("div", 'dropdownballoon ' + type, p);
+	var barrow = newHTML("div", "menuarrow " + type, mm);
 	var mdd= newHTML("div", "dropdown " + Defs.lang, mm);
 	mm.setAttribute('id', 'appmenu');
 	for (var i=0; i < labels.length; i++) {
@@ -382,7 +387,7 @@ UI.downloadVM = function (){
 		console.log(req);
 	  if (req.readyState!=4) return;
 	  if (req.status!=200) return;
-		chrome.fileSystem.chooseEntry({type: 'saveFile', suggestedName: 'picobitVM.hex'}, next2)
+		chrome.fileSystem.chooseEntry({type: 'saveFile', suggestedName: 'ARTbitVM.hex'}, next2)
 	}
 
 	function next2(fe){
@@ -398,6 +403,27 @@ UI.downloadVM = function (){
 			writer.truncate(blob.size);	
 		}
 	}
+}
+
+/////////////////////////
+//
+//  undo/redo
+//
+/////////////////////////
+
+UI.openAbout  =  function(e){
+	e.preventDefault();
+	e.stopPropagation();
+	gn("backdrop").setAttribute("class","modal-backdrop fade in");
+	setProps(gn("backdrop").style, {display: 'block'});
+	gn("alertdialog").setAttribute("class","alertdialog fade in");	
+	gn("OK")[eventDispatch["start"]] = function(e) {	UI.closeDialog();};
+}
+
+UI.closeDialog   =  function(){
+	gn("backdrop").setAttribute("class","modal-backdrop fade out");
+	setProps(gn("backdrop").style, {display: 'none'});
+	gn("alertdialog").setAttribute("class","alertdialog fade out");	
 }
 
 
