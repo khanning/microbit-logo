@@ -56,7 +56,7 @@ Runtime.stopThreads = function(sc) {
 		}
 	}	
   Prim.currentShape = {n: undefined, dx:0, dy: 0}
-	HW.shape = [0,0,0,0,0];
+//	HW.shape = [0,0,0,0,0];
 }
 
 Runtime.stopOthers = function(t) {

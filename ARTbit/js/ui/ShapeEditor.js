@@ -125,8 +125,8 @@ ShapeEditor.doAction =  function (e){
 			break;
 		case "scissors":
 			let scrollto = gn('palette').scrollTop; 
-			ShapeEditor.shapes.splice(n,1);
-			gn('palette').removeChild(gn('palette').childNodes[n]);
+			if (t.className == "thumbslot selected") ShapeEditor.unfocus();
+			if ((t.className == 'thumbslot') && t.parentNode) t.parentNode.removeChild(t);
 			ShapeEditor.reOrder(); 
 			UI.selectTool(undefined);
 			break;
@@ -330,6 +330,7 @@ ShapeEditor.update = function (){
 	ShapeEditor.shapes[pos] = val;
 	var states = ShapeEditor.convertRowToState(val);
 	HW.shape = val;
+//	console.log ("update", val.join(' '));
 	var svg = ShapeEditor.paintingShape.childNodes[1].childNodes[0];
 	while (svg.childElementCount > 0) svg.removeChild(svg.childNodes[0]);
 	var t = "translate(" + 3  + " " + 3 + ")";
@@ -552,15 +553,18 @@ ShapeEditor.repositionThumb = function (){
 ShapeEditor.reOrder = function (){
 	let p  = gn('palette');
 	let shapes = [];
+	let editting = undefined;
 	for (let i=0; i < p.childElementCount; i++) {
 		let tb = p.childNodes[i]
 		tb.id = "thumb_" + i;
 		tb.childNodes[0].textContent = (i+1) +".";
  		tb.key = i;
 		let shape = ShapeEditor.fromSVGToArray(tb.childNodes[1].childNodes[0]);
-		shapes.push (shape)
+		shapes.push (shape);
+		if (tb.className == "thumbslot selected") editting = tb;		
 	}
 	ShapeEditor.shapes = shapes;
+	ShapeEditor.paintingShape = editting;
 }
 
 ShapeEditor.fromSVGToArray = function (svg){
