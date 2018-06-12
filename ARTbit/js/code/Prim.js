@@ -434,6 +434,7 @@ Prim.myblocks_procedure = function () {
 		Runtime.thread.stack.push(Runtime.thread.thisblock);
 		Runtime.thread.stack.push(Runtime.thread.next());
 		Runtime.thread.stack.push('exitProc');
+		Runtime.yield=true;
 		Runtime.thread.thisblock = callblock
 		Runtime.glowStack(thread, callblock);
 	}
