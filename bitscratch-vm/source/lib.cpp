@@ -214,7 +214,8 @@ void prim_resett(){
 }
 
 void prim_timer(){
-  vm_push(now()-t0);
+  float t = (float)(now()-t0);
+  vm_push_float(t/1000);
 }
 
 void prim_ticks(){

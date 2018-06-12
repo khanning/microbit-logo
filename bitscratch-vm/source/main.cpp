@@ -2,7 +2,7 @@
 #include "MicroBitFlash.h"
 
 #define MAJOR_VERSION 1
-#define MINOR_VERSION 12
+#define MINOR_VERSION 13
 
 MicroBitSerial pc(USBTX, USBRX, 200);
 MicroBitStorage storage;

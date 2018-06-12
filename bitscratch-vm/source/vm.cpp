@@ -445,6 +445,7 @@ int32_t vm_pop(){
 
 void vm_push(int32_t x){*sp++=x*100;}
 int32_t vm_pop_raw(){return *--sp;}
+void vm_push_float(float n){*sp++=(int32_t)(n*100);} 
 float vm_pop_float(){return ((float)*--sp)/100;}
 
 void(*prims[])() = {
