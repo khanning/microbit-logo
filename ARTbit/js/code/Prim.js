@@ -260,6 +260,7 @@ Prim.events_broadcast = function (){
 	var blocks = Code.scripts.triggerBroadast(num);
 	for (var i=0; i < blocks.length; i++) Runtime.addScript(Code.scripts, blocks[i]);
 	Prim.doNext();
+	Runtime.yield=true;
 }
 
 //////////////////////
