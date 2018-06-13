@@ -36,8 +36,8 @@ Runtime.startTimer = function() {
 	resett()
 	Runtime.stopTimer ();
 	Runtime.intervalId = window.setInterval(function (){Runtime.tickTask();}, Runtime.ticker);
-	if (!HW.comms.serialID) gn('microbitstate').className = "microbit fail";
-	else gn('microbitstate').className = "microbit ok";
+	if (!HW.comms.serialID) gn("microbitstate").className = "microbit fail";
+	else gn("microbitstate").className = "microbit ok";
 }
 
 Runtime.stopTimer = function(){
@@ -45,7 +45,7 @@ Runtime.stopTimer = function(){
 	Runtime.intervalId = null;
 	Runtime.stopThreads(Code.scripts);
 	UI.updateRunStopButtons(); 	
-	gn('microbitstate').className = "microbit debug";
+	gn("microbitstate").className = "microbit fail";
 }
 
 Runtime.stopThreads = function(sc) {
@@ -77,8 +77,8 @@ Runtime.turnOffStacks = function(sc) {
 }
 	
 Runtime.tickTask = function() { 
-//	if (!HW.comms.serialID) gn('microbitstate').className = "microbit fail";
-//	else gn('microbitstate').className = "microbit ok";
+//	if (!HW.comms.serialID) gn("microbitstate").className = "microbit fail";
+//	else gn("microbitstate").className = "microbit ok";
 	Runtime.send();
 	HW.poll();
 	Runtime.run();

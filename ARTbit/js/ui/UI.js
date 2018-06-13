@@ -56,11 +56,10 @@ UI.resize = function(e) {
 	gn("contents").style.top =  dh + "px";
 	gn("contents").style.width = (w - gn("rightpanel").offsetWidth)+ "px";
 	gn("rightpanel").style.height = (h - dh)+ "px";
-	gn("lang").style.bottom =  "0px";
-	gn("lang").style.display =  "block";
 	gn("palette").style.height = (h - gn("grid").offsetTop - gn("grid").offsetHeight - dh - gn("shapesbar").offsetHeight)+ "px";
 	gn("alertdialog").style.top = Math.floor((h-292) / 2) + "px";
 	gn("alertdialog").style.left = Math.floor((w-670) / 2) + "px";
+	gn('playbutton').style.left = (gn('extratools').offsetLeft +  gn('extratools').offsetWidth) + "px";
 	Blockly.hideChaff(true);
   Blockly.svgResize(Code.workspace);	
 }
@@ -76,8 +75,12 @@ UI.checkState= function (e){
 		UI.downloadVM();
 		return;
 	}
-	if (gn("microbitstate").className != "microbit ok") HW.reopen();
-	else Code.download();
+	let key = gn("microbitstate").className.split(' ')[1];
+	switch (key) {
+		case 'ok': Code.download(); break; // download stacks to on brick VM
+		case 'badhex': UI.downloadVM(); break; // download the firmware
+		case 'fail': HW.reopen(); break; // try to re-connnect
+	}
 }
 
 UI.checkStatus = function (e){
@@ -98,7 +101,7 @@ UI.changeLang = function (e){
 		var hasValidName = UI.projectName && !UI.projectSamples[UI.projectName];	
 		var options = ['Français', "English"];
 		var optionfcns = ["loadFr", "loadEn"];
-		UI.openBalloon(e.target, "bottomleft",options, optionfcns);
+		UI.openBalloon(e.target, "topright", options, optionfcns);
 		gn('appmenu')[eventDispatch["start"]] = UI.doAction;
 	}
 }
@@ -113,7 +116,7 @@ UI.toggleMenu = function (e){
 		var hasValidName = UI.projectName && !UI.projectSamples[UI.projectName];	
 		var options = [menus["new"], menus["load"], menus["save"], menus["saveas"]];
 		var optionfcns = ["newProject", "loadProject", "doSave", "doSaveAs"];
-		UI.openBalloon(frame,"topdown", options, optionfcns);
+		UI.openBalloon(frame,"topleft", options, optionfcns);
 		gn('appmenu')[eventDispatch["start"]] = UI.doAction;
 	}
 }
@@ -151,11 +154,6 @@ UI.closeDropdown =  function (){if (gn('appmenu')) gn('appmenu').parentNode.remo
 ///////////////////
  
 UI.setupToolbar = function(p, tools){
-	for (var i=0; i < tools.length; i++) {
-		var ul =  newHTML("ul", undefined, p);
-		var li = newHTML("li", "icon " + tools[i], ul);
-		li.id = tools[i];
-	}
 	UI.selectTool(undefined);
 	gn('extratools')[eventDispatch["start"]] = UI.pressTool;
 	gn('extratools')[eventDispatch["end"]] = UI.releaseTool;
@@ -300,7 +298,8 @@ UI.save = function (fe){
 UI.openBalloon = function(p, type,  labels, fcns){
 	var mm = newHTML("div", 'dropdownballoon ' + type, p);
 	var barrow = newHTML("div", "menuarrow " + type, mm);
-	var mdd= newHTML("div", "dropdown " + Defs.lang, mm);
+	let csstype = type == 'topleft' ? "dropdown " + Defs.lang : 'dropdown en';
+	var mdd= newHTML("div",csstype, mm);
 	mm.setAttribute('id', 'appmenu');
 	for (var i=0; i < labels.length; i++) {
 		var ul =  newHTML("ul", undefined, mdd);
@@ -384,7 +383,6 @@ UI.downloadVM = function (){
   req.send(null);
 
 	function next1(){
-		console.log(req);
 	  if (req.readyState!=4) return;
 	  if (req.status!=200) return;
 		chrome.fileSystem.chooseEntry({type: 'saveFile', suggestedName: 'ARTbitVM.hex'}, next2)
@@ -397,10 +395,12 @@ UI.downloadVM = function (){
 		function next3(writer){
 			writer.onwriteend = next4; 
 			writer.write(blob);
-		}
-		function next4(){
-			writer.onwriteend=undefined; 
-			writer.truncate(blob.size);	
+
+			function next4(){
+				writer.onwriteend=undefined; 
+				writer.truncate(blob.size);	
+			}
+			
 		}
 	}
 }

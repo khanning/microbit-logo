@@ -64,7 +64,7 @@
 *.abouttext{
 	padding: 0px 20px 0px;
 	margin: 0 auto 0;
-	line-height: 24px;
+	line-height: 48px;
 }
 
 *.sbtext{
@@ -75,7 +75,7 @@
 }
 
 *.versiontext{
-	padding: 20px 0px 0px;
+	padding: 30px 0px 0px;
 	margin: 0 auto 0;
 	width:260px;
 	text-align: center;
@@ -83,9 +83,6 @@
 	font-size: 12px;
   color: #909396;
 }
-
- span.kcjcolor{color:  #52ade1;}
- span.picocolor{color:  #f6891f;}
 
 *.alertactions {
 	position: relative;
@@ -133,24 +130,16 @@
 	background:  url('../assets/about/ARTbit.svg') no-repeat center center; 
 }
 
-*.logoicon {
+*.line1 {
 	position: relative;
 	display: inline-block;
-  margin: 0;
+  margin: 0 auto 0;
   padding: 0;
   vertical-align: baseline;
-	height: 26px;
-	line-height: 36px;
-}
-
-*.logoicon.kcj {
-	width: 38px;
-  background: url('../assets/about/kcjsmall.svg') no-repeat center center; 
-}
-
-*.logoicon.pico {
-	width: 38px;
-  background: url('../assets/about/picosmall.svg') no-repeat right center; 
+	line-height: 48px;
+	width: 630px;
+	height: 48px;
+  background: url('../assets/about/line1.svg') no-repeat center center; 
 }
 
 *.buttonhidden{
@@ -170,6 +159,6 @@
 
 *.button:hover{
 	border: 1px solid  rgba(0,0, 0, 0.1);
-	background: #52ade1;
+	background: #3BB2F7;
 	color: #fff;
 }

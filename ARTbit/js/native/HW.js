@@ -38,7 +38,7 @@ HW.setup = function (){
 
 HW.reopen = function(){
 	chrome.serial.getConnections(closeStrayPorts);
- 	gn('microbitstate').className = "microbit connecting"
+ 	gn("microbitstate").className = "microbit connecting"
  	HW.comms.openSerialPort(doNext)
  	
  	function doNext(port){
@@ -47,7 +47,7 @@ HW.reopen = function(){
  	}
  	
  	function whenDone(str){
- 		if (str=="fail") gn('microbitstate').className = "microbit fail";
+ 		if (str=="fail") gn("microbitstate").className = "microbit fail";
  		else HW.fetchVersionNumber();
  		setTimeout(Runtime.startTimer, 500)	
  	}	
@@ -55,7 +55,7 @@ HW.reopen = function(){
  	function showversion (l){gn('fwversion').textContent =  l.join(".");}
 
  	function closeStrayPorts(l){
- 		for(var i=0;i<l.length;i++) HW.serialDisconnec(l[i].connectionId);
+ 		for(var i=0;i<l.length;i++) HW.serialDisconnect(l[i].connectionId);
  	}
 }
 
@@ -72,12 +72,12 @@ HW.fetchVersionNumber = function (){
   setTimeout (function () {HW.getVersion(showversion);}, 520);
  
  function notTheRightHex(){ 		
- 	HW.serialDisconnect(HW.comms.serialID, function (){gn('microbitstate').className = "microbit badhex";});
+ 	HW.serialDisconnect(HW.comms.serialID, function (){gn("microbitstate").className = "microbit badhex";});
  	HW.comms.serialID = undefined;
  }	
  
  function showversion (l){
- 	gn('microbitstate').className = "microbit ok";
+ 	gn("microbitstate").className = "microbit ok";
  	if (HW.timeout) clearTimeout (HW.timeout);
  	HW.timeout = undefined;
  	gn('fwversion').textContent =  l.join(".");
@@ -85,12 +85,11 @@ HW.fetchVersionNumber = function (){
 
 }
 
-
 HW.onReceiveError = function (err){
 	HW.comms.serialID = undefined;
 	Runtime.stopThreads(Code.scripts);
-	console.warn ("onReceiveError", err);
-	gn('microbitstate').className = "microbit fail";
+	console.log ("onReceiveError", err);
+	gn("microbitstate").className = "microbit fail";
 	gn('fwversion').textContent = '';
 }
 

@@ -14,7 +14,7 @@
 		"menu": {
 			"new": "Nouveau",
 			"load": "Ouvrir",
-			"save": "Sauvegarder",
+			"save": "Enregistrer",
 			"saveas": "Enregistrer sous"
 		},
 		 "blocks": {

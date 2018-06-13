@@ -46,7 +46,7 @@ fieldset, legend, object, embed {
 	left:0;
 	height: 64px;
 	width: 100%;
-	background: #52ade1;
+	background: #3BB2F7;
 	border-bottom: 1px solid #ccc;
 	border-right: 1px solid #ccc;
 }
@@ -75,8 +75,9 @@ fieldset, legend, object, embed {
 	position: absolute;
 	left: 0px;
 	margin: 6px;
+	margin-top: 8px;
 	margin-left: 10px;
-	width: 48px;
+	width: 108px;
 	height: 48px;
 	padding: 0;
 	background: url('../assets/about.svg') no-repeat center center;
@@ -85,8 +86,9 @@ fieldset, legend, object, embed {
 
 #filemenu {
 	position: absolute;
-	left: 72px;
+	left: 130px;
 	margin: 6px;
+	margin-top: 8px;
 	width: 48px;
 	height: 48px;
 	padding: 0;
@@ -95,16 +97,15 @@ fieldset, legend, object, embed {
 
 #lang {
 	position: absolute;
-	display: none;
-	left: 0px;
-	bottom: 0px
+	right: 10px;
+	top: 0px
 	margin: 6px;
-	width: 72px;
+	margin-top: 8px;
+	width: 48px;
 	height: 48px;
 	padding: 0;
 	z-index: 1000;
-	border-top: 1px solid #D4D4D4;
-	background: #ffffff url('../assets/lang.svg') no-repeat center center;
+	background: url('../assets/lang.svg') no-repeat center center;
 }
 
 #topbar  *.microbit {
@@ -118,7 +119,7 @@ fieldset, legend, object, embed {
 
 #playbutton {
 	position: absolute;
-	right: 0px;
+	left: 600px;
 	margin: 6px;
 	margin-top: 8px;
 	width: 48px;
@@ -282,14 +283,14 @@ fieldset, legend, object, embed {
   z-index: 10000;
 }
 
-.dropdownballoon.topdown {
+.dropdownballoon.topleft {
   top: 50px;
-  left: 72px;
+  left: 142px;
 }
 
-.dropdownballoon.bottomleft {
-  bottom: 110px;
-  left: 72px;
+.dropdownballoon.topright {
+  top: 50px;
+  right: 100px;
 }
 
 .dropdown { 
@@ -316,7 +317,7 @@ fieldset, legend, object, embed {
   height: 49px;
   vertical-align: middle;
   font-weight: normal;
-  color: #52ade1;
+  color: #3BB2F7;
   z-index: 1000; 
   cursor: default;
 }
@@ -334,26 +335,26 @@ fieldset, legend, object, embed {
  }​
 
 .dropdown li.selectmenu {
-  background-color: #52ade1;
+  background-color: #3BB2F7;
   color: #FFF;
   cursor: pointer;
 }
 
 .dropdown li:hover {
-  background-color:  #52ade1;
+  background-color:  #3BB2F7;
   color: #FFF;
   margin: 0px;
   cursor: pointer;
 }
 
 .dropdown li:active {
-  background-color:  #52ade1;
+  background-color:  #3BB2F7;
   color: #FFF;
   cursor: pointer;
 }
 
 .dropdown ul li.divider {
-  border-top: 1px solid #52ade1;
+  border-top: 1px solid #3BB2F7;
   height: 1px;
   margin: 0px;
   margin: 0px 0px 0px;
@@ -367,20 +368,18 @@ fieldset, legend, object, embed {
 	height: 16px;
 	background: #fff;
 	z-index: 200; 	
+		top: 0px;
+		-webkit-transform: rotate(45deg);
+	-webkit-box-shadow: -1px -1px 0px rgba(0,0, 0, 0.2);
 }
 
-*.menuarrow.topdown {
-	top: 0px;
+*.menuarrow.topleft {
 	left: 16px;
-	-webkit-transform: rotate(45deg);
-	-webkit-box-shadow: -1px -1px 0px rgba(0,0, 0, 0.2);
+
 }
 
-*.menuarrow.bottomleft {
-	top: 70px;
-	left: -8px;
-	-webkit-transform: rotate(-45deg);
-	-webkit-box-shadow: -1px -1px 0px rgba(0,0, 0, 0.2);
+*.menuarrow.topright {
+	left: 72px;
 }
 
 *.menuarrow.up {}
@@ -474,7 +473,7 @@ fieldset, legend, object, embed {
 	width: 128px;
 	height: 128px;
 	-webkit-border-radius: 8px;
-  border: 2px solid #52ade1;
+  border: 2px solid #3BB2F7;
   opacity: 0.75;
 	background:  #fff;
 }
@@ -517,7 +516,7 @@ fieldset, legend, object, embed {
   font-weight: bold;
   line-height: 48px;
 	width: 100%;
-	background: #52ade1;
+	background: #3BB2F7;
 	text-shadow:  0px -1px rgba(0,0,0, 0.2);
 }
 
@@ -585,7 +584,7 @@ fieldset, legend, object, embed {
 }
 
 .thumbslot.selected > .thumbimg {
-	 border: 4px solid #52ade1;
+	 border: 4px solid #3BB2F7;
 	 padding: 0px;
 	}
 
