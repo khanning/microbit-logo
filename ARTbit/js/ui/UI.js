@@ -245,7 +245,6 @@ UI.changeLanguageTo = function (str){
 	function doTranslate (){
 		Code.workspace.dispose();
 		Code.reset(content);
-		UI.cleanUndo ();
 		gn('nametag').textContent = Defs.translation["editor"]["shapes"];
 	}
 }
@@ -342,17 +341,28 @@ UI.loadProject = function (e){
   }
 }
 	
+
+	
 UI.loadXML = function (str, whenDone){ 
 //	console.log(str) 
 	var data = str.split("\n")
-	ShapeEditor.shapes =  data[1] == "" ? [] : JSON.parse(data[1]);
-	var xml = Blockly.Xml.textToDom([data]);
-	Blockly.Xml.domToWorkspace(xml, Code.workspace);
-  ShapeEditor.displayAll(); 
-  ShapeEditor.unfocus();
-  if (whenDone) whenDone()
-}
+	try {
+		ShapeEditor.shapes =  data[1] == "" ? [] : JSON.parse(data[1]);
+		var xml = Blockly.Xml.textToDom([data]);
+		Blockly.Xml.domToWorkspace(xml, Code.workspace);
+  	ShapeEditor.displayAll(); 
+  	ShapeEditor.unfocus();
+ 	 	if (whenDone) whenDone()
+	} catch(e){
+		console.log (e)
+		ShapeEditor.shapes = [[0,0,4,0,0], [0,14,10,14,0], [31, 17,17,17, 31]];
+  	ShapeEditor.displayAll(); 
+  	ShapeEditor.unfocus();
+		whenDone();
+	}
 
+}
+	
 UI.getProjectContents = function (){
 	var xml = Blockly.Xml.workspaceToDom(Code.workspace, true);
 	var str =  Blockly.Xml.domToText(xml);

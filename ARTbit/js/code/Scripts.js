@@ -126,7 +126,7 @@ class Scripts {
 			var t =  new Thread(this, block);
 			var token=Prim[block.opcode];			
 			var value = t.getArgs (block);
-			var str = Number(value.toString()).toString() == "NaN" ? value.toString() : value.trim(2).toString()
+			var str = value == undefined ? "?" :  Number(value.toString()).toString() == "NaN" ? value.toString() : value.trim(2).toString()
 			Code.workspace.reportValue(id, str);	
 		}  
 		else  Runtime.addScript(this, block)

@@ -23,8 +23,8 @@ HW = function(){}
 HW.compiler = new Compiler();
 HW.comms = new Comms();
 
-HW.state = {acount:0, bcount:0, apressed: false, bpressed: false, abpressed: false};
-//, recc: 255, tilts: {x: undefined, y: undefined, z: undefined, w: undefined}};
+HW.state = {acount:0, bcount:0, apressed: false, bpressed: false, abpressed: false, 
+						recc: 255, tilts: {x: undefined, y: undefined, z: undefined, w: undefined}};
 HW.shape = [0,0,0,0,0];
 HW.messages = [];
 HW.brightness = 100;

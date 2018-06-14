@@ -69,7 +69,11 @@ Code.reset = function (str){
 	Code.flyoutworkspace.addChangeListener(Code.blockListenerFlyout);
 	Code.blocklyOverrides();	
 	Code.updatePalette();
-	UI.loadXML(str);
+	UI.loadXML(str, whenDone);
+	function whenDone(){
+  	Code.updatePalette()	
+  	UI.cleanUndo();
+  }
 }		
 		
 Code.updatePalette = function (){

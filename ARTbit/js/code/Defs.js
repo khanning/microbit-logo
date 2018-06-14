@@ -100,7 +100,7 @@ Defs = function(){}
 		["bpressed","r","sensing", "bpressed"], 	
 		["accx","r","sensing", "tilt"],  	
 		["timer","r","sensing", "timer"],  	
-		["resett","r","sensing", "resett"],  	
+		["resett","c","sensing", "resett"],  	
 			
 		["add","r","operators", "%d..num1 + %d..num2"],  			
 		["subtract","r","operators", "%d..num1 - %d..num2"],  			
