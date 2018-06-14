@@ -536,6 +536,10 @@ Prim.toBool = function (value) {
     return Boolean(value);
 };
 
-Prim.isInt = function (val) {return val.indexOf('.') < 0;};
+Prim.isInt = function (val) {
+	let n = Number (val);
+	if (isNaN(n)) return true; // strings are consider ints
+	return n.toString().indexOf('.') < 0;
+};
 
 

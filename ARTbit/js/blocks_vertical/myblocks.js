@@ -149,6 +149,7 @@ Blockly.Blocks['myblocks_definition'] = {
           case "t": 
             var val = val ? val : "";
   	 				var fcn =	function(option) {
+  	 						if (ws.isFlyout) return '    ';
   	 						var last  = ws.undoStack_[ws.undoStack_.length - 1]
   	 						// remove the typing from the undo stack
   	 						if (last && (last.type == "change") && (b.id == last.blockId) &&

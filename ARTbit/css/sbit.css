@@ -633,7 +633,17 @@ fieldset, legend, object, embed {
 
 
 /* blockly overrides*/
-
+  .valueReportBox {
+    min-width: 50px;
+    max-width: 300px;
+    max-height: 200px;
+    overflow: auto;
+    word-wrap: break-word;
+    text-align: center;
+    font-family: "Helvetica Neue", Helvetica, sans-serif;
+    font-size: 1.2em;
+  }
+  
   .scratchCategoryMenu {
     width: 72px;
     background: $colour_toolbox;
