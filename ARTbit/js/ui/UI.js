@@ -79,6 +79,7 @@ UI.checkState= function (e){
 	switch (key) {
 		case 'ok': Code.download(); break; // download stacks to on brick VM
 		case 'badhex': UI.downloadVM(); break; // download the firmware
+		case 'connecting': 
 		case 'fail': HW.reopen(); break; // try to re-connnect
 	}
 }
@@ -106,7 +107,6 @@ UI.changeLang = function (e){
 	}
 }
 
-	
 UI.toggleMenu = function (e){
 	e.preventDefault();
 	e.stopPropagation();
@@ -147,7 +147,6 @@ UI.cleanUndo = function (){
 }
 
 UI.closeDropdown =  function (){if (gn('appmenu')) gn('appmenu').parentNode.removeChild(gn('appmenu'))}
-
 
 ///////////////////
 // Tools
@@ -195,7 +194,6 @@ UI.updateToolsState = function(t){
 		else mt.className = (mt == t) ? "icon "+  mt.id+" on": "icon "+  mt.id;
  }
 }
-
 
 ///////////////////
 // NEW
@@ -262,7 +260,8 @@ UI.doSaveAs = function (e){
 
 UI.saveAs = function (name){	
 	Runtime.stopThreads(Code.scripts);
-	chrome.fileSystem.chooseEntry({type: "saveFile", suggestedName: name}, next1)
+	let attr = {type: "saveFile", suggestedName: name, accepts: [{description: 'art:bit projects (*.txt)', mimeTypes: ['text/plain'], extensions: ['txt']}]};        
+	chrome.fileSystem.chooseEntry(attr, next1)
 	function next1(fe){
 	 	if(chrome.runtime.lastError) console.warn(chrome.runtime.lastError.message);
 		if(fe!=undefined){
@@ -320,7 +319,8 @@ UI.loadProject = function (e){
 	Runtime.stopThreads(Code.scripts);
   var fr = new FileReader();
   fr.onload = function(e){doNext(e.target.result)};
-  chrome.fileSystem.chooseEntry({type: 'openFile'}, next)
+  let attr = {type: "openFile", accepts: [{description: 'art:bit projects (*.txt)', mimeTypes: ['text/plain'], extensions: ['txt']}]}     
+  chrome.fileSystem.chooseEntry(attr, next)
 	function next(fe){	
 		 if(chrome.runtime.lastError) console.warn(chrome.runtime.lastError.message);
 		 if(fe!=undefined) {
@@ -341,20 +341,26 @@ UI.loadProject = function (e){
   }
 }
 	
-
-	
 UI.loadXML = function (str, whenDone){ 
 //	console.log(str) 
 	var data = str.split("\n")
 	try {
-		ShapeEditor.shapes =  data[1] == "" ? [] : JSON.parse(data[1]);
-		var xml = Blockly.Xml.textToDom([data]);
-		Blockly.Xml.domToWorkspace(xml, Code.workspace);
-  	ShapeEditor.displayAll(); 
-  	ShapeEditor.unfocus();
- 	 	if (whenDone) whenDone()
+		let watermark = data[0].split(" ");
+		if (watermark[0] != "art:bit") loadempty();
+		else {
+			let code = data [1];
+			var xml = Blockly.Xml.textToDom([code]);
+			ShapeEditor.shapes =  data[2] == "" ? [] : JSON.parse(data[2]);
+			Blockly.Xml.domToWorkspace(xml, Code.workspace);
+  		ShapeEditor.displayAll(); 
+  		ShapeEditor.unfocus();
+ 	 		if (whenDone) whenDone()
+		}
 	} catch(e){
 		console.log (e)
+		loadempty();
+	}
+	function loadempty(){
 		ShapeEditor.shapes = [[0,0,4,0,0], [0,14,10,14,0], [31, 17,17,17, 31]];
   	ShapeEditor.displayAll(); 
   	ShapeEditor.unfocus();
@@ -365,11 +371,13 @@ UI.loadXML = function (str, whenDone){
 	
 UI.getProjectContents = function (){
 	var xml = Blockly.Xml.workspaceToDom(Code.workspace, true);
-	var str =  Blockly.Xml.domToText(xml);
+	let str = "art:bit 1.0";
+	str +="\n"
+	str +=  Blockly.Xml.domToText(xml);
 	str +="\n"
 	str += JSON.stringify(ShapeEditor.shapes)
 	str +="\n"
-	return str
+	return str;
 }
 
 /*blockly overrrides */
@@ -495,8 +503,16 @@ UI.restoreState = function(obj, isRedo){
 
 UI.getStackState = function(type){
 	if (Code.workspace[type+"Stack_"].length > 0) return true;
-	if (UI[type+"Stack"].length > 0 ) return true;
-	return false;
+	if (UI[type+"Stack"].length == 0) return false;
+	if ((Code.workspace[type+"Stack_"].length == 0) && stackNotEditor(UI[type+"Stack"])) return false;
+	return (UI[type+"Stack"].length > 0 );
+	
+	function stackNotEditor(list){
+		for (let i=0; i< list.length; i++) {
+			if (list[i].isEditor) return false;
+		}
+		return true;
+	}	
 }
 
 

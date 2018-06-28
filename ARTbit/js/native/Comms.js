@@ -156,9 +156,13 @@ openSerialPort(fcn){
 		return false;
 	}
 
-
 	function connected(r){
 //		console.log(r);
+		if (!r) {
+			if(!chrome.runtime.lastError) console.log('not connected', r);
+			if (fcn) fcn(null);
+			return;
+		}
 		t.serialID = r.connectionId;
 		t.packet = [];
 		t.respfcns = {};

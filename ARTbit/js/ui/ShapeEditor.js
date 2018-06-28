@@ -149,6 +149,7 @@ ShapeEditor.clone =  function (n){  // prim
 			
 ShapeEditor.getShapeData =  function (data){  // prim
 	let n = data.n ? data.n : 0;
+	if (ShapeEditor.shapes.length == 0) return [0,0,0,0,0];
 	if ((data.dx == 0) && (data.dy == 0)) return ShapeEditor.shapes[n];
 	else if (data.dx != 0) return ShapeEditor.interPolateHorizontal(n, data.dx)
 	else return ShapeEditor.interPolateVertical(n, data.dy)
