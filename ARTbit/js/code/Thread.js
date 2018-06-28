@@ -74,12 +74,10 @@ class Thread {
 	}
 
 	restart () {
-		if (this.onblock) Runtime.unglowBlock(this, this.onblock);
-		this.onblock = null;
+		Runtime.stopThread(this);
 		this.isRunning = true;
 		this.thisblock = this.firstBlock;
-		this.waitfcn= undefined;
-		this.stack=[];
+		this.startGlow();
 	}
 	 
 	getProcStack () {

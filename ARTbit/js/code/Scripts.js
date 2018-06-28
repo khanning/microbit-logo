@@ -126,19 +126,24 @@ class Scripts {
 			var t =  new Thread(this, block);
 			var token=Prim[block.opcode];			
 			var value = t.getArgs (block);
-			var str = value == undefined ? "?" :  Number(value.toString()).toString() == "NaN" ? value.toString() : value.trim(2).toString()
+			var str = getValue(value)
 			Code.workspace.reportValue(id, str);	
 		}  
-		else  Runtime.addScript(this, block)
+		else Runtime.addScript(this, block)
+		function getValue(v){
+			if (v == undefined) return "?";
+			if (Number(v.toString()).toString() != "NaN") return v.trim(2).toString();
+			if (v == "?") return v;
+			else return Defs.translation['editor'][v];
+		}
 	}	
-	
 	
 	cutBlocks (id){
 		let topblockID = this.blocksContainer.getTopLevelScript(id)
 		let block = this.blocksContainer.getBlock(id);
-		if (!block) return
+		if (!block) return;
 		 // PB  under the hood dispose
-		 Code.workspace.blockDB_[id].dispose()
+		 Code.workspace.blockDB_[id].dispose();
 	}
 	
 	deleteBlocks (id, whenDone){
@@ -198,7 +203,6 @@ class Scripts {
 // Sensing
 ////////////////////////
 		
-
 triggerButton (type){
 	let strips = []
 	let hats = {"apressed": "onbuttona", 
@@ -209,7 +213,6 @@ triggerButton (type){
 	this[type] = HW.state[type];
 	return strips;
 }
-
 
 triggerBroadast (type){
 	var blocks = [];
@@ -225,8 +228,6 @@ triggerBroadast (type){
 	return blocks;
 }
 
-
-		
 ////////////////////////
 // Stacks to string
 ////////////////////////

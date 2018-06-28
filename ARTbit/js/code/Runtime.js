@@ -144,7 +144,7 @@ Runtime.runPrim = function() {
 //	console.log (timer(), "runPrim", (typeof b)=='string' ? b : b.opcode);
 	if((typeof b)=='string') Prim[b]();
 	else {
-		if (!Runtime.thread.getBlock(b.id)) Runtime.thread.cancel()
+		if (!Runtime.thread.getBlock(b.id)) Runtime.stopThread(Runtime.thread);
 		else Runtime.runBlock(b);
 	}
 }
@@ -208,14 +208,14 @@ Runtime.restartThread = function (newThread) {
       wasRunning = true;
       notSpecial = newThread.firstBlock.opcode.indexOf('events_onbutton') < 0; 
      	thread.isRunning = notSpecial;
-     	if (notSpecial) thread.thisblock = thread.firstBlock;
-      else thread.thisblock = undefined;
+     	if (notSpecial) thread.restart();
+      else Prim.cancelThread(thread);
     }
   }
   if (!wasRunning) {
-  	 Runtime.threadsRunning.push(newThread);
-  	 newThread.startGlow();
-  	}
+  	Runtime.threadsRunning.push(newThread);
+  	newThread.startGlow();
+  }
 }
 
 Runtime.stopThread = function (thread) {

@@ -20,6 +20,7 @@
  
 HW = function(){}
 
+HW.requiredFW = "1.13";
 HW.compiler = new Compiler();
 HW.comms = new Comms();
 
@@ -72,21 +73,32 @@ HW.fetchVersionNumber = function (){
   setTimeout (function () {HW.getVersion(showversion);}, 520);
  
  function notTheRightHex(){ 		
- 	HW.serialDisconnect(HW.comms.serialID, function (){gn("microbitstate").className = "microbit badhex";});
+ 	if (!HW.comms.serialID)	return;
+ 	else HW.serialDisconnect(HW.comms.serialID, function (){gn("microbitstate").className = "microbit badhex";});
  	HW.comms.serialID = undefined;
  }	
  
  function showversion (l){
- 	gn("microbitstate").className = "microbit ok";
- 	if (HW.timeout) clearTimeout (HW.timeout);
+  if (HW.timeout) clearTimeout (HW.timeout);
  	HW.timeout = undefined;
- 	gn('fwversion').textContent =  l.join(".");
- }
+ 	if (l == 'fail') gn("microbitstate").className =  "microbit fail";
+ 	else {
+ 		let version = l.join(".");
+ 		if (HW.requiredFW != version) notTheRightHex();
+ 		else gotTheRightHex(version);
+ 		}
+ 	}
 
+ function gotTheRightHex(version){ 
+	 gn("microbitstate").className = "microbit ok";
+	 gn('fwversion').textContent =  version;
+ }
 }
 
 HW.onReceiveError = function (err){
 	HW.comms.serialID = undefined;
+	HW.state = {acount:0, bcount:0, apressed: false, bpressed: false, abpressed: false, 
+						  recc: 255, tilts: {x: undefined, y: undefined, z: undefined, w: undefined}};
 	Runtime.stopThreads(Code.scripts);
 	console.log ("onReceiveError", err);
 	gn("microbitstate").className = "microbit fail";
@@ -158,7 +170,8 @@ HW.gotPollPacket = function (l){
 }
 
 HW.getVersion = function (doNext){
-	HW.comms.sendReceive([0xff], doNext);
+	if (!HW.comms.serialID)  doNext ('fail')
+	else HW.comms.sendReceive([0xff], doNext);
 }
 
 function array2float(l){

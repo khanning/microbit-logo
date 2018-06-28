@@ -17,6 +17,8 @@
 			"save": "Enregistrer",
 			"saveas": "Enregistrer sous"
 		},
+		 "true": "vrai",
+		 "false": "faux",
 		 "blocks": {
 			"clean": "éteindre tout",
 			"setshape": "afficher forme %1",

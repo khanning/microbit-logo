@@ -48,6 +48,13 @@ Prim.doClean = function (){
 	t.thisblock = undefined;		
 }
 
+Prim.cancelThread = function (t){
+	Prim.currentShape = {n: undefined, dx:0, dy: 0}
+	HW.shape = [0,0,0,0,0];
+	Runtime.stopThread(t);
+	t.thisblock = undefined;	
+}
+ 
 Prim.missing  = function (){ 
 	var thread =  Runtime.thread;
 	var b = thread.thisblock;
@@ -199,7 +206,7 @@ Prim.control_waituntil = function (){
 	var b = t.thisblock;
 	var args = t.getArgs(b);
 	if (Prim.toBool(args.CONDITION)) Prim.doNext();
-	else Runtime.yield=true;
+	Runtime.yield=true;
 }
 
 Prim.control_repeatuntil = function (){		
