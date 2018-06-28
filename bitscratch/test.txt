@@ -1,20 +1,15 @@
 to on-buttona
-stopothers
 setshape 1
-repeat 9 
- [repeat 5 [scrolll]
-  wait .5]
-clear
+print 111
+wait .2
+waituntil [buttona]
+print 222
+wait .2
+print 333
 end
 
 to on-buttonb
-stopothers
-if eq shape 0 [setshape 4]
-nextshape
-repeat 9 
- [repeat 5 [scrollu]
-  wait .5]
-clear
+clean
 end
 
 
