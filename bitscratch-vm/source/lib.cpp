@@ -21,6 +21,7 @@ extern MicroBitStorage flash;
 extern MicroBitSerial pc;
 
 void uputc(uint8_t);
+void ble_putc(uint8_t);
 
 void mwait(int32_t);
 void setshape(int32_t);
@@ -492,7 +493,7 @@ int rrecc(){int c=recvchar; recvchar=-1; return c;}
 int rpeek(){return recvchar;}
 
 int radiorecv(){
-  uint8_t c;
+  uint8_t c=0;
   radio.idleTick();
   int len = radio.datagram.recv(&c, 1);
   if(len==MICROBIT_INVALID_PARAMETER) return -1;
@@ -526,6 +527,14 @@ void send_io_state(){
   uputc(0xed);
 }
 
+void ble_io_state(){
+  int32_t acc = accmag();
+  ble_putc(0xf5);
+  ble_putc(buttona.isPressed());
+  ble_putc(buttonb.isPressed());
+  ble_putc(acc&0xff);
+  ble_putc((acc>>8)&0xff);
+}
 
 
 void(*libprims[])() = {

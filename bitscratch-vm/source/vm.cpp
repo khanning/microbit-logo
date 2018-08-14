@@ -2,8 +2,8 @@
 
 #define procs 0x30000
 #define code ((uint8_t*)procs)
-#define NSTACKS 16
-#define STACKLEN 128
+#define NSTACKS 10
+#define STACKLEN 64
 int32_t stacks[NSTACKS*STACKLEN];
 
 #define OP_ONSTART 5
