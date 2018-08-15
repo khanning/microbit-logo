@@ -20,8 +20,8 @@ MicroBitRadio radio;
 extern MicroBitStorage flash;
 extern MicroBitSerial pc;
 
-void uputc(uint8_t);
-void ble_putc(uint8_t);
+void putc(uint8_t);
+void usb_putc(uint8_t);
 
 void mwait(int32_t);
 void setshape(int32_t);
@@ -138,17 +138,17 @@ void flasherase(uint32_t* addr){flash.flashPageErase(addr);}
 
 
 /////////////////////////////////
-// 
+//
 // Serial Printing Primitives
 //
 /////////////////////////////////
 
 void sendprbuf(){
   int len = strlen(prbuf);
-  uputc(0xf0);
-  uputc(len);
-  for(int i=0;i<len;i++) uputc(prbuf[i]);
-  uputc(0xed);
+  usb_putc(0xf0);
+  usb_putc(len);
+  for(int i=0;i<len;i++) usb_putc(prbuf[i]);
+  usb_putc(0xed);
 }
 
 void printnum(int32_t n){
@@ -201,7 +201,7 @@ void prim_prf(){
 
 
 /////////////////////////////////
-// 
+//
 // Timer Primitives
 //
 /////////////////////////////////
@@ -225,7 +225,7 @@ void prim_ticks(){
 
 
 /////////////////////////////////
-// 
+//
 // Shape Primitives
 //
 /////////////////////////////////
@@ -282,7 +282,7 @@ void prim_setshape(){
   int32_t len = nshapes();
   n%=len;
   if(n<0) n+=len;
-  setshape(n+1); 
+  setshape(n+1);
   vm_wait(pace);
 }
 
@@ -290,7 +290,7 @@ void prim_shape(){
   vm_push(thisshape);
 }
 void prim_clear(){
-  clear(); 
+  clear();
 //  vm_wait(pace);
 }
 
@@ -306,7 +306,7 @@ void prim_prevshape(){
 
 
 /////////////////////////////////
-// 
+//
 // Scrolling Primitives
 //
 /////////////////////////////////
@@ -406,7 +406,7 @@ void prim_scroll_u(){
 
 
 /////////////////////////////////
-// 
+//
 // Display Primitives
 //
 /////////////////////////////////
@@ -448,7 +448,7 @@ void prim_dotoff(){
 
 
 /////////////////////////////////
-// 
+//
 // I/O Primitives
 //
 /////////////////////////////////
@@ -508,34 +508,23 @@ void prim_rsend(){
   rsend((uint8_t)vm_pop());
 }
 
-void uputc16(int32_t n){
-  uputc(n&0xff);
-  uputc((n>>8)&0xff);
+void putc16(int32_t n){
+  putc(n&0xff);
+  putc((n>>8)&0xff);
 }
 
 void send_io_state(){
-  pollinhibit = 40;  // about 2 seconds
-  uputc(0xf5);
-  uputc(11);
-  uputc(buttona.isPressed());
-  uputc(buttonb.isPressed());
-  uputc(pollrecv); pollrecv=-1;
-  uputc16(accx());
-  uputc16(accy());
-  uputc16(accz());
-  uputc16(accmag());
-  uputc(0xed);
+  putc(0xf5);
+  putc(11);
+  putc(buttona.isPressed());
+  putc(buttonb.isPressed());
+  putc(pollrecv); pollrecv=-1;
+  putc16(accx());
+  putc16(accy());
+  putc16(accz());
+  putc16(accmag());
+  putc(0xed);
 }
-
-void ble_io_state(){
-  int32_t acc = accmag();
-  ble_putc(0xf5);
-  ble_putc(buttona.isPressed());
-  ble_putc(buttonb.isPressed());
-  ble_putc(acc&0xff);
-  ble_putc((acc>>8)&0xff);
-}
-
 
 void(*libprims[])() = {
   prim_print, prim_prs, prim_prf,

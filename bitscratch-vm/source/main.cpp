@@ -5,7 +5,7 @@
 #define MAJOR_VERSION 2
 #define MINOR_VERSION 0
 
-MicroBitSerial pc(USBTX, USBRX, 200);
+MicroBitSerial usb_uart(USBTX, USBRX, 200);
 MicroBitStorage storage;
 MicroBitFlash flash;
 MicroBitMessageBus messageBus;
@@ -17,11 +17,6 @@ MicroBitUARTService *ble_uart;
 void lib_init(void);
 void direct_setshape(uint8_t,uint8_t,uint8_t,uint8_t,uint8_t);
 void setbrightness(int32_t);
-
-uint8_t ugetc(){return pc.read(SYNC_SPINWAIT);}
-int ugetcAsync(){return pc.read(ASYNC);}
-void uputc(uint8_t c){pc.sendChar(c, SYNC_SPINWAIT);}
-void ble_putc(uint8_t c){ble_uart->putc(c);}
 
 void vm_start(uint8_t);
 void vm_run(void);
@@ -36,7 +31,6 @@ void print(int32_t);
 int rpeek(void);
 void rsend(uint8_t);
 void send_io_state(void);
-void ble_io_state(void);
 extern int btna_evt, btnb_evt, btnab_evt, radio_evt;
 extern volatile int32_t ticks;
 extern int pollinhibit;
@@ -50,6 +44,13 @@ void prs(uint8_t*);
 #define OP_ONFLAG 0xF0
 
 uint8_t code[128];
+int usb_comms=0, ble_comms=0;
+
+uint8_t usb_getc(){return usb_uart.read(SYNC_SPINWAIT);}
+int ugetcAsync(){return usb_uart.read(ASYNC);}
+void usb_putc(uint8_t c){usb_uart.sendChar(c, SYNC_SPINWAIT);}
+void ble_putc(uint8_t c){ble_uart->putc(c);}
+
 
 uint8_t ble_getc(){
     while(1){
@@ -58,8 +59,19 @@ uint8_t ble_getc(){
     }
 }
 
+void putc(uint8_t c){
+	if(usb_comms) usb_putc(c);
+	else if(ble_comms) ble_putc(c);
+}
+
+uint8_t getc(){
+	if(usb_comms) return usb_getc();
+	else if(ble_comms) return ble_getc();
+	return 0;
+}
+
 void init(){
-    pc.baud(19200);
+    usb_uart.baud(19200);
     scheduler_init(messageBus);
     microbit_create_heap(MICROBIT_SD_GATT_TABLE_START + MICROBIT_SD_GATT_TABLE_SIZE, MICROBIT_SD_LIMIT);
     ManagedString BLEName("art:bit v2");
@@ -69,55 +81,55 @@ void init(){
 }
 
 uint32_t read16(){
-    uint8_t c1 = ugetc();
-    uint8_t c2 = ugetc();
+    uint8_t c1 = getc();
+    uint8_t c2 = getc();
     return (c2<<8)+c1;
 }
 
 uint32_t read32(){
-    uint8_t c1 = ugetc();
-    uint8_t c2 = ugetc();
-    uint8_t c3 = ugetc();
-    uint8_t c4 = ugetc();
+    uint8_t c1 = getc();
+    uint8_t c2 = getc();
+    uint8_t c3 = getc();
+    uint8_t c4 = getc();
     return (c4<<24)+(c3<<16)+(c2<<8)+c1;
 }
 
 void sendresponse(uint8_t resp){
-    uputc(resp);
-    uputc(0);
-    uputc(0xed);
+    putc(resp);
+    putc(0);
+    putc(0xed);
 }
 
 void ping(){
-    uputc(0xff);
-    uputc(2);
-    uputc(MAJOR_VERSION);
-    uputc(MINOR_VERSION);
-    uputc(0xed);
+    putc(0xff);
+    putc(2);
+    putc(MAJOR_VERSION);
+    putc(MINOR_VERSION);
+    putc(0xed);
 }
 
 void readmemory(){
     uint32_t addr = read32();
-    uint32_t count = ugetc();
+    uint32_t count = getc();
     uint32_t i;
-    uputc(0xfe);
-    uputc(count);
-    for(i=0;i<count;i++) uputc(*((uint8_t*) addr++));
-    uputc(0xed);
+    putc(0xfe);
+    putc(count);
+    for(i=0;i<count;i++) putc(*((uint8_t*) addr++));
+    putc(0xed);
 }
 
 void writememory(){
     uint32_t addr = read32();
-    uint32_t count = ugetc();
+    uint32_t count = getc();
     uint32_t i;
-    uputc(0xfd);
-    uputc(count);
+    putc(0xfd);
+    putc(count);
     for(i=0;i<count;i++){
-        uint8_t c = ugetc();
+        uint8_t c = getc();
         *((uint8_t*) addr++)=c;
-        uputc(c);
+        putc(c);
     }
-    uputc(0xed);
+    putc(0xed);
 }
 
 void writeflash(){
@@ -134,30 +146,30 @@ void eraseflash(){
     sendresponse(0xfb);
 }
 
-void setshapecmd(uint8_t (*getc)(void)){
+void setshapecmd(){
     direct_setshape(getc(), getc(), getc(), getc(), getc());
 }
 
-void setbrightnesscmd(uint8_t (*getc)(void)){
+void setbrightnesscmd(){
     setbrightness(getc());
 }
 
 void runcc(){
-    uint32_t count = ugetc();
-    uputc(0xf8);
-    uputc(count);
+    uint32_t count = getc();
+    putc(0xf8);
+    putc(count);
     for(uint8_t i=0;i<count;i++){
-        uint8_t c = ugetc();
+        uint8_t c = getc();
         code[i] = c;
-        uputc(c);
+        putc(c);
     }
-    uputc(0xed);
+    putc(0xed);
     vm_runcc((uint32_t)code);
 }
 
 void rsendcmd(){
-    uint32_t count = ugetc();
-    for(uint8_t i=0;i<count;i++) rsend(ugetc());
+    uint32_t count = getc();
+    for(uint8_t i=0;i<count;i++) rsend(getc());
 }
 
 
@@ -167,6 +179,8 @@ void pollcmd(){
 }
 
 void serial_dispatch(uint8_t c){
+	usb_comms = 1;
+	pollinhibit = 40;  // about 2 seconds
     if(c==0xff) ping();
     else if(c==0xfe) readmemory();
     else if(c==0xfd) writememory();
@@ -175,18 +189,21 @@ void serial_dispatch(uint8_t c){
     else if(c==0xfa) vm_start(OP_ONSTART);
     else if(c==0xf9) vm_stop();
     else if(c==0xf8) runcc();
-    else if(c==0xf7) setshapecmd(ugetc);
-    else if(c==0xf6) setbrightnesscmd(ugetc);
+    else if(c==0xf7) setshapecmd();
+    else if(c==0xf6) setbrightnesscmd();
     else if(c==0xf5) pollcmd();
     else if(c==0xf4) rsendcmd();
-    else uputc(c);
+    else putc(c);
+	usb_comms = 0;
 }
 
 void ble_dispatch(uint8_t c){
+	ble_comms = 1;
     pollinhibit = 1000000;
-    if(c==0xf7) setshapecmd(ble_getc);
-    else if(c==0xf6) setbrightnesscmd(ble_getc);
-    else if(c==0xf5) ble_io_state();
+    if(c==0xf7) setshapecmd();
+    else if(c==0xf6) setbrightnesscmd();
+    else if(c==0xf5) send_io_state();
+	ble_comms = 0;
 }
 
 int main() {
