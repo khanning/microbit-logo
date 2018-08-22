@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include "MicroBit.h"
 #include "MicroBitTicker.h"
+#include "MicroBitUARTService.h"
 #include "vm.h"
 
 
@@ -19,6 +20,7 @@ MicroBitRadio radio;
 
 extern MicroBitStorage flash;
 extern MicroBitSerial pc;
+extern MicroBitUARTService *ble_uart;
 
 void putc(uint8_t);
 void usb_putc(uint8_t);
@@ -513,7 +515,7 @@ void putc16(int32_t n){
   putc((n>>8)&0xff);
 }
 
-void send_io_state(){
+void usb_io_state(){
   putc(0xf5);
   putc(11);
   putc(buttona.isPressed());
@@ -524,6 +526,26 @@ void send_io_state(){
   putc16(accz());
   putc16(accmag());
   putc(0xed);
+}
+
+void write16(uint8_t* addr, int32_t n){
+  addr[0]=(uint8_t)(n&0xff);
+  addr[1]=(uint8_t)((n>>8)&0xff);
+}
+
+void ble_io_state(){
+  uint8_t buf[14];
+  buf[0] = 0xf5;
+  buf[1] = 11;
+  buf[2] = buttona.isPressed();
+  buf[3] = buttonb.isPressed();
+  buf[4] = pollrecv; pollrecv=-1;
+  write16(&buf[5], accx());
+  write16(&buf[7], accy());
+  write16(&buf[9], accz());
+  write16(&buf[11], accmag());
+  buf[13]= 0xed;
+  ble_uart->send(buf,14,ASYNC);
 }
 
 void(*libprims[])() = {

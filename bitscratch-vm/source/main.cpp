@@ -30,7 +30,8 @@ void dev_poll(void);
 void print(int32_t);
 int rpeek(void);
 void rsend(uint8_t);
-void send_io_state(void);
+void usb_io_state(void);
+void ble_io_state(void);
 extern int btna_evt, btnb_evt, btnab_evt, radio_evt;
 extern volatile int32_t ticks;
 extern int pollinhibit;
@@ -175,7 +176,7 @@ void rsendcmd(){
 
 void pollcmd(){
     vm_stop();
-    send_io_state();
+    usb_io_state();
 }
 
 void serial_dispatch(uint8_t c){
@@ -202,7 +203,7 @@ void ble_dispatch(uint8_t c){
     pollinhibit = 1000000;
     if(c==0xf7) setshapecmd();
     else if(c==0xf6) setbrightnesscmd();
-    else if(c==0xf5) send_io_state();
+    else if(c==0xf5) ble_io_state();
 	ble_comms = 0;
 }
 
