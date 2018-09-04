@@ -59,17 +59,21 @@ int pollrecv=-1;
 int pollinhibit = 0;
 
 
-void lib_init(){
-  microbit_seed_random();
-  radio.enable();
-  display.setDisplayMode(DISPLAY_MODE_BLACK_AND_WHITE);
-  display.setBrightness(100);
+void boot_flash(){
   direct_setshape(0x00,0x00,0x04,0x00,0x00); mwait(50);
   direct_setshape(0x00,0x0e,0x04,0x0e,0x00); mwait(50);
   direct_setshape(0x1f,0x11,0x11,0x11,0x1f); mwait(50);
   direct_setshape(0x00,0x0e,0x00,0x0e,0x00); mwait(50);
   direct_setshape(0x00,0x00,0x04,0x00,0x00); mwait(50);
   clear();
+}
+
+void lib_init(){
+  microbit_seed_random();
+  radio.enable();
+  display.setDisplayMode(DISPLAY_MODE_BLACK_AND_WHITE);
+  display.setBrightness(100);
+  boot_flash();
 }
 
 void evt_poll(){

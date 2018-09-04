@@ -17,6 +17,7 @@ MicroBitUARTService *ble_uart;
 void lib_init(void);
 void direct_setshape(uint8_t,uint8_t,uint8_t,uint8_t,uint8_t);
 void setbrightness(int32_t);
+void boot_flash(void);
 
 void vm_start(uint8_t);
 void vm_run(void);
@@ -204,6 +205,7 @@ void ble_dispatch(uint8_t c){
     if(c==0xf7) setshapecmd();
     else if(c==0xf6) setbrightnesscmd();
     else if(c==0xf5) ble_io_state();
+    else if(c==0xf3) boot_flash();
 	ble_comms = 0;
 }
 
