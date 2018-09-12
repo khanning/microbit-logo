@@ -199,10 +199,21 @@ void serial_dispatch(uint8_t c){
 	usb_comms = 0;
 }
 
+void ble_ping(){
+  uint8_t buf[5];
+  buf[0] = 0xff;
+  buf[1] = 2;
+  buf[2] = MAJOR_VERSION;
+  buf[3] = MINOR_VERSION;
+  buf[4] = 0xed;
+  ble_uart->send(buf,5,ASYNC);
+}
+
 void ble_dispatch(uint8_t c){
 	ble_comms = 1;
     pollinhibit = 1000000;
-    if(c==0xf7) setshapecmd();
+    if(c==0xff) ble_ping();
+    else if(c==0xf7) setshapecmd();
     else if(c==0xf6) setbrightnesscmd();
     else if(c==0xf5) ble_io_state();
     else if(c==0xf3) boot_flash();
