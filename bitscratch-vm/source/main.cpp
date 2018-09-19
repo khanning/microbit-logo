@@ -5,6 +5,8 @@
 #define MAJOR_VERSION 2
 #define MINOR_VERSION 0
 
+#define SIGNATURE 0x32000
+
 MicroBitSerial usb_uart(USBTX, USBRX, 200);
 MicroBitStorage storage;
 MicroBitFlash flash;
@@ -148,6 +150,15 @@ void eraseflash(){
     sendresponse(0xfb);
 }
 
+void write_sig(){
+    uint8_t buf[8];
+    int i;
+    for(i=0;i<8;i++) buf[i] = getc();
+    flash.erase_page((uint32_t*)SIGNATURE);
+    flash.flash_write((uint32_t*)SIGNATURE, (uint32_t*)buf, 8);
+}
+
+
 void setshapecmd(){
     direct_setshape(getc(), getc(), getc(), getc(), getc());
 }
@@ -209,6 +220,17 @@ void ble_ping(){
   ble_uart->send(buf,5,ASYNC);
 }
 
+void ble_sendsig(){
+  uint8_t *src =  (uint8_t*)SIGNATURE; 
+  uint8_t buf[11];
+  buf[0] = 0xf1;
+  buf[1] = 8;
+  buf[2]=src[0]; buf[3]=src[1]; buf[4]=src[2]; buf[5]=src[3];
+  buf[6]=src[4]; buf[7]=src[5]; buf[8]=src[6]; buf[9]=src[7];
+  buf[10] = 0xed;
+  ble_uart->send(buf,11,ASYNC);
+}
+
 void ble_dispatch(uint8_t c){
 	ble_comms = 1;
     pollinhibit = 1000000;
@@ -217,6 +239,8 @@ void ble_dispatch(uint8_t c){
     else if(c==0xf6) setbrightnesscmd();
     else if(c==0xf5) ble_io_state();
     else if(c==0xf3) boot_flash();
+    else if(c==0xf2) write_sig();
+    else if(c==0xf1) ble_sendsig();
 	ble_comms = 0;
 }
 
