@@ -208,7 +208,7 @@ extern uint32_t __etext;
 // Enable/Disable BLE pairing mode mode at power up.
 // Set '1' to enable.
 #ifndef MICROBIT_BLE_PAIRING_MODE
-#define MICROBIT_BLE_PAIRING_MODE               1
+#define MICROBIT_BLE_PAIRING_MODE               0
 #endif
 
 // Enable/Disable the use of private resolvable addresses.
@@ -222,7 +222,7 @@ extern uint32_t __etext;
 // Open BLE links are not secure, but commonly used during the development of BLE services
 // Set '1' to disable all secuity
 #ifndef MICROBIT_BLE_OPEN
-#define MICROBIT_BLE_OPEN                       0
+#define MICROBIT_BLE_OPEN                       1
 #endif
 
 // Configure for open BLE operation if so configured
@@ -248,7 +248,7 @@ extern uint32_t __etext;
 // If enabled, the micro:bit will only respond to connection requests from
 // known, bonded devices.
 #ifndef MICROBIT_BLE_WHITELIST
-#define MICROBIT_BLE_WHITELIST                  1
+#define MICROBIT_BLE_WHITELIST                  0
 #endif
 
 // Define the period of time for which the BLE stack will advertise (seconds)
@@ -274,7 +274,7 @@ extern uint32_t __etext;
 // This allows over the air programming during normal operation.
 // Set '1' to enable.
 #ifndef MICROBIT_BLE_DFU_SERVICE
-#define MICROBIT_BLE_DFU_SERVICE                1
+#define MICROBIT_BLE_DFU_SERVICE                0
 #endif
 
 // Enable/Disable availability of Eddystone URL APIs
@@ -293,7 +293,7 @@ extern uint32_t __etext;
 // This allows routing of events from the micro:bit message bus over BLE.
 // Set '1' to enable.
 #ifndef MICROBIT_BLE_EVENT_SERVICE
-#define MICROBIT_BLE_EVENT_SERVICE              1
+#define MICROBIT_BLE_EVENT_SERVICE              0
 #endif
 
 // Enable/Disable BLE Service: MicroBitDeviceInformationService

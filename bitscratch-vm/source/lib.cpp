@@ -13,7 +13,8 @@ MicroBitDisplay display;
 MicroBitButton buttona(MICROBIT_PIN_BUTTON_A, MICROBIT_ID_BUTTON_A);
 MicroBitButton buttonb(MICROBIT_PIN_BUTTON_B, MICROBIT_ID_BUTTON_B);
 MicroBitI2C i2c = MicroBitI2C(I2C_SDA0, I2C_SCL0);
-MicroBitAccelerometer acc = MicroBitAccelerometer(i2c);
+//MicroBitAccelerometer acc = MicroBitAccelerometer(i2c);
+MicroBitAccelerometer *acc;
 MicroBitFont ramshapefont((const unsigned char*)directshape, 32+2);
 MicroBitTicker ticker;
 MicroBitRadio radio;
@@ -69,6 +70,7 @@ void boot_flash(){
 }
 
 void lib_init(){
+  acc = &MicroBitAccelerometer::autoDetect(i2c);  
   microbit_seed_random();
   radio.enable();
   display.setDisplayMode(DISPLAY_MODE_BLACK_AND_WHITE);
@@ -101,9 +103,9 @@ void evt_poll(){
 void dev_poll(){
   if(ticks==lastticks) return;
   lastticks = ticks;
-  int16_t x = acc.getX();
-  int16_t y = acc.getY();
-  int16_t z = acc.getZ();
+  int16_t x = acc->getX();
+  int16_t y = acc->getY();
+  int16_t z = acc->getZ();
   float acc = sqrt((float)(x*x+y*y+z*z));
   xbuf[pollphase] = x;
   ybuf[pollphase] = y;
