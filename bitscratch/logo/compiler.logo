@@ -364,6 +364,6 @@ to compiler-startup
 make "startaddr 64
 make "proc-addr $30000
 make "font-addr $31000
-make "ram $20003700
+make "ram $20003800
 setup
 end

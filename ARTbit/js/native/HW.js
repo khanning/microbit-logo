@@ -20,7 +20,7 @@
  
 HW = function(){}
 
-HW.requiredFW = "1.13";
+HW.requiredFW = "2.1";
 HW.compiler = new Compiler();
 HW.comms = new Comms();
 

@@ -21,7 +21,7 @@
 class Comms{
 
 constructor(){
-	this.RAM = 0x20003700
+	this.RAM = 0x20003800
 	this.FONT = 0x31000;
 	this.PROCS = 0x30000;
 	this.serialID = undefined;

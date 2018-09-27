@@ -267,7 +267,7 @@ void prim_step(){
 }
 
 void eol_step(){
-    int32_t boxindex = *(sp-6);
+    int32_t boxindex = (*(sp-6))/100;
     int32_t delta = *(sp-5);
     int32_t to = *(sp-4);
     uint8_t *newip = (uint8_t*)(*(sp-3));
