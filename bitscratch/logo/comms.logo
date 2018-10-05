@@ -69,16 +69,23 @@ sendl (se $fd
 ignore get-packet
 end
 
-to flash-write :src :dst :count
+to flash-write :dst :l
+loop
+ [if empty? :l [stop]
+  flash-write-chunk :dst first128 :l
+  make "l bf128 :l
+  make "dst :dst + 128]
+end
+
+to flash-write-chunk :dst :l
 clearcom
 sendl (se $fc
-         byte0 :src byte1 :src
-         byte2 :src byte3 :src
          byte0 :dst byte1 :dst
          byte2 :dst byte3 :dst
-         byte0 :count byte1 :count)
-if empty? get-packet [print se [flash write error] hw :dst stopme]
+         count :l :l)
+if empty? get-packet [print se [flash write-chunk error] hw :dst stopme]
 end
+
 
 to erp :addr
 clearcom
@@ -120,26 +127,17 @@ send $f6
 output (se recc recc recc recc16 recc16 recc16 recc16)
 end
 
-to first32 :l
-if (count :l) < 32 [output :l]
+to first128 :l
+if (count :l) < 128 [output :l]
 let [res []]
-dotimes [i 32][make "res se :res nth :i :l]
+dotimes [i 128][make "res se :res nth :i :l]
 output :res
 end
 
-to bf32 :l
-if (count :l) < 32 [output []]
-repeat 32 [make "l bf :l]
+to bf128 :l
+if (count :l) < 128 [output []]
+repeat 128 [make "l bf :l]
 output :l
-end
-
-to bytes-to-words :l
-let [res []]
-if (remainder (count :l) 2) = 1 [make "l se :l $ff]
-loop
- [if empty? :l [output :res]
-  make "res se :res (nth 0 :l) + 256 * nth 1 :l
-  make "l bf bf :l]
 end
 
 to recc16

@@ -74,6 +74,11 @@ uint8_t getc(){
 	return 0;
 }
 
+void send(uint8_t * buf, int len){
+    if(usb_comms) usb_uart.send(buf, len);
+    else if(ble_comms) ble_uart->send(buf,len,ASYNC);
+}
+
 void init(){
     usb_uart.baud(19200);
     scheduler_init(messageBus);
@@ -99,18 +104,23 @@ uint32_t read32(){
 }
 
 void sendresponse(uint8_t resp){
-    putc(resp);
-    putc(0);
-    putc(0xed);
+  uint8_t buf[3];
+  buf[0] = resp;
+  buf[1] = 0;
+  buf[2] = 0xed;
+  send(buf,3);
 }
 
 void ping(){
-    putc(0xff);
-    putc(2);
-    putc(MAJOR_VERSION);
-    putc(MINOR_VERSION);
-    putc(0xed);
+  uint8_t buf[5];
+  buf[0] = 0xff;
+  buf[1] = 2;
+  buf[2] = MAJOR_VERSION;
+  buf[3] = MINOR_VERSION;
+  buf[4] = 0xed;
+  send(buf,5);
 }
+
 
 void readmemory(){
     uint32_t addr = read32();
@@ -137,10 +147,15 @@ void writememory(){
 }
 
 void writeflash(){
-    uint32_t src = read32();
+    uint32_t i;
     uint32_t dst = read32();
-    uint32_t count = read16();
-    flash.flash_write((uint32_t*)dst, (uint32_t*)src, (int)count);
+    uint32_t count = getc();
+//    int32_t end = now()+100;
+    for(i=0;i<count;i++){
+        code[i]=getc();
+    }
+    flash.flash_write((uint32_t*)dst, (uint32_t*)code, (int)count);    
+//    while(now()<end){i++;};
     sendresponse(0xfc);
 }
 
@@ -234,7 +249,9 @@ void ble_sendsig(){
 void ble_dispatch(uint8_t c){
 	ble_comms = 1;
     pollinhibit = 1000000;
-    if(c==0xff) ble_ping();
+    if(c==0xff) ping();
+    else if(c==0xfc) writeflash();
+    else if(c==0xfb) eraseflash();
     else if(c==0xf7) setshapecmd();
     else if(c==0xf6) setbrightnesscmd();
     else if(c==0xf5) ble_io_state();

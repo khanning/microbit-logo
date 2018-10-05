@@ -5,10 +5,9 @@
 to cdl
 let [res compile-file "test.txt]
 dumpl :res
-wl :ram :res erp :proc-addr
-flash-write :ram :proc-addr count :res
-wl :ram :shapes erp :font-addr
-flash-write :ram :font-addr count :shapes
+erp :proc-addr erp :proc-addr
+flash-write :proc-addr :res
+flash-write :font-addr :shapes
 end
 
 to \ :line
