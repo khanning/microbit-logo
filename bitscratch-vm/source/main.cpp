@@ -11,6 +11,7 @@ MicroBitSerial usb_uart(USBTX, USBRX, 200);
 MicroBitStorage storage;
 MicroBitFlash flash;
 MicroBitMessageBus messageBus;
+extern MicroBitRadio radio;
 
 MicroBitBLEManager bleManager(storage);
 BLEDevice ble;
@@ -48,7 +49,7 @@ void prs(uint8_t*);
 #define OP_ONFLAG 0xF0
 
 uint8_t code[128];
-int usb_comms=0, ble_comms=0;
+int usb_comms=0, ble_comms=0, ble_connected=0;
 
 uint8_t usb_getc(){return usb_uart.read(SYNC_SPINWAIT);}
 int ugetcAsync(){return usb_uart.read(ASYNC);}
@@ -87,6 +88,14 @@ void init(){
     ManagedString BLESerial("00003");
     bleManager.init(BLEName, BLESerial, messageBus, false);
     ble_uart = new MicroBitUARTService(ble, 32, 32);
+}
+
+void radio_switch(){
+    if(ble_connected) return;
+    if(ble_uart==0) return;
+    ble_uart=0; 
+    ble.shutdown(); 
+    radio.enable();
 }
 
 uint32_t read16(){
@@ -209,6 +218,7 @@ void pollcmd(){
 void serial_dispatch(uint8_t c){
 	usb_comms = 1;
 	pollinhibit = 40;  // about 2 seconds
+    radio_switch();
     if(c==0xff) ping();
     else if(c==0xfe) readmemory();
     else if(c==0xfd) writememory();
@@ -248,7 +258,7 @@ void ble_sendsig(){
 
 void ble_dispatch(uint8_t c){
 	ble_comms = 1;
-    pollinhibit = 1000000;
+    pollinhibit = 40;  // about 2 seconds
     if(c==0xff) ping();
     else if(c==0xfc) writeflash();
     else if(c==0xfb) eraseflash();
@@ -271,14 +281,16 @@ int main() {
         while(now()<end){
             int c = ugetcAsync();
             if (c!=MICROBIT_NO_DATA) serial_dispatch((uint8_t)c);
-            c = ble_uart->getc(ASYNC);
-            if (c!=MICROBIT_NO_DATA) ble_dispatch(c);
+            if(ble_uart){
+                c = ble_uart->getc(ASYNC);
+                if (c!=MICROBIT_NO_DATA) ble_dispatch(c);
+            }
             dev_poll();
         }
         evt_poll();
-        if(btna_evt){btna_evt=0; vm_run_toggle(OP_ONBUTTONA);}
-        if(btnb_evt){btnb_evt=0; vm_run_toggle(OP_ONBUTTONB);}
-        if(btnab_evt){btnab_evt=0; vm_run_toggle(OP_ONBUTTONAB);}
+        if(btna_evt){radio_switch(); btna_evt=0; vm_run_toggle(OP_ONBUTTONA);}
+        if(btnb_evt){radio_switch(); btnb_evt=0; vm_run_toggle(OP_ONBUTTONB);}
+        if(btnab_evt){radio_switch(); btnab_evt=0; vm_run_toggle(OP_ONBUTTONAB);}
         if(radio_evt){
             radio_evt=0;
             vm_start(OP_ONRECEIVE);

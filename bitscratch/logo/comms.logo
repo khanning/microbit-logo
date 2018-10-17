@@ -48,6 +48,23 @@ repeat :len / 16
   make "addr :addr + 16]
 end
 
+to dumpheap :start :end
+let [w 0 l 0]
+loop 
+ [if not :start < :end [print hw :start stop]
+  make "w rw :start
+  make "l logand :w $ffff
+  ifelse :w < 10000 
+   [print se hw :start :l]
+   [print (se hw :start  :l "f) ]
+  make "start :start + 4 * :l]
+end
+
+to rw :addr
+let [l rl :addr 4]
+output (nth 0 :l) + (lsh nth 1 :l 8) + (lsh nth 2 :l 16) + (lsh nth 3 :l 24) 
+end
+
 to rl :addr :count
 let [res []]
 clearcom
