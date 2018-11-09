@@ -49,7 +49,7 @@ void prs(uint8_t*);
 #define OP_ONFLAG 0xF0
 
 uint8_t code[128];
-int usb_comms=0, ble_comms=0, ble_connected=0;
+int usb_comms=0, ble_comms=0;
 
 uint8_t usb_getc(){return usb_uart.read(SYNC_SPINWAIT);}
 int ugetcAsync(){return usb_uart.read(ASYNC);}
@@ -91,11 +91,12 @@ void init(){
 }
 
 void radio_switch(){
-    if(ble_connected) return;
+/*
     if(ble_uart==0) return;
     ble_uart=0; 
     ble.shutdown(); 
     radio.enable();
+*/
 }
 
 uint32_t read16(){
