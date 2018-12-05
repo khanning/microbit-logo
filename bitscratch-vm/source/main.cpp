@@ -7,6 +7,8 @@
 
 #define SIGNATURE 0x32000
 
+void resetPatch(void);
+
 MicroBitSerial usb_uart(USBTX, USBRX, 200);
 MicroBitStorage storage;
 MicroBitFlash flash;
@@ -273,6 +275,7 @@ void ble_dispatch(uint8_t c){
 }
 
 int main() {
+    resetPatch();
     init();
     lib_init();
     prs((uint8_t*)"starting...");
