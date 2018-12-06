@@ -3,7 +3,7 @@
 #include "MicroBitFlash.h"
 
 #define MAJOR_VERSION 2
-#define MINOR_VERSION 1
+#define MINOR_VERSION 2
 
 #define SIGNATURE 0x32000
 
