@@ -3,7 +3,7 @@
 #include "MicroBitFlash.h"
 
 #define MAJOR_VERSION 2
-#define MINOR_VERSION 2
+#define MINOR_VERSION 3
 
 #define SIGNATURE 0x32000
 
@@ -125,6 +125,7 @@ void sendresponse(uint8_t resp){
 
 void ping(){
   uint8_t buf[5];
+  vm_stop();
   buf[0] = 0xff;
   buf[1] = 2;
   buf[2] = MAJOR_VERSION;
@@ -236,16 +237,6 @@ void serial_dispatch(uint8_t c){
     else if(c==0xf4) rsendcmd();
     else putc(c);
 	usb_comms = 0;
-}
-
-void ble_ping(){
-  uint8_t buf[5];
-  buf[0] = 0xff;
-  buf[1] = 2;
-  buf[2] = MAJOR_VERSION;
-  buf[3] = MINOR_VERSION;
-  buf[4] = 0xed;
-  ble_uart->send(buf,5,ASYNC);
 }
 
 void ble_sendsig(){
